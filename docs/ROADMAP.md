@@ -17,6 +17,9 @@ when its contract can be stated. Order is intent, not promise.
 - **`camber new app`.** The quickstart IS a scaffold: one command pours
   a running cambered app (shell, first component, gate.sh, ratchet.toml,
   AGENTS.md). The README quickstart then fits in five lines.
+- **`camber new demo`.** Pit Board as a scaffold, not a package payload:
+  extras deliver dependencies, only a pour delivers code. The demo
+  arrives editable, which is what a demo is for.
 - **OC-150/151** as specced: orphan CSS selectors, registry patterns.
 - **Deployment doc.** The boring truth: uvicorn workers behind a
   reverse proxy, one container, fragment-cache headers. Publish it so

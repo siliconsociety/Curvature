@@ -13,7 +13,7 @@ import math
 import sys
 from pathlib import Path
 
-from camber.gate import checks
+from camber.gate import checks, scaffold
 from camber.gate.findings import Finding, walk_source
 from camber.gate.ratchet import load, save
 
@@ -96,6 +96,18 @@ def command_ratchet(root: Path, grandfather: list[str]) -> int:
     return 0
 
 
+def command_new(root: Path, path: str) -> int:
+    try:
+        created = scaffold.new_component(root, path)
+    except (ValueError, FileExistsError) as error:
+        print(error)
+        return 1
+    for file in created:
+        print(f"poured {file.relative_to(root)}")
+    print("declare the Props, fill the markup, run ./gate.sh")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="camber", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -107,7 +119,12 @@ def main(argv: list[str] | None = None) -> int:
         "--grandfather", action="append", default=[], metavar="PATH",
         help="pin an over-ceiling file at its current size (adoption only)",
     )
+    new = sub.add_parser("new", help="scaffold: camber new component <dir/name>")
+    new.add_argument("kind", choices=["component"])
+    new.add_argument("path", help="e.g. demo/components/lap_counter")
     args = parser.parse_args(argv)
+    if args.command == "new":
+        return command_new(Path.cwd(), args.path)
     root = Path(args.root).resolve()
     if args.command == "check":
         return command_check(root)

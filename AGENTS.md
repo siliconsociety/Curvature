@@ -27,7 +27,9 @@ message; it tells you the fix.
 
 ## How to add a component
 
-1. Create `components/<name>.py` (its CSS, if any, lives beside it).
+1. `uv run camber new component <dir>/components/<name>` — the scaffold
+   pours the file pair (component + test) already on-camber. Its CSS, if
+   any, lives beside it.
 2. Define the interface first — a `Props` model:
 
 ```python

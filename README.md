@@ -11,11 +11,11 @@ Camber's design center is the maintainer nobody watches: the coding
 agent in its forty-third session, at 2 a.m., doing whatever the shape of
 the code suggests. Frameworks built for humans enforce their discipline
 through culture. Camber's discipline is machine-checked — every
-invariant in [SPEC.md](SPEC.md) names the check that enforces it, and
+invariant in [SPEC.md](https://github.com/siliconsociety/Camber/blob/main/SPEC.md) names the check that enforces it, and
 violations are reported by `camber check` as **off-camber findings**.
-The canonical documentation is [AGENTS.md](AGENTS.md); this README is
+The canonical documentation is [AGENTS.md](https://github.com/siliconsociety/Camber/blob/main/AGENTS.md); this README is
 the courtesy translation. The argument for all of it is the
-[MANIFESTO](MANIFESTO.md).
+[MANIFESTO](https://github.com/siliconsociety/Camber/blob/main/MANIFESTO.md).
 
 ## The shape of it
 
@@ -67,10 +67,10 @@ the directory and ask for a feature — the repo is the prompt.
 
 ## The demo
 
-From a checkout of the source repo (PyPI ships the framework; the repo
-ships Pit Board, the demo):
+PyPI ships the framework; the repo ships Pit Board, the demo:
 
 ```bash
+git clone https://github.com/siliconsociety/Camber && cd Camber
 uv sync && ./gate.sh
 uv run uvicorn demo.app:app --reload   # Pit Board
 ```

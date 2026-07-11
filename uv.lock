@@ -36,10 +36,6 @@ wheels = [
 name = "camber"
 version = "0.1.0"
 source = { editable = "." }
-dependencies = [
-    { name = "pydantic" },
-    { name = "starlette" },
-]
 
 [package.optional-dependencies]
 fastapi = [
@@ -61,9 +57,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = ">=0.115" },
-    { name = "pydantic", specifier = ">=2.11" },
     { name = "python-multipart", marker = "extra == 'fastapi'", specifier = ">=0.0.20" },
-    { name = "starlette", specifier = ">=0.47" },
 ]
 provides-extras = ["fastapi"]
 

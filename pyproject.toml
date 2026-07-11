@@ -10,6 +10,11 @@ authors = [
 ]
 requires-python = ">=3.14"
 keywords = ["web", "framework", "agents", "progressive-enhancement", "server-rendered", "htmx-alternative"]
+
+[project.urls]
+Homepage = "https://github.com/siliconsociety/Camber"
+Repository = "https://github.com/siliconsociety/Camber"
+Issues = "https://github.com/siliconsociety/Camber/issues"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

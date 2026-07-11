@@ -1,0 +1,194 @@
+/* Tarmac — the poured surface. Tokens first, then the few shapes the
+ * demo needs. Everything themes from these custom properties. */
+
+:root {
+  --tarmac: #f6f5f2;
+  --ink: #1c1b19;
+  --ink-soft: #6d6a63;
+  --line: #dcd9d2;
+  --card: #ffffff;
+  --signal: #e8590c;      /* safety orange */
+  --signal-ink: #ffffff;
+  --go: #2f9e44;
+  --radius: 10px;
+  --pace: 160ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tarmac: #161513;
+    --ink: #ece9e2;
+    --ink-soft: #98948a;
+    --line: #2e2c28;
+    --card: #201f1c;
+    --signal: #ff7a2f;
+    --signal-ink: #161513;
+    --go: #51cf66;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--tarmac);
+  color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+header {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 3rem 1.25rem 0;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.01em;
+}
+
+header h1::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 4px;
+  margin-top: 0.4rem;
+  background: var(--signal);
+  border-radius: 2px;
+}
+
+header p {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+/* The add form */
+
+.add-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-form input[type="text"] {
+  flex: 1;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.add-form input[type="text"]:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 1px;
+}
+
+.add {
+  padding: 0.65rem 1.1rem;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--signal);
+  color: var(--signal-ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--pace);
+}
+
+.add:active { transform: translateY(1px); }
+
+/* Filters — real links wearing a segmented control */
+
+.filters {
+  display: flex;
+  gap: 0.25rem;
+  margin: 1.25rem 0 0.75rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.6rem;
+}
+
+.filter {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: background var(--pace), color var(--pace);
+}
+
+.filter:hover { color: var(--ink); }
+
+.filter.current {
+  background: var(--ink);
+  color: var(--tarmac);
+}
+
+/* The laps */
+
+.laps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.lap-toggle-form { display: flex; }
+
+/* The one custom control: a pit light, poured from a real button */
+
+.lap-toggle {
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 2px solid var(--ink-soft);
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color var(--pace), background var(--pace), color var(--pace);
+}
+
+.lap-toggle:hover { border-color: var(--go); }
+
+.lap.done .lap-toggle {
+  border-color: var(--go);
+  background: var(--go);
+  color: var(--tarmac);
+}
+
+.lap-title { flex: 1; }
+
+.lap.done .lap-title {
+  color: var(--ink-soft);
+  text-decoration: line-through;
+  text-decoration-color: var(--go);
+}
+
+.empty {
+  margin: 1.5rem 0;
+  color: var(--ink-soft);
+  font-style: italic;
+}

@@ -1,0 +1,14 @@
+# __CAMBER_TITLE__
+
+A cambered app. Three commands:
+
+```bash
+./gate.sh    # ruff + pytest + camber check; green means done
+./run.sh     # http://127.0.0.1:8000
+uv run camber new component app/components/<name>   # grow it
+```
+
+Working with an agent? Point it at this directory — AGENTS.md is its
+onboarding, the gate is its reviewer. No uv? `python -m venv .venv &&
+. .venv/bin/activate && pip install -e . --group dev`, then swap `uv run`
+for direct commands. Then install uv anyway.

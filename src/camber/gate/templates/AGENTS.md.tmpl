@@ -1,0 +1,56 @@
+# AGENTS.md — your onboarding
+
+You are maintaining __CAMBER_TITLE__, a Camber app. This file is the
+documentation; everything else is enforced, not remembered.
+
+## The one command
+
+```bash
+./gate.sh        # ruff + pytest with coverage + camber check
+```
+
+Green means done. Red means not done. `camber check` findings are
+called off-camber; each names the invariant it serves and the message
+tells you the fix. If a finding seems wrong, stop and say so — never
+route around the gate.
+
+## Recipes
+
+**Component**: `uv run camber new component app/components/<name>` —
+pours the file pair (component + test) already on-camber. Declare the
+Props model first; the component is a pure function of it. Its CSS
+lives beside it.
+
+**Route**: reads render, writes redirect. No exceptions you can grant
+yourself.
+
+```python
+@app.get("/things")
+async def things(request: Request):
+    return respond(request, thing_list(props), shell=shell)
+
+@app.post("/things")
+async def create_thing(name: Annotated[str, Form()]):
+    store.add(name.strip())
+    return redirect("/things")
+```
+
+Every fragment root carries an id. Forms are real forms, links are real
+links — the constructors refuse anything else.
+
+## The four nevers
+
+1. Never write JavaScript. The boost layer is complete; behavior
+   belongs on the server or in native HTML.
+2. Never edit ratchet.toml. `uv run camber ratchet` is the only hand on
+   the mechanism.
+3. Never bypass the gate — no skipped tests, no weakened assertions.
+4. Never add a template language, bundler, client state store, or
+   plugin registry.
+
+## When you finish
+
+Run ./gate.sh. If green and coverage rose, run `uv run camber ratchet`
+and include the tightened file in your change. Report what you built,
+what the gate said, and every shortcut, doubt, or failed attempt that
+shaped the result.

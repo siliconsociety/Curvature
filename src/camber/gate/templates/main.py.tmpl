@@ -1,0 +1,25 @@
+"""__CAMBER_TITLE__ — assembled the cambered way.
+
+Reads render through respond(); writes go POST -> redirect -> GET.
+Run it: ./run.sh
+"""
+
+from pathlib import Path
+
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+
+import camber
+from camber import respond
+
+from app.components.shell import shell
+from app.components.welcome import WelcomeProps, welcome
+
+app = FastAPI(title="__CAMBER_TITLE__")
+app.mount("/static/lib", StaticFiles(directory=Path(camber.__file__).parent / "static"))
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"))
+
+
+@app.get("/")
+async def index(request: Request):
+    return respond(request, welcome(WelcomeProps(app_name="__CAMBER_TITLE__")), shell=shell)

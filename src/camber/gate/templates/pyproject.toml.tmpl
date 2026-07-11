@@ -1,0 +1,27 @@
+[project]
+name = "__CAMBER_NAME__"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "camber[fastapi]",
+    "uvicorn",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "httpx",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true

@@ -48,17 +48,34 @@ def lap(props: LapProps) -> Element:
   10,000-line file is never written because week two's gate refuses the
   sediment while the split is still cheap.
 
-## Try it
+## Start from nothing
+
+```bash
+uvx camber new app pitstop     # no install, no venv, no Python even — uv brings it
+cd pitstop
+./gate.sh                      # green before you write a line
+./run.sh                       # http://127.0.0.1:8000
+```
+
+Only have pip? `pip install camber && python -m camber new app pitstop`
+— the `python -m` form dodges PATH entirely; the poured README carries
+the rest of the old ritual. (Until Camber reaches PyPI, clone this repo
+and use `uv run camber new app` from inside it.)
+
+Onboarding an agent takes zero steps: the scaffold poured AGENTS.md,
+the gate, and one example component as the pattern. Point your agent at
+the directory and ask for a feature — the repo is the prompt.
+
+## The demo
 
 ```bash
 git clone <this repo> && cd Camber
-uv sync
-./gate.sh                              # ruff + pytest + camber check
-uv run uvicorn demo.app:app --reload   # Pit Board, the demo
+uv sync && ./gate.sh
+uv run uvicorn demo.app:app --reload   # Pit Board
 ```
 
-Then turn JavaScript off and use the demo again. Nothing changes. That
-is the whole point.
+Then turn JavaScript off and use it again. Nothing changes. That is the
+whole point.
 
 ## Status
 

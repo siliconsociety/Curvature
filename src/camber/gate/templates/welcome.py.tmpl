@@ -1,0 +1,19 @@
+"""The example component. Copy its shape, then delete it (test included)."""
+
+from camber import Element, Props
+from camber import html as h
+
+
+class WelcomeProps(Props):
+    """Declare the interface first; the component is a function of it."""
+
+    app_name: str
+
+
+def welcome(props: WelcomeProps) -> Element:
+    return h.section(
+        h.h2(props.app_name + " is on the road"),
+        h.p("Frozen props in, one identified subtree out. That is a component."),
+        h.p("The gate is ./gate.sh — green before you write a line, green after every one."),
+        id="welcome",
+    )

@@ -1,0 +1,19 @@
+"""These tests are the no-JS user: httpx executes no JavaScript, so every
+assertion is a promise about the degraded path."""
+
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+def test_the_page_renders_whole():
+    response = TestClient(app).get("/")
+    assert response.status_code == 200
+    assert response.text.startswith("<!doctype html>")
+    assert 'id="welcome"' in response.text
+
+
+def test_boosted_requests_get_the_fragment():
+    response = TestClient(app).get("/", headers={"Camber-Boost": "1"})
+    assert response.text.startswith('<section id="welcome">')
+    assert "<!doctype html>" not in response.text

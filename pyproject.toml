@@ -11,10 +11,6 @@ authors = [
 requires-python = ">=3.14"
 keywords = ["web", "framework", "agents", "progressive-enhancement", "server-rendered", "htmx-alternative"]
 
-[project.urls]
-Homepage = "https://github.com/siliconsociety/Camber"
-Repository = "https://github.com/siliconsociety/Camber"
-Issues = "https://github.com/siliconsociety/Camber/issues"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -26,6 +22,11 @@ dependencies = [
     "pydantic>=2.11",
     "starlette>=0.47",
 ]
+
+[project.urls]
+Homepage = "https://github.com/siliconsociety/Camber"
+Repository = "https://github.com/siliconsociety/Camber"
+Issues = "https://github.com/siliconsociety/Camber/issues"
 
 [project.optional-dependencies]
 fastapi = ["fastapi>=0.115", "python-multipart>=0.0.20"]

@@ -26,6 +26,10 @@
     for (const root of roots) {
       document.getElementById(root.id).replaceWith(root);
     }
+    for (const root of roots) {
+      const auto = root.querySelector("[autofocus]");
+      if (auto) { auto.focus(); break; }
+    }
     if (push) history.pushState({ camber: true }, "", url);
   };
 

@@ -40,7 +40,7 @@ def lap(props: LapProps) -> Element:
   are POST → redirect → GET through real forms. Your test suite drives
   it with httpx — which executes no JS — so the degraded path is the
   tested path, permanently.
-- **camber.js** (91 lines, the only script) boosts working links and
+- **camber.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
   forms into fragment swaps. Same route, same render, one header of
   difference. Every failure path is real navigation.
 - **The ratchet only tightens.** File ceilings fall, the coverage floor

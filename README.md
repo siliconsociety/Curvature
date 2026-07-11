@@ -59,8 +59,7 @@ cd pitstop
 
 Only have pip? `pip install camber && python -m camber new app pitstop`
 — the `python -m` form dodges PATH entirely; the poured README carries
-the rest of the old ritual. (Until Camber reaches PyPI, clone this repo
-and use `uv run camber new app` from inside it.)
+the rest of the old ritual. 
 
 Onboarding an agent takes zero steps: the scaffold poured AGENTS.md,
 the gate, and one example component as the pattern. Point your agent at
@@ -68,8 +67,10 @@ the directory and ask for a feature — the repo is the prompt.
 
 ## The demo
 
+From a checkout of the source repo (PyPI ships the framework; the repo
+ships Pit Board, the demo):
+
 ```bash
-git clone <this repo> && cd Camber
 uv sync && ./gate.sh
 uv run uvicorn demo.app:app --reload   # Pit Board
 ```

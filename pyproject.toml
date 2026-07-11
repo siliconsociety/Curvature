@@ -4,10 +4,19 @@ version = "0.1.0"
 description = "A web framework for code that agents maintain. Pour the road so the car steers itself."
 readme = "README.md"
 license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Robert Sharp", email = "webmaster@sharpdesigndigital.com" },
 ]
 requires-python = ">=3.14"
+keywords = ["web", "framework", "agents", "progressive-enhancement", "server-rendered", "htmx-alternative"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
 dependencies = [
     "pydantic>=2.11",
     "starlette>=0.47",

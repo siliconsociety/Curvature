@@ -195,7 +195,7 @@ menu = _factory("menu")
 
 def a(*children: Child, href: str, **attrs: AttrValue) -> Element:
     """A real link (C-200). href is required and must go somewhere."""
-    if href == "#" or href.startswith("javascript:"):
+    if href == "#" or href.startswith("javascript:"):  # camber-allow: enforcement
         raise OffCamber(
             f'href={href!r} is off-camber (C-200): a link that goes nowhere '
             "is a button wearing a costume; use a form or a real URL"

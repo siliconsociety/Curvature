@@ -170,6 +170,12 @@ patterns, no module-scope route table mutation outside app assembly) —
 | OC-141 | C-401 | coverage below floor |
 | OC-142 | C-402 | ratchet bound looser than tightest-known |
 
+Token checks (OC-121, OC-130) honor one escape hatch: a line carrying a
+`camber-allow` pragma with a reason. Enforcement code and tests that
+exercise refusals must spell the forbidden words; the pragma keeps them
+buildable while staying greppable — and `camber check` publishes the
+pragma census on every run, so the escape hatch can never go quietly.
+
 A cambered repo is one where `camber check` exits 0 and has *teeth it
 can show*: the finding index above is the minimum. Projects may add
 rules; they may never remove one that has fired.

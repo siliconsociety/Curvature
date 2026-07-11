@@ -8,3 +8,4 @@ htmlcov/
 dist/
 .DS_Store
 .idea/
+coverage.json

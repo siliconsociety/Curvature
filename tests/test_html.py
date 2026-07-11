@@ -59,7 +59,7 @@ def test_anchor_requires_a_real_href():
 
 def test_anchor_refuses_javascript_urls():
     with pytest.raises(OffCamber, match="C-200"):
-        h.a("click", href="javascript:void(0)")
+        h.a("click", href="javascript:void(0)")  # camber-allow: exercises the refusal
 
 
 def test_anchor_href_is_keyword_required():

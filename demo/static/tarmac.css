@@ -181,6 +181,48 @@ main {
 
 .lap-title { flex: 1; }
 
+.edit {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.edit:hover { color: var(--signal); }
+
+.edit-form {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.edit-form input[type="text"] {
+  min-width: 0;
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--signal);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+
+.save,
+.cancel {
+  border: 0;
+  background: none;
+  color: var(--signal);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.cancel { color: var(--ink-soft); }
+
+.save:hover,
+.cancel:hover { color: var(--ink); }
+
 .lap.done .lap-title {
   color: var(--ink-soft);
   text-decoration: line-through;

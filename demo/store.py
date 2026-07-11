@@ -27,6 +27,10 @@ class PitBoard:
         if task_id in self.tasks:
             self.tasks[task_id].done = not self.tasks[task_id].done
 
+    def update_title(self, task_id: int, title: str) -> None:
+        if task_id in self.tasks:
+            self.tasks[task_id].title = title
+
     def visible(self, status: str) -> list[Task]:
         tasks = list(self.tasks.values())
         match status:

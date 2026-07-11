@@ -62,6 +62,36 @@ def test_filter_links_are_real_links(client):
         assert f'href="/?status={status}"' in text
 
 
+def test_edit_link_opens_the_task_in_a_real_form(client):
+    task = board.add("Set tire pressures")
+    text = client.get(f"/tasks/{task.id}/edit?status=open").text
+    assert f'action="/tasks/{task.id}/edit"' in text
+    assert 'name="title" value="Set tire pressures"' in text
+    assert 'name="status" value="open"' in text
+    assert 'href="/?status=open"' in text
+
+
+def test_save_edit_redirects_and_preserves_the_filter(client):
+    task = board.add("Old title")
+    response = client.post(
+        f"/tasks/{task.id}/edit",
+        data={"title": "  New title  ", "status": "done"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers["location"] == "/?status=done"
+    assert board.tasks[task.id].title == "New title"
+
+
+def test_cancel_edit_returns_to_the_current_filter(client):
+    task = board.add("Leave this alone")
+    board.toggle(task.id)
+    response = client.get(f"/tasks/{task.id}/edit?status=done")
+    assert response.status_code == 200
+    assert 'href="/?status=done"' in response.text
+    assert board.tasks[task.id].title == "Leave this alone"
+
+
 def test_unknown_status_falls_back_to_all(client):
     board.add("Visible")
     assert "Visible" in client.get("/?status=nonsense").text

@@ -1,0 +1,51 @@
+[project]
+name = "camber"
+version = "0.1.0"
+description = "A web framework for code that agents maintain. Pour the road so the car steers itself."
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Robert Sharp", email = "webmaster@sharpdesigndigital.com" },
+]
+requires-python = ">=3.14"
+dependencies = [
+    "pydantic>=2.11",
+]
+
+[project.optional-dependencies]
+fastapi = ["fastapi>=0.115", "python-multipart>=0.0.20"]
+
+[project.scripts]
+camber = "camber.gate.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
+    "ruff>=0.14",
+    "fastapi>=0.115",
+    "python-multipart>=0.0.20",
+    "httpx>=0.28",
+    "uvicorn>=0.35",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.11,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["src/camber"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true

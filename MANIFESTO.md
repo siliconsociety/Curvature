@@ -105,12 +105,29 @@ does not have is an artifact that cannot silt up.
 
 ## Who this is for
 
-The builder with an API to ship and an agent crew to manage. Admin panels,
-personal tools, internal apps — the hundred honest interfaces a working
-engineer pours on top of their real work. If you need a design-award
-consumer surface, hire the React team; Camber will happily serve them the
-API. This is the road for everything else — and it is paved for whoever
-maintains it after you stop looking.
+Anyone whose interface is, honestly described, state on a server that
+people read and change. That is admin panels and personal tools — and it
+is also most of the consumer web, which spent fifteen years shipping a
+runtime to every phone to reimplement what the server already knew. The
+industry has begun conceding this quietly: server components arrived in
+the very framework that taught the world to leave the server, carrying
+more machinery and less conviction.
 
-Which, these days, is the whole point. Nobody is looking at week twelve.
-The road has to do it.
+The honest boundary is not scale. It is the latency class of a single
+interaction: rendering happens where the state lives, so work that
+cannot tolerate a round-trip — the 60fps enclave of canvas editors,
+maps, collaborative cursors — belongs on an **island**: a declared,
+fenced, vendored enclave inside a cambered page, with its own budget
+and its own contract (islands doctrine, spec 0.2). Most applications
+are five percent island and ninety-five percent road, and the road is
+faster, cheaper, and testable with JavaScript off.
+
+Heavy traffic is not the argument against banked corners; it is the
+argument for them. The client-heap taxes scale with your users —
+bundles, hydration, API chatter, and a UI state no one but the pixels
+can see. A cambered app scales with requests, caches as HTML, and keeps
+its entire capability surface on the server, legible to any client you
+point at it — including the ones arriving next, which do not have eyes.
+
+The road is paved for whoever maintains it after you stop looking.
+Nobody is looking at week twelve. The road has to do it.

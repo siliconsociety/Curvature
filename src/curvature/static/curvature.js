@@ -1,6 +1,6 @@
 /* curvature.js — the boost layer. The only script (C-300).
  *
- * It intercepts working links and working forms inside a [data-boost]
+ * It intercepts working links and GET forms inside a [data-boost]
  * scope, refetches with the Curvature-Boost header, and swaps the returned
  * subtrees by id. Every path out of here on trouble is the same: real
  * navigation to a real URL. The app never needs this file; it only
@@ -10,6 +10,7 @@
   "use strict";
 
   const HEADER = { "Curvature-Boost": "1" };
+  let navigation;
 
   const sameOrigin = (url) => url.origin === location.origin;
 
@@ -53,6 +54,8 @@
   };
 
   const boostedFetch = async (url, options, push) => {
+    if (navigation) navigation.abort();
+    navigation = new AbortController();
     let response;
     try {
       response = await fetch(url, {
@@ -60,8 +63,10 @@
         headers: HEADER,
         credentials: "same-origin",
         redirect: "follow",
+        signal: navigation.signal,
       });
-    } catch {
+    } catch (error) {
+      if (error.name === "AbortError") return;
       return fallback(url);
     }
     const type = response.headers.get("content-type") || "";
@@ -91,31 +96,17 @@
     const url = new URL(form.action, location.href);
     if (!sameOrigin(url)) return;
     const method = (form.method || "get").toUpperCase();
+    // Mutations stay native. A failed enhanced POST cannot be retried without
+    // risking a duplicate write, so interception would make the baseline less safe.
+    if (method !== "GET") return;
     event.preventDefault();
-    if (method === "GET") {
-      url.search = new URLSearchParams(new FormData(form)).toString();
-      boostedFetch(url, { method: "GET" }, true);
-    } else {
-      boostedFetch(url, { method: "POST", body: new FormData(form) }, true);
-    }
+    url.search = new URLSearchParams(new FormData(form, event.submitter)).toString();
+    boostedFetch(url, { method: "GET" }, true);
   });
 
   addEventListener("popstate", () => {
     boostedFetch(new URL(location.href), { method: "GET" }, false);
   });
-
-  // Offline (C-303): register the replay worker when the page declares
-  // it, and report the browser's own connectivity fact as a data
-  // attribute — the banner itself is CSS; nothing here decides.
-  const offline = document.querySelector("[data-offline-cache]");
-  if (offline && "serviceWorker" in navigator) {
-    navigator.serviceWorker.register(offline.dataset.offlineCache);
-  }
-  const reflect = () =>
-    document.documentElement.toggleAttribute("data-offline", !navigator.onLine);
-  addEventListener("online", reflect);
-  addEventListener("offline", reflect);
-  reflect();
 
   startLive();
 })();

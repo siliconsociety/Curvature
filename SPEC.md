@@ -1,6 +1,6 @@
 # The Curvature Spec
 
-Version 0.1 — 2026-07-11. Protocol of record for the runtime, the gate,
+Version 0.2 — 2026-07-12. Protocol of record for the runtime, the gate,
 and every codebase that claims to be curved.
 
 The rule of this document: **an invariant that names no enforcement is a
@@ -23,9 +23,11 @@ a `curvature.Props` subclass and whose return type is `curvature.Element`.
 No classes, no registries, no context vars. *Why:* an explicit, typed,
 import-traceable interface is the unit of composition — the thing every
 change has a default destination inside.
-*Enforcement:* gate (ANOM-110): every function in a `components/` tree that
-returns `Element` must annotate its first parameter with a `Props`
-subclass.
+*Enforcement:* gate (ANOM-110) checks the locally visible shape: every
+`Element`-returning function in a `components/` tree with a positional
+parameter must annotate the first one with a name ending in `Props`.
+Pyright then resolves the actual type. ANOM-110 is structural guidance, not
+a Python type resolver.
 
 **C-101 · Props are frozen and closed.**
 `Props` is a pydantic model with `frozen=True, extra="forbid"`. *Why:*
@@ -65,17 +67,20 @@ Mutating handlers return a redirect (303) to a GET view; they never
 render a body. *Why:* refresh-safe, history-safe, and it forces every
 state change to have a canonical, linkable after-state.
 *Enforcement:* gate (ANOM-131: route functions registered for POST/PUT/
-DELETE must return `Redirect`; heuristic AST check, escape hatch
-documented in AGENTS.md for the rare JSON endpoint).
+PATCH/DELETE, including literal `methods=[...]`, must return `redirect()`
+on every visible return path; a rare JSON endpoint needs the documented
+pragma plus a written reason). This is deliberately predictable AST
+analysis, not a proof of arbitrary Python control flow.
 
 **C-203 · Sessions carry the CSRF posture.**
-Session cookies are HttpOnly and SameSite=Lax; the session-resolving
-dependency refuses writes bearing a foreign Origin header (403) before
-any handler runs. Bearer-token clients carry no cookies and are
-untouched. *Why:* cookies plus cross-site POST is the CSRF shape; the
-defense lives in the one dependency every authenticated route already
-declares. *Enforcement:* construction (the Auth satellite's session
-dependency; landed 0.2).
+Auth configuration explicitly declares allowed origins and whether cookies
+are Secure; production has no permissive default. Every browser write in
+the poured Auth routes, authenticated or not, requires a matching Origin or
+Referer. Session cookies are HttpOnly and SameSite=Lax. Bearer-token clients
+carry no cookies and are untouched. *Why:* cookies plus cross-site POST is
+the CSRF shape, including login and registration. *Enforcement:*
+construction in the Auth route dependencies and integration tests poured
+into a fresh app.
 
 **C-202 · The app works with JavaScript off.**
 Full stop. The unboosted path is not a fallback; it is the application.
@@ -88,10 +93,10 @@ it isn't testable, and coverage (C-401) starves until it is.
 
 **C-300 · One script.**
 The only first-party JavaScript in a curved project is the vendored,
-pinned `curvature.js` boost layer. *Why:* every additional script is a new
-sediment bed. *Enforcement:* gate (ANOM-120: any `.js` file outside
-`static/vendor/` is an anomaly; the vendor directory is pinned by
-`VERSIONS.md` entry).
+`curvature.js` boost layer at `curvature/static/curvature.js`. *Why:* every
+additional script is a new sediment bed. *Enforcement:* gate (ANOM-120: any
+other first-party `.js` file is an anomaly; explicitly vendored directories
+remain the application's review responsibility).
 
 **C-301 · JavaScript never speaks HTTP on its own.**
 No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
@@ -99,21 +104,12 @@ No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
 wearing an enhancement's jacket. *Enforcement:* gate (ANOM-121: token scan
 of all non-vendor JS and inline script bodies).
 
-**C-303 · Offline is a cache, never a database.**
-The replay worker (`curvature-offline.js`, the boost layer's one
-sanctioned companion) remembers successful same-origin GETs and serves
-them back when the network dies. It never touches a write, holds no
-state beyond the HTTP cache, and decides nothing. Enrollment is
-declarative — `data-offline-cache="<worker-url>"` on any element, the
-worker served from the scope it protects — and the staleness banner is
-CSS keyed on the `data-offline` attribute the boost layer reflects
-from the browser's own connectivity events. Offline writes fail with
-the browser's honesty; that refusal is a promise (see MANIFESTO).
-*Why:* reads surviving a tunnel is nearly all the real-world value of
-offline at none of the architectural cost; the rest is the refused
-client-heap wearing a worker's uniform. *Enforcement:* construction
-(the worker's fetch handler returns early on non-GET) + gate (the
-sanctioned-script list is exactly two names).
+**C-303 · Offline replay is not a framework feature.**
+Curvature ships no service worker and caches no authenticated pages or
+one-time secrets in the browser. *Why:* a generic replay cache cannot know
+the authorization and invalidation rules of an application; pretending it
+can breaks the one-source-of-truth claim. *Enforcement:* the sanctioned
+script path in ANOM-120 names only `curvature.js`.
 
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
@@ -158,7 +154,8 @@ either the full document (header absent) or the fragment subtree(s)
 `Vary: Curvature-Boost`. *Why:* the protocol surface between server and
 boost layer must fit in one sentence, or it will grow until it is a
 framework nobody chose. *Enforcement:* construction (`respond()` is the
-only fragment emitter).
+only fragment emitter). The framework boosts links and GET forms only;
+mutating forms use native navigation and PRG.
 
 **C-501 · Fragments are identified subtrees.**
 Every fragment root carries an `id`. The boost layer replaces the
@@ -199,15 +196,15 @@ able to answer "who calls this?" with grep.
 *Enforcement:* gate (ANOM-151, landed: `__init_subclass__` and
 `metaclass=` are findings — the manifold refuses invisible machinery).
 
-## 7. Satellites — DRAFT, lands in 0.2
+## 7. Satellites
 
 Extensibility without a registry: a satellite is a body captured into
 the app's gravity by explicit assembly, never discovered. The refusals
 stand — there is no registry, no entry point, no import-time magic.
 
 **C-800 · A satellite is a value, not a discovery.**
-A frozen, typed manifest (name, version, routes, components, assets,
-checks) validated at `capture(app, satellite, orbit=...)`. First-party
+A frozen, typed manifest (name, version, router, components) captured with
+`capture(app, satellite, orbit=...)`. First-party
 satellites are POURED — `curvature pour <name>` delivers their source
 into `satellites/<name>/`, owned by the manifold and audited by its own
 gate natively; third-party satellites may install from an index, where
@@ -215,23 +212,24 @@ C-801's reach applies. *Why:* "who runs in my app?" must be answerable
 by grep, and only a pour delivers code. *Enforcement:* construction
 (capture validates; nothing else mounts anything). **Landed in 0.2.**
 
-**C-801 · The contract follows the code.**
-`curvature check` audits captured satellites' installed source —
-site-packages included — under the full anomaly index. No satellite
-JavaScript; a satellite needing client physics declares an event
-horizon with a budget in its manifest. *Why:* a contract that stops at
-the repo boundary is a costume. *Enforcement:* `curvature audit <package>` (landed): the source checks walk any installed package's directory.
+**C-801 · Installed satellite audits are explicit.**
+`curvature audit <package>` applies the source-shape checks to an installed
+package when the owner invokes it. Poured satellites need no special path:
+their source and tests belong to the app and its ordinary gate. *Why:* audit
+reach must be real, but `capture()` must not imply an invisible plugin
+registry. *Enforcement:* the audit command walks the named installed
+package. It does not claim automatic discovery of captured packages.
 
 **C-802 · Declared orbit only.**
-Every route prefix, component, and check a satellite contributes is in
-its manifest; contribution outside the declaration is an anomaly.
+The orbit is explicit at capture, and each named component must match the
+satellite's `components/` directory.
 *Why:* the manifest is the fence. *Enforcement:* gate (ANOM-161, landed: a manifest's declared components must match its components/ directory — ghosts and stowaways are findings).
 
-**C-803 · Satellites tighten, never flatten.**
-A satellite may add gate checks (rule-packs); it may never remove,
-weaken, or reorder one. *Why:* the ratchet philosophy, applied to the
-rule set itself. *Enforcement:* construction (the check API is
-append-only).
+**C-803 · A manifest declares only what capture enforces.**
+Satellites do not advertise assets, mass, or rule-packs. Those fields were
+removed until a real enforcement path exists. *Why:* an unenforced manifest
+is documentation wearing a type annotation. *Enforcement:* construction:
+the manifest type has no such fields.
 
 **C-804 · No interception, no ordering.**
 Satellites cannot observe each other, wrap each other, or add global
@@ -239,9 +237,10 @@ middleware; offered capabilities are opted into explicitly at use
 sites. *Why:* capture order must be meaningless by construction.
 *Enforcement:* construction (the capture API has no hook surface).
 
-Doctrine: satellites are how features audition for core. First
-constellation: Concierge (the resident agent), IFR (the agent
-projection), Auth, Admin, Live (SSE push), and rule-packs.
+Doctrine: satellites are how features audition for core. Auth is the first
+poured satellite. Chart/Atlas and Live are runtime capabilities. Concierge
+was removed: resident-agent product policy is not part of Curvature's web
+contract.
 
 ## 8. The chart — LANDED 0.3-line, 2026-07-12
 
@@ -265,8 +264,9 @@ nothing else).
 `respond(..., purpose=...)` carries the single human-written sentence
 of orientation a derivation cannot supply: what this screen is FOR.
 *Why:* the first job of the agent-facing surface is orientation.
-*Enforcement:* gate (ANOM-170, queued: chart-serving screens without
-purpose are anomalies).
+*Enforcement:* runtime (chart negotiation refuses an empty purpose) and
+gate (ANOM-170: app `respond()` calls without a non-empty authored purpose
+are anomalies).
 
 **C-903 · The atlas is a screen.**
 The enumeration of a manifold's readable regions is an ordinary
@@ -280,8 +280,8 @@ from app routes; there is nothing to hand-maintain).
 
 | ID     | Invariant | Check |
 |--------|-----------|-------|
-| ANOM-110 | C-100 | component signature: first param is `Props` subclass |
-| ANOM-120 | C-300 | `.js` outside `static/vendor/` |
+| ANOM-110 | C-100 | component signature: first annotation name ends in `Props` |
+| ANOM-120 | C-300 | first-party `.js` outside the exact framework boost path |
 | ANOM-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
 | ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
 | ANOM-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
@@ -302,5 +302,6 @@ buildable while staying greppable — and `curvature check` publishes the
 pragma census on every run, so the escape hatch can never go quietly.
 
 A curved repo is one where `curvature check` exits 0 and has *teeth it
-can show*: the finding index above is the minimum. Projects may add
-rules; they may never remove one that has fired.
+can show*: the finding index above is the framework minimum. A green gate
+means these declared checks passed; it is not a claim that static analysis
+proved every semantic property of arbitrary Python.

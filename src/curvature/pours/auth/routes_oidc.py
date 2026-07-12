@@ -1,41 +1,36 @@
-"""OIDC's orbit segment: two redirects and a verified claim. The state
-nonce rides the same stash as pending logins; a returning user with
-TOTP still owes the second factor — federation does not skip the house
-rules."""
+"""Browser-bound OIDC Authorization Code flow with PKCE and nonce."""
 
 from __future__ import annotations
 
+import hmac
+import json
 import time
 import uuid
 
 from fastapi import APIRouter, Request
-from satellites.auth.oidc import authorization_url, exchange_code, verify_id_token
+from satellites.auth.oidc import (
+    authorization_url,
+    exchange_code,
+    pkce_pair,
+    verify_id_token,
+)
 from satellites.auth.routes_totp import stash_pending
-from satellites.auth.security import hash_password, new_session_token
-from satellites.auth.sessions import start_session
-from satellites.auth.store import UserRecord
+from satellites.auth.security import hash_token, new_session_token
+from satellites.auth.sessions import auth_config, rate_limit, start_session
+from satellites.auth.store import ChallengeRecord, DuplicateUserError, UserRecord
 
 from curvature import redirect
 
 router = APIRouter()
-
 STATE_SECONDS = 600
+OIDC_COOKIE = "curvature_oidc"
 
 
 def _providers(request: Request) -> dict:
     return getattr(request.app.state, "auth_oidc", {})
 
 
-def _states(request: Request) -> dict[str, float]:
-    stash = getattr(request.app.state, "auth_oidc_states", None)
-    if stash is None:
-        stash = {}
-        request.app.state.auth_oidc_states = stash
-    return stash
-
-
 def _verifier(request: Request):
-    """The seam: tests inject a fake; production verifies for real."""
     return getattr(request.app.state, "auth_oidc_verify", verify_id_token)
 
 
@@ -45,42 +40,108 @@ def _fetch(request: Request):
     return getattr(request.app.state, "auth_oidc_fetch", _fetch_json)
 
 
+def _failure(request: Request):
+    response = redirect("/auth/login?error=credentials")
+    response.delete_cookie(
+        OIDC_COOKIE,
+        httponly=True,
+        samesite="lax",
+        secure=auth_config(request).secure_cookies,
+        path="/auth/oidc",
+    )
+    return response
+
+
 @router.get("/oidc/{provider_name}/login")
-async def oidc_login(request: Request, provider_name: str):
+def oidc_login(request: Request, provider_name: str):
     provider = _providers(request).get(provider_name)
     if provider is None:
-        return redirect("/auth/login?error=credentials")
-    state = new_session_token()[:24]
-    _states(request)[state] = time.time() + STATE_SECONDS
-    return redirect(authorization_url(provider, state, _fetch(request)))
+        return _failure(request)
+    client = request.client.host if request.client else "unknown"
+    rate_limit(request, "oidc-start", f"{client}:{provider_name}", limit=20, window_seconds=600)
+    state = new_session_token()
+    nonce = new_session_token()
+    binder = new_session_token()
+    verifier, challenge = pkce_pair()
+    request.app.state.auth_store.save_challenge(ChallengeRecord(
+        token_hash=hash_token(state),
+        kind="oidc",
+        payload=json.dumps({
+            "provider": provider_name,
+            "nonce": nonce,
+            "verifier": verifier,
+            "binder_hash": hash_token(binder),
+        }),
+        expires_at=time.time() + STATE_SECONDS,
+    ))
+    response = redirect(authorization_url(
+        provider, state, nonce, challenge, _fetch(request)
+    ))
+    config = auth_config(request)
+    response.set_cookie(
+        OIDC_COOKIE,
+        binder,
+        max_age=STATE_SECONDS,
+        httponly=True,
+        samesite="lax",
+        secure=config.secure_cookies,
+        path="/auth/oidc",
+    )
+    return response
 
 
 @router.get("/oidc/{provider_name}/callback")
-async def oidc_callback(
+def oidc_callback(
     request: Request, provider_name: str, code: str = "", state: str = ""
 ):
     provider = _providers(request).get(provider_name)
-    expires = _states(request).pop(state, 0)
-    if provider is None or not code or expires < time.time():
-        return redirect("/auth/login?error=credentials")
-    id_token = exchange_code(provider, code, _fetch(request))
-    claims = _verifier(request)(provider, id_token, _fetch(request))
-    email = str(claims.get("email", "")).lower()
-    if not email:
-        return redirect("/auth/login?error=credentials")
-    store = request.app.state.auth_store
-    user = store.get_user_by_email(email)
-    if user is None:
-        user = UserRecord(
-            id=uuid.uuid4().hex,
-            email=email,
-            # No usable password: this identity signs in at its issuer.
-            password_hash=hash_password(new_session_token()),
+    challenge = request.app.state.auth_store.pop_challenge(
+        hash_token(state), "oidc", time.time()
+    )
+    if provider is None or not code or challenge is None:
+        return _failure(request)
+    transaction = json.loads(challenge.payload)
+    binder = request.cookies.get(OIDC_COOKIE, "")
+    if transaction.get("provider") != provider_name or not hmac.compare_digest(
+        hash_token(binder), str(transaction.get("binder_hash", ""))
+    ):
+        return _failure(request)
+    try:
+        id_token = exchange_code(
+            provider, code, str(transaction["verifier"]), _fetch(request)
         )
-        store.save_user(user)
+        claims = _verifier(request)(
+            provider, id_token, str(transaction["nonce"]), _fetch(request)
+        )
+    except (KeyError, OSError, ValueError):
+        return _failure(request)
+    subject = str(claims.get("sub", ""))
+    email = str(claims.get("email", "")).strip().casefold()
+    if not subject or not email or claims.get("email_verified") is not True:
+        return _failure(request)
+    store = request.app.state.auth_store
+    user_id = store.get_oidc_user_id(provider.issuer, subject)
+    user = store.get_user_by_id(user_id) if user_id else None
+    if user is None:
+        if store.get_user_by_email(email) is not None:
+            return _failure(request)  # never link an existing account by email alone
+        user = UserRecord(id=uuid.uuid4().hex, email=email, password_hash="oidc-only")
+        try:
+            store.save_user(user)
+        except DuplicateUserError:
+            return _failure(request)
+        store.save_oidc_identity(provider.issuer, subject, user.id)
     if user.totp_secret:
         nonce = stash_pending(request, user.id)
-        return redirect(f"/auth/totp/check?pending={nonce}")
-    response = redirect("/")
-    start_session(response, store, user)
+        response = redirect(f"/auth/totp/check?pending={nonce}")
+    else:
+        response = redirect("/")
+        start_session(request, response, store, user)
+    response.delete_cookie(
+        OIDC_COOKIE,
+        httponly=True,
+        samesite="lax",
+        secure=auth_config(request).secure_cookies,
+        path="/auth/oidc",
+    )
     return response

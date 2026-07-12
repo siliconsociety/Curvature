@@ -96,6 +96,45 @@ def previous_committed(root: Path) -> Ratchet | None:
     )
 
 
+def historical_tightest(root: Path) -> Ratchet | None:
+    """Tightest ceiling and highest floor reachable from HEAD.
+
+    Exceptions remain compared with HEAD because grandfathering is an adoption
+    transition; numeric project-wide bounds answer to the complete ancestry.
+    """
+    baseline = previous_committed(root)
+    if baseline is None:
+        return None
+    try:
+        history = subprocess.run(
+            ["git", "-C", str(root), "log", "--format=%H", "HEAD", "--", RATCHET_FILE],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return baseline
+    if history.returncode != 0:
+        return baseline
+    for commit in history.stdout.splitlines():
+        shown = subprocess.run(
+            ["git", "-C", str(root), "show", f"{commit}:{RATCHET_FILE}"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if shown.returncode != 0:
+            continue
+        data = tomllib.loads(shown.stdout)
+        ceilings = data.get("ceilings", {})
+        for suffix, value in ceilings.items():
+            if isinstance(value, int):
+                baseline.ceilings[suffix] = min(baseline.ceilings.get(suffix, value), value)
+        floor = float(data.get("floors", {}).get("coverage", 0.0))
+        baseline.coverage_floor = max(baseline.coverage_floor, floor)
+    return baseline
+
+
 def loosened(current: Ratchet, committed: Ratchet) -> list[str]:
     """Every way the working ratchet is looser than the committed one."""
     complaints: list[str] = []

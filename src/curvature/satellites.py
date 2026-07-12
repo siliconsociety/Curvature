@@ -1,24 +1,17 @@
-"""Satellites — extensibility without a registry (C-800..C-804).
+"""Satellites — explicit route bundles without a registry (C-800..C-804).
 
-A satellite is a body captured into the manifold's gravity by explicit
-assembly, never discovered. The manifest is a frozen value; capture()
-is the only way in; there are no hooks, no ordering, no interception.
-A satellite's checks are its mass — the part of it that bends the
-geometry — and mass only adds (C-803: there is no negative mass).
+A satellite is captured by explicit assembly, never discovered. The manifest
+is a frozen value; capture() is the only way in; there are no hooks, ordering,
+interception, or aspirational fields the runtime does not consume.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from curvature.errors import Anomaly
-from curvature.gate.findings import Finding
-
-type CheckFunction = Callable[[Path], list[Finding]]
 
 
 class Satellite(BaseModel):
@@ -32,8 +25,6 @@ class Satellite(BaseModel):
     version: str = Field(min_length=1, max_length=40)
     router: Any = None
     components: tuple[str, ...] = ()
-    assets: tuple[str, ...] = ()
-    checks: tuple[CheckFunction, ...] = ()
 
 
 def _constellation(app: Any) -> dict[str, tuple[str, Satellite]]:
@@ -75,13 +66,3 @@ def captured(app: Any) -> dict[str, str]:
     """The constellation: satellite name -> orbit. What grep confirms,
     this reports."""
     return {name: orbit for name, (orbit, _) in _constellation(app).items()}
-
-
-def constellation_checks(app: Any) -> list[CheckFunction]:
-    """Every check contributed by captured satellites — the mass bending
-    the geometry. Append-only by construction: frozen manifests and
-    tuple fields leave nothing to remove (C-803)."""
-    checks: list[CheckFunction] = []
-    for _orbit, satellite in _constellation(app).values():
-        checks.extend(satellite.checks)
-    return checks

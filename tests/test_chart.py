@@ -7,7 +7,7 @@ from curvature import respond
 from curvature.chart import build_chart
 
 
-def make_request(*, chart: bool = False, boost: bool = False) -> Request:
+def make_request(*, chart: bool = False, boost: bool = False, query: bytes = b"") -> Request:
     headers = []
     if chart:
         headers.append((b"curvature-chart", b"1"))
@@ -15,7 +15,7 @@ def make_request(*, chart: bool = False, boost: bool = False) -> Request:
         headers.append((b"curvature-boost", b"1"))
     return Request({
         "type": "http", "method": "GET", "headers": headers,
-        "path": "/board", "query_string": b"", "scheme": "http",
+        "path": "/board", "query_string": query, "scheme": "http",
         "server": ("test", 80), "root_path": "",
     })
 
@@ -41,6 +41,14 @@ def board():
 def test_chart_negotiation_returns_json():
     response = respond(make_request(chart=True), board(), shell=shell, purpose="Track laps")
     assert response.media_type == "application/json"
+
+
+def test_chart_url_preserves_screen_defining_query_state():
+    response = respond(
+        make_request(chart=True, query=b"status=open"),
+        board(), shell=shell, purpose="Track laps",
+    )
+    assert b'"url":"/board?status=open"' in response.body
 
 
 def test_html_responses_advertise_the_chart():
@@ -104,9 +112,18 @@ def test_select_projects_as_enum():
 
 def test_the_chart_wins_over_boost():
     response = respond(
-        make_request(chart=True, boost=True), board(), shell=shell, purpose=None
+        make_request(chart=True, boost=True), board(), shell=shell, purpose="Track laps"
     )
     assert response.media_type == "application/json"
+
+
+def test_chart_negotiation_refuses_a_placeholder_purpose():
+    import pytest
+
+    from curvature import Anomaly
+
+    with pytest.raises(Anomaly, match="C-902"):
+        respond(make_request(chart=True), board(), shell=shell, purpose=None)
 
 
 def test_the_html_heads_are_unchanged():
@@ -159,57 +176,87 @@ def test_form_without_button_has_no_prompt():
     assert chart["affordances"]["forms"][0]["prompt"] is None
 
 
-def test_the_atlas_is_a_screen_whose_chart_is_the_atlas():
-    from fastapi.testclient import TestClient
-
-    from demo.app import app
-
-    client = TestClient(app)
-    page = client.get("/atlas")
-    assert 'id="atlas"' in page.text  # humans get a sitemap of real links
-    chart = client.get("/atlas", headers={"Curvature-Chart": "1"}).json()
-    hrefs = {link["href"] for link in chart["affordances"]["links"]}
-    assert "/" in hrefs and "/atlas" in hrefs
-    assert "purpose" in chart and chart["purpose"]
-
-
-def test_anomaly_170_fires_on_unauthored_screens(tmp_path):
-    from curvature.gate.checks import check_purposes
-
-    (tmp_path / "views.py").write_text(
-        "def index(request):\n    return respond(request, board(), shell=shell)\n"
+def test_repeated_controls_preserve_native_group_semantics():
+    form = h.form(
+        h.input_(type="radio", name="lane", value="inside", required=True),
+        h.input_(type="radio", name="lane", value="outside", checked=True),
+        h.input_(type="checkbox", name="flags", value="yellow"),
+        h.input_(type="checkbox", name="flags", value="red"),
+        action="/set", method="post",
     )
-    findings = check_purposes(tmp_path)
-    assert [f.rule for f in findings] == ["ANOM-170"]
+    fields = build_chart((h.div(form, id="f"),), url="/", purpose=None)[
+        "affordances"
+    ]["forms"][0]["fields"]
+    assert fields["properties"]["lane"] == {
+        "type": "string", "enum": ["inside", "outside"], "default": "outside",
+    }
+    assert fields["properties"]["flags"] == {
+        "type": "array",
+        "items": {"type": "string", "enum": ["yellow", "red"]},
+        "uniqueItems": True,
+    }
+    assert fields["required"] == ["lane"]
 
 
-def test_anomaly_170_spares_tests_and_authored_screens(tmp_path):
-    from curvature.gate.checks import check_purposes
-
-    (tmp_path / "views.py").write_text(
-        'def index(request):\n    return respond(request, b(), shell=s, purpose="Why")\n'
+def test_disabled_controls_are_not_affordances_and_submitters_are_explicit():
+    form = h.form(
+        h.input_(name="ignored", disabled=True),
+        h.button("Save draft", name="intent", value="draft"),
+        h.button("Publish", name="intent", value="publish"),
+        action="/articles", method="post", enctype="multipart/form-data",
     )
-    tests_dir = tmp_path / "tests"
-    tests_dir.mkdir()
-    (tests_dir / "test_x.py").write_text(
-        "def test_it():\n    respond(req, frag, shell=shell)\n"
+    projected = build_chart((h.div(form, id="f"),), url="/", purpose=None)[
+        "affordances"
+    ]["forms"][0]
+    assert projected["fields"]["properties"] == {}
+    assert projected["enctype"] == "multipart/form-data"
+    assert projected["submitters"] == [
+        {"prompt": "Save draft", "name": "intent", "value": "draft"},
+        {"prompt": "Publish", "name": "intent", "value": "publish"},
+    ]
+
+
+def test_chart_preserves_native_constraints_and_control_shapes():
+    form = h.form(
+        h.input_(
+            type="number", name="temperature", min="-10", max=50, step=0.5,
+            pattern="ignored-by-browser-for-number", maxlength=True,
+        ),
+        h.select(
+            h.option("Soft", value="soft"), h.option("Hard", value="hard"),
+            name="tyres", multiple=True,
+        ),
+        h.input_(type="radio", name="lane", value="inside"),
+        h.input_(type="radio", name="lane", value="outside"),
+        h.input_(name="tag", value="one"),
+        h.input_(name="tag", value="two"),
+        h.input_(type="submit", name="intent", value="Search"),
+        h.button("Not a submitter", type="button"),
+        h.button("Disabled", disabled=True),
+        action="/search", method="get",
     )
-    assert check_purposes(tmp_path) == []
-
-
-def test_the_atlas_skips_parameterized_regions():
-    from fastapi import FastAPI
-
-    from curvature.atlas import atlas
-
-    plain = FastAPI()
-
-    @plain.get("/items/{item_id}")
-    async def item(item_id: str): ...  # curvature: json-endpoint (fixture)
-
-    @plain.get("/whole")
-    async def whole(): ...  # curvature: json-endpoint (fixture)
-
-    markup = str(atlas(plain))
-    assert 'href="/whole"' in markup
-    assert "{item_id}" not in markup
+    projected = build_chart((h.div(form, id="f"),), url="/", purpose=None)[
+        "affordances"
+    ]["forms"][0]
+    properties = projected["fields"]["properties"]
+    assert properties["temperature"] == {
+        "type": "number",
+        "minimum": -10.0,
+        "maximum": 50.0,
+        "multipleOf": 0.5,
+        "pattern": "ignored-by-browser-for-number",
+    }
+    assert properties["tyres"] == {
+        "type": "array",
+        "items": {"type": "string", "enum": ["soft", "hard"]},
+        "uniqueItems": True,
+    }
+    assert properties["lane"] == {
+        "type": "string", "enum": ["inside", "outside"],
+    }
+    assert properties["tag"] == {
+        "type": "array", "items": {"type": "string", "default": "one"},
+    }
+    assert projected["submitters"] == [
+        {"prompt": "Search", "name": "intent", "value": "Search"}
+    ]

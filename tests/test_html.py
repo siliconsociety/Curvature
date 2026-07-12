@@ -1,3 +1,5 @@
+from dataclasses import FrozenInstanceError
+
 import pytest
 
 from curvature import Anomaly, element, raw, render
@@ -93,3 +95,27 @@ def test_script_takes_src_only():
 def test_element_id_property():
     assert h.div(id="task-list").id == "task-list"
     assert h.div().id is None
+
+
+def test_elements_are_immutable_values():
+    node = h.div("fixed", id="panel")
+    with pytest.raises(TypeError):
+        node.attrs["id"] = "changed"  # type: ignore[index]
+    with pytest.raises(FrozenInstanceError):
+        node.tag = "span"  # type: ignore[misc]
+
+
+def test_generic_construction_cannot_bypass_web_contracts():
+    with pytest.raises(Anomaly, match="C-200"):
+        element("a", "nowhere")
+    with pytest.raises(Anomaly, match="C-200"):
+        element("form", action="/save")
+    with pytest.raises(Anomaly, match="C-302"):
+        element("script", "inline", src="/safe.js")
+
+
+def test_generic_construction_refuses_empty_form_actions_and_click_handlers():
+    with pytest.raises(Anomaly, match="without an action"):
+        element("form", action="", method="post")
+    with pytest.raises(Anomaly):
+        element("button", onclick="submit()")  # curvature-allow: exercises refusal

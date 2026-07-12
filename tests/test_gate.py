@@ -25,7 +25,7 @@ def test_stray_first_party_js_is_off_curvature(tmp_path):
 
 
 def test_boost_layer_and_vendor_are_allowed(tmp_path):
-    write(tmp_path, "static/curvature.js", "// the only script\n")
+    write(tmp_path, "curvature/static/curvature.js", "// the only script\n")
     write(tmp_path, "static/vendor/lib.js", "// pinned\n")
     assert checks.check_js_placement(tmp_path) == []
 
@@ -134,10 +134,29 @@ def test_json_endpoint_escape_hatch(tmp_path):
     write(tmp_path, "routes.py", textwrap.dedent("""
         @app.post("/api/tasks")
         def create(request):
-            # curvature: json-endpoint
+            # curvature: json-endpoint — machine client contract
             return {"ok": True}
     """))
     assert checks.check_mutating_routes(tmp_path) == []
+
+
+def test_json_endpoint_escape_hatch_requires_a_reason(tmp_path):
+    write(tmp_path, "routes.py", textwrap.dedent("""
+        @app.post("/api/tasks")
+        def create(request):
+            # curvature: json-endpoint
+            return {"ok": True}
+    """))
+    assert [f.rule for f in checks.check_mutating_routes(tmp_path)] == ["ANOM-131"]
+
+
+def test_api_route_mutations_are_seen(tmp_path):
+    write(tmp_path, "routes.py", textwrap.dedent("""
+        @app.api_route("/tasks", methods=["GET", "POST"])
+        def tasks(request):
+            return respond(request, fragment, shell=shell)
+    """))
+    assert [f.rule for f in checks.check_mutating_routes(tmp_path)] == ["ANOM-131"]
 
 
 def test_get_routes_are_not_mutating(tmp_path):
@@ -203,8 +222,45 @@ def test_walk_source_skips_excluded_dirs(tmp_path):
 
 
 
-def test_the_replay_worker_is_sanctioned_company(tmp_path):
-    write(tmp_path, "static/curvature-offline.js", 'fetch("replays")\n')
-    write(tmp_path, "static/curvature.js", "// the boost layer\n")
+def test_only_the_framework_copy_of_the_boost_layer_is_sanctioned(tmp_path):
+    write(tmp_path, "curvature/static/curvature.js", 'fetch("fragments")\n')
     assert checks.check_js_placement(tmp_path) == []
     assert checks.check_js_http(tmp_path) == []
+
+
+def test_anomaly_170_fires_on_unauthored_screens(tmp_path):
+    write(
+        tmp_path,
+        "views.py",
+        "def index(request):\n    return respond(request, board(), shell=shell)\n",
+    )
+    findings = checks.check_purposes(tmp_path)
+    assert [finding.rule for finding in findings] == ["ANOM-170"]
+
+
+def test_anomaly_170_spares_tests_and_authored_screens(tmp_path):
+    write(
+        tmp_path,
+        "views.py",
+        'def index(request):\n    return respond(request, b(), shell=s, purpose="Why")\n',
+    )
+    write(
+        tmp_path,
+        "tests/test_x.py",
+        "def test_it():\n    respond(req, frag, shell=shell)\n",
+    )
+    assert checks.check_purposes(tmp_path) == []
+
+
+def test_anomaly_170_refuses_placeholder_purposes(tmp_path):
+    write(
+        tmp_path,
+        "views.py",
+        "def index(request):\n    return respond(request, b(), shell=s, purpose=None)\n",
+    )
+    assert [finding.rule for finding in checks.check_purposes(tmp_path)] == ["ANOM-170"]
+
+
+def test_an_app_cannot_smuggle_javascript_under_the_framework_filename(tmp_path):
+    write(tmp_path, "app/static/curvature.js", "// counterfeit\n")
+    assert [f.rule for f in checks.check_js_placement(tmp_path)] == ["ANOM-120"]

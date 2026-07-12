@@ -11,6 +11,7 @@ second source of truth to drift (C-901).
 
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Any
 
 from curvature.html import Element, Raw
@@ -43,8 +44,6 @@ def _text_of(element: Element) -> str:
                 parts.append(child)
             elif isinstance(child, int | float):
                 parts.append(str(child))
-            elif child is not None:
-                walk(tuple(child))
 
     walk(element.children)
     return " ".join(" ".join(parts).split())
@@ -53,7 +52,7 @@ def _text_of(element: Element) -> str:
 def _field_schema(element: Element) -> dict[str, Any] | None:
     attrs = element.attrs
     name = attrs.get("name")
-    if not isinstance(name, str):
+    if not isinstance(name, str) or attrs.get("disabled"):
         return None
     if element.tag == "textarea":
         schema: dict[str, Any] = {"type": "string"}
@@ -63,16 +62,28 @@ def _field_schema(element: Element) -> dict[str, Any] | None:
             for child in element.children
             if isinstance(child, Element) and child.tag == "option"
         ]
-        schema = {"type": "string", "enum": options}
+        item_schema: dict[str, Any] = {"type": "string", "enum": options}
+        schema = (
+            {"type": "array", "items": item_schema, "uniqueItems": True}
+            if attrs.get("multiple")
+            else item_schema
+        )
     else:
         input_type = str(attrs.get("type", "text"))
         schema = dict(_FIELD_TYPES.get(input_type, {"type": "string"}))
         if input_type == "hidden" and "value" in attrs:
             schema["const"] = attrs["value"]
-    if "maxlength" in attrs:
-        schema["maxLength"] = int(attrs["maxlength"])
-    if "minlength" in attrs:
-        schema["minLength"] = int(attrs["minlength"])
+    for attribute, keyword in (("maxlength", "maxLength"), ("minlength", "minLength")):
+        value = attrs.get(attribute)
+        if isinstance(value, str | int | float) and not isinstance(value, bool):
+            schema[keyword] = int(value)
+    for attribute, keyword in (("min", "minimum"), ("max", "maximum"), ("step", "multipleOf")):
+        value = attrs.get(attribute)
+        if isinstance(value, str | int | float) and not isinstance(value, bool):
+            schema[keyword] = float(value)
+    pattern = attrs.get("pattern")
+    if isinstance(pattern, str):
+        schema["pattern"] = pattern
     if "value" in attrs and "const" not in schema:
         schema["default"] = attrs["value"]
     return {"name": name, "required": bool(attrs.get("required")), "schema": schema}
@@ -83,32 +94,81 @@ def _walk_elements(element: Element):
     for child in element.children:
         if isinstance(child, Element):
             yield from _walk_elements(child)
-        elif isinstance(child, str | Raw | int | float) or child is None:
-            continue
-        else:
-            for sub in child:
-                if isinstance(sub, Element):
-                    yield from _walk_elements(sub)
+
+
+def _group_schema(elements: list[Element]) -> dict[str, Any] | None:
+    schemas = [field["schema"] for element in elements if (field := _field_schema(element))]
+    if not schemas:
+        return None
+    input_types = {str(element.attrs.get("type", "text")) for element in elements}
+    if input_types == {"radio"}:
+        values = [element.attrs.get("value", "on") for element in elements]
+        schema: dict[str, Any] = {"type": "string", "enum": values}
+        selected = next((element.attrs.get("value", "on") for element in elements
+                         if element.attrs.get("checked")), None)
+        if selected is not None:
+            schema["default"] = selected
+        return schema
+    if input_types == {"checkbox"} and len(elements) > 1:
+        return {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [element.attrs.get("value", "on") for element in elements],
+            },
+            "uniqueItems": True,
+        }
+    if len(schemas) == 1:
+        return schemas[0]
+    return {"type": "array", "items": schemas[0]}
+
+
+def _submitter(element: Element) -> dict[str, Any] | None:
+    if element.attrs.get("disabled"):
+        return None
+    if element.tag == "button":
+        input_type = str(element.attrs.get("type", "submit"))
+        prompt = _text_of(element)
+    elif element.tag == "input" and str(element.attrs.get("type")) in {"submit", "image"}:
+        input_type = str(element.attrs.get("type"))
+        prompt = str(element.attrs.get("value", "Submit"))
+    else:
+        return None
+    if input_type != "submit":
+        return None
+    result: dict[str, Any] = {"prompt": prompt or None}
+    name = element.attrs.get("name")
+    if isinstance(name, str):
+        result["name"] = name
+        result["value"] = element.attrs.get("value", "")
+    return result
 
 
 def _form_affordance(form: Element) -> dict[str, Any]:
-    fields = {}
-    required = []
+    controls: dict[str, list[Element]] = defaultdict(list)
+    required: set[str] = set()
+    submitters: list[dict[str, Any]] = []
     for element in _walk_elements(form):
         if element.tag in {"input", "textarea", "select"}:
             field = _field_schema(element)
             if field is None:
                 continue
-            fields[field["name"]] = field["schema"]
+            controls[field["name"]].append(element)
             if field["required"]:
-                required.append(field["name"])
-    submit_text = next(
-        (_text_of(e) for e in _walk_elements(form) if e.tag == "button"), ""
-    )
+                required.add(field["name"])
+        if submitter := _submitter(element):
+            submitters.append(submitter)
+    fields = {
+        name: schema
+        for name, elements in controls.items()
+        if (schema := _group_schema(elements)) is not None
+    }
     return {
         "action": form.attrs.get("action"),
         "method": form.attrs.get("method"),
-        "prompt": submit_text or None,
+        "enctype": form.attrs.get("enctype", "application/x-www-form-urlencoded"),
+        "prompt": submitters[0]["prompt"] if submitters else None,
+        "submitters": submitters,
         "fields": {
             "type": "object",
             "properties": fields,

@@ -5,8 +5,7 @@ from pydantic import ValidationError
 
 from curvature import Anomaly, respond
 from curvature import html as h
-from curvature.gate.findings import Finding
-from curvature.satellites import Satellite, capture, captured, constellation_checks
+from curvature.satellites import Satellite, capture, captured
 
 
 def shell(*fragments):
@@ -76,27 +75,6 @@ def test_manifests_are_frozen_and_closed():
 def test_satellite_names_are_lower_snake():
     with pytest.raises(ValidationError):
         Satellite(name="Beacon", version="1")
-
-
-def test_mass_accumulates_across_the_constellation():
-    def check_a(root):
-        return [Finding("ANOM-900", "x", None, "a")]
-
-    def check_b(root):
-        return [Finding("ANOM-901", "y", None, "b")]
-
-    app = FastAPI()
-    capture(app, make_satellite("beacon", checks=(check_a,)), orbit="/beacon")
-    capture(app, make_satellite("pulse", checks=(check_b,)), orbit="/pulse")
-    gathered = constellation_checks(app)
-    assert len(gathered) == 2
-    assert [f.rule for fn in gathered for f in fn(None)] == ["ANOM-900", "ANOM-901"]
-
-
-def test_a_massless_satellite_is_legal():
-    app = FastAPI()
-    capture(app, make_satellite(checks=()), orbit="/beacon")
-    assert constellation_checks(app) == []
 
 
 def test_capture_order_is_meaningless():

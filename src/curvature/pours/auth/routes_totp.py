@@ -3,6 +3,7 @@ success to code success: no session exists until both factors do."""
 
 from __future__ import annotations
 
+import json
 import time
 from typing import Annotated
 
@@ -15,41 +16,51 @@ from satellites.auth.components.totp_desk import (
     totp_setup,
 )
 from satellites.auth.security import (
+    hash_token,
+    match_totp_counter,
     new_session_token,
     new_totp_secret,
     otpauth_uri,
-    verify_totp,
 )
-from satellites.auth.sessions import CurrentUser, start_session
+from satellites.auth.sessions import (
+    CurrentUser,
+    rate_limit,
+    require_write_origin,
+    start_session,
+)
+from satellites.auth.store import ChallengeRecord
 
 from curvature import redirect, respond
 
 router = APIRouter()
 
 PENDING_SECONDS = 300
+PENDING_ATTEMPTS = 5
 
 
-def pending_logins(request: Request) -> dict[str, tuple[str, float]]:
-    stash = getattr(request.app.state, "auth_pending_logins", None)
-    if stash is None:
-        stash = {}
-        request.app.state.auth_pending_logins = stash
-    return stash
-
-
-def stash_pending(request: Request, user_id: str) -> str:
-    nonce = new_session_token()[:16]
-    pending_logins(request)[nonce] = (user_id, time.time() + PENDING_SECONDS)
+def stash_pending(request: Request, user_id: str, attempts: int = PENDING_ATTEMPTS) -> str:
+    nonce = new_session_token()
+    request.app.state.auth_store.save_challenge(ChallengeRecord(
+        token_hash=hash_token(nonce),
+        kind="totp-login",
+        payload=json.dumps({"user_id": user_id, "attempts": attempts}),
+        expires_at=time.time() + PENDING_SECONDS,
+    ))
     return nonce
 
 
-def pop_pending(request: Request, nonce: str) -> str | None:
-    user_id, expires = pending_logins(request).pop(nonce, (None, 0))
-    return user_id if user_id and expires > time.time() else None
+def pop_pending(request: Request, nonce: str) -> tuple[str, int] | None:
+    challenge = request.app.state.auth_store.pop_challenge(
+        hash_token(nonce), "totp-login", time.time()
+    )
+    if challenge is None:
+        return None
+    payload = json.loads(challenge.payload)
+    return str(payload["user_id"]), int(payload["attempts"])
 
 
 @router.get("/totp")
-async def totp_setup_page(request: Request, user: CurrentUser):
+def totp_setup_page(request: Request, user: CurrentUser):
     secret = new_totp_secret()
     return respond(
         request,
@@ -64,20 +75,23 @@ async def totp_setup_page(request: Request, user: CurrentUser):
 
 
 @router.post("/totp/enable")
-async def totp_enable(
+def totp_enable(
     request: Request,
     user: CurrentUser,
     secret: Annotated[str, Form()],
     code: Annotated[str, Form()],
 ):
-    if not verify_totp(secret, code):
+    counter = match_totp_counter(secret, code)
+    if counter is None:
         return redirect("/auth/totp")
-    request.app.state.auth_store.set_totp_secret(user.id, secret)
+    store = request.app.state.auth_store
+    store.set_totp_secret(user.id, secret)
+    store.claim_totp_counter(user.id, counter)
     return redirect("/")
 
 
 @router.get("/totp/check")
-async def totp_check_page(request: Request, pending: str = "", error: str = ""):
+def totp_check_page(request: Request, pending: str = "", error: str = ""):
     return respond(
         request,
         totp_challenge(TotpChallengeProps(pending=pending, error=error or None)),
@@ -88,28 +102,36 @@ async def totp_check_page(request: Request, pending: str = "", error: str = ""):
 
 
 @router.post("/totp/check")
-async def totp_check(
+def totp_check(
     request: Request,
     pending: Annotated[str, Form()],
     code: Annotated[str, Form()],
 ):
-    user_id = pop_pending(request, pending)
+    require_write_origin(request)
+    pending_login = pop_pending(request, pending)
+    user_id, attempts = pending_login if pending_login else (None, 0)
     store = request.app.state.auth_store
     user = store.get_user_by_id(user_id) if user_id else None
     if user is None:
         return redirect("/auth/login?error=credentials")
-    if not user.totp_secret or not verify_totp(user.totp_secret, code):
-        nonce = stash_pending(request, user.id)
+    rate_limit(request, "totp", user.id, limit=10, window_seconds=600)
+    counter = match_totp_counter(user.totp_secret, code) if user.totp_secret else None
+    if counter is None or not store.claim_totp_counter(user.id, counter):
+        if attempts <= 1:
+            return redirect("/auth/login?error=credentials")
+        nonce = stash_pending(request, user.id, attempts - 1)
         return redirect(f"/auth/totp/check?pending={nonce}&error=code")
     response = redirect("/")
-    start_session(response, store, user)
+    start_session(request, response, store, user)
     return response
 
 
 @router.post("/totp/disable")
-async def totp_disable(
+def totp_disable(
     request: Request, user: CurrentUser, code: Annotated[str, Form()]
 ):
-    if user.totp_secret and verify_totp(user.totp_secret, code):
-        request.app.state.auth_store.set_totp_secret(user.id, None)
+    store = request.app.state.auth_store
+    counter = match_totp_counter(user.totp_secret, code) if user.totp_secret else None
+    if counter is not None and store.claim_totp_counter(user.id, counter):
+        store.set_totp_secret(user.id, None)
     return redirect("/")

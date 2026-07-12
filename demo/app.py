@@ -93,23 +93,9 @@ async def live(request: Request):
     return live_stream(_tower_events(request.app.state.roadmap_store))
 
 
-@app.get("/curvature-offline.js")
-async def offline_worker():
-    """The replay worker must be served from the scope it protects —
-    a worker registered from /static/lib/ could only cache /static/lib."""
-    from starlette.responses import FileResponse
-
-    import curvature
-
-    return FileResponse(
-        Path(curvature.__file__).parent / "static" / "curvature-offline.js",
-        media_type="text/javascript",
-    )
-
-
 @app.get("/atlas")
 async def atlas_page(request: Request):
     return respond(
-        request, atlas(app), shell=shell,
+        request, atlas(app, exclude=("/live",)), shell=shell,
         purpose="Every readable region of Pit Board; agents fetch each region's chart.",
     )

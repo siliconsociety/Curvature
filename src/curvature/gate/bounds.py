@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from curvature.gate.findings import Finding, is_vendored, walk_source
-from curvature.gate.ratchet import Ratchet, loosened, previous_committed
+from curvature.gate.ratchet import Ratchet, historical_tightest, loosened
 
 
 def check_ceilings(root: Path, ratchet: Ratchet) -> list[Finding]:
@@ -54,8 +54,8 @@ def check_coverage(root: Path, ratchet: Ratchet) -> list[Finding]:
 
 
 def check_ratchet_integrity(root: Path, ratchet: Ratchet) -> list[Finding]:
-    """ANOM-142: nothing loosened since the last commit (C-402)."""
-    committed = previous_committed(root)
+    """ANOM-142: project bounds cannot loosen anywhere in HEAD's history (C-402)."""
+    committed = historical_tightest(root)
     if committed is None:
         return []
     return [

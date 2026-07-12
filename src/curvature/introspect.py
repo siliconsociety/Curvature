@@ -1,9 +1,8 @@
-"""First-party chart reading (C-900 consumed from inside the house).
+"""In-process chart reading (C-900 consumed through the ASGI front door).
 
-The Concierge — or any resident — reads a screen's chart by calling the
-app directly through the ASGI interface: no HTTP, no client library, no
-socket. The resident is just another chart consumer; it happens to live
-here.
+Server-side tooling can read a screen's chart through the app's ASGI
+interface: no network socket and no parallel component API. It remains an
+ordinary chart consumer and receives exactly the public projection.
 """
 
 from __future__ import annotations

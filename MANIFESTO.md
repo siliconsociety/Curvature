@@ -80,10 +80,12 @@ tests drive real forms through real URLs is an app whose degraded path is
 its *tested* path. We had this once. We are taking it back.
 
 **3. JavaScript annotates; it never decides.** The boost layer — the only
-JavaScript Curvature ships — intercepts working links and working forms and
-swaps fragments instead of navigating. Enhancement, by definition:
-everything it touches already works without it. App logic in the browser is
-an anomaly, and the gate knows what a `fetch` call looks like.
+JavaScript Curvature ships — intercepts working links and GET forms and
+swaps fragments instead of navigating. Writes remain native browser
+submissions: their failure semantics are too important to simulate.
+Enhancement, by definition, only touches paths that already work without it.
+App logic in the browser is an anomaly, and the gate knows what a `fetch`
+call looks like.
 
 **4. The UI is typed Python.** Components are functions of props; props are
 pydantic models. Your markup logic is type-checked by the same tools as
@@ -112,6 +114,12 @@ No bundler. No build step. No client-side state store. No plugin registry.
 No mixin. No configuration sprawl. No abstraction admitted before the
 second concrete need. Each refusal is load-bearing: every artifact Curvature
 does not have is an artifact that cannot silt up.
+
+No offline replay cache. Authenticated HTML and one-time secrets do not
+belong in a framework service worker, and Curvature will not pretend that a
+partial shadow application is the same application. Offline support, if a
+product truly needs it, is an explicit event-horizon architecture owned by
+that product.
 
 ## Who this is for
 

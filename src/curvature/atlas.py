@@ -23,6 +23,8 @@ def _readable_routes(app: Any) -> list[tuple[str, str]]:
         methods = getattr(route, "methods", None)
         if path is None or methods is None or "GET" not in methods:
             continue
+        if getattr(route, "include_in_schema", True) is False:
+            continue
         if "{" in path:
             continue  # parameterized regions are reached from their parents
         name = getattr(route, "name", "") or path

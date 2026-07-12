@@ -3,5 +3,6 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 uv run ruff check src tests demo
+uv run pyright
 uv run pytest -q --cov --cov-report=json
 uv run curvature check

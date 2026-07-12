@@ -6,7 +6,7 @@ documentation; everything else is enforced, not remembered.
 ## The one command
 
 ```bash
-./gate.sh        # ruff + pytest with coverage + curvature check
+./gate.sh        # ruff + pyright + pytest with coverage + curvature check
 ```
 
 Green means done. Red means not done. `curvature check` findings are
@@ -27,7 +27,10 @@ yourself.
 ```python
 @app.get("/things")
 async def things(request: Request):
-    return respond(request, thing_list(props), shell=shell)
+    return respond(
+        request, thing_list(props), shell=shell,
+        purpose="Review the current things",
+    )
 
 @app.post("/things")
 async def create_thing(name: Annotated[str, Form()]):
@@ -40,7 +43,8 @@ links — the constructors refuse anything else.
 
 ## The four nevers
 
-1. Never write JavaScript. The boost layer is complete; behavior
+1. Never write application JavaScript. The framework boost layer is the
+   sole sanctioned script; behavior
    belongs on the server or in native HTML.
 2. Never edit ratchet.toml. `uv run curvature ratchet` is the only hand on
    the mechanism.

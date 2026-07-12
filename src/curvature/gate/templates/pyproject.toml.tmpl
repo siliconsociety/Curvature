@@ -1,7 +1,7 @@
 [project]
 name = "__CURVATURE_NAME__"
 version = "0.1.0"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
     "curvature[fastapi]",
     "uvicorn",
@@ -9,18 +9,27 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest",
+    "pytest>=9.1",
     "pytest-cov",
+    "httpx",
     "httpx2",
     "ruff",
+    "pyright",
 ]
 
 [tool.ruff]
 line-length = 100
+target-version = "py312"
+
+[tool.pyright]
+include = ["app", "satellites", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = ["error"]
 
 [tool.coverage.run]
 source = ["app"]

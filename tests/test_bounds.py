@@ -4,7 +4,14 @@ import json
 from pathlib import Path
 
 from curvature.gate import bounds as checks
-from curvature.gate.ratchet import Ratchet, load, loosened, save
+from curvature.gate.ratchet import (
+    Ratchet,
+    historical_tightest,
+    load,
+    loosened,
+    previous_committed,
+    save,
+)
 
 
 def write(root: Path, relpath: str, text: str) -> Path:
@@ -64,6 +71,18 @@ def test_tightening_is_not_loosening():
     committed = Ratchet(ceilings={"py": 300}, exceptions={"big.py": 500}, coverage_floor=80.0)
     current = Ratchet(ceilings={"py": 250}, exceptions={"big.py": 400}, coverage_floor=90.0)
     assert loosened(current, committed) == []
+
+
+def test_a_loosened_bound_already_committed_is_still_caught(tmp_path):
+    write(tmp_path, "ratchet.toml", "[ceilings]\npy = 100\n[floors]\ncoverage = 90\n")
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-qm", "tight")
+    write(tmp_path, "ratchet.toml", "[ceilings]\npy = 200\n[floors]\ncoverage = 80\n")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-qm", "loosened")
+    findings = checks.check_ratchet_integrity(tmp_path, load(tmp_path))
+    assert [finding.rule for finding in findings] == ["ANOM-142", "ANOM-142"]
 
 
 def test_ratchet_round_trip(tmp_path):
@@ -157,3 +176,53 @@ def test_git_failures_stay_silent(tmp_path, monkeypatch):
 
     monkeypatch.setattr(subprocess, "run", explode)
     assert checks.check_version_currency(tmp_path) == []
+
+
+def test_ratchet_history_survives_missing_git(tmp_path, monkeypatch):
+    import subprocess
+
+    def explode(*args, **kwargs):
+        raise subprocess.TimeoutExpired("git", 10)
+
+    monkeypatch.setattr(subprocess, "run", explode)
+    assert previous_committed(tmp_path) is None
+
+
+def test_ratchet_history_falls_back_when_log_fails(tmp_path, monkeypatch):
+    import subprocess
+
+    baseline = Ratchet(coverage_floor=91.0)
+    calls = 0
+
+    def run(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return subprocess.CompletedProcess(args[0], 0, "[floors]\ncoverage = 91\n", "")
+        return subprocess.CompletedProcess(args[0], 1, "", "no log")
+
+    monkeypatch.setattr(subprocess, "run", run)
+    assert historical_tightest(tmp_path) == baseline
+
+
+def test_ratchet_history_ignores_unreadable_entries(tmp_path, monkeypatch):
+    import subprocess
+
+    responses = iter(
+        [
+            subprocess.CompletedProcess(
+                [], 0, "[ceilings]\npy = 300\n[floors]\ncoverage = 80\n", ""
+            ),
+            subprocess.CompletedProcess([], 0, "missing\nvalid\n", ""),
+            subprocess.CompletedProcess([], 1, "", "missing"),
+            subprocess.CompletedProcess(
+                [], 0, "[ceilings]\npy = 250\n[floors]\ncoverage = 90\n", ""
+            ),
+        ]
+    )
+
+    monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: next(responses))
+    tightest = historical_tightest(tmp_path)
+    assert tightest is not None
+    assert tightest.ceilings["py"] == 250
+    assert tightest.coverage_floor == 90

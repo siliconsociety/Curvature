@@ -3,7 +3,12 @@ import ast
 import pytest
 
 from curvature.gate.cli import main, run_checks
-from curvature.gate.scaffold import available_pours, new_app, pour_satellite
+from curvature.gate.scaffold import (
+    _enable_curvature_extra,
+    available_pours,
+    new_app,
+    pour_satellite,
+)
 
 
 @pytest.fixture(scope="module")
@@ -15,7 +20,7 @@ def manifold(tmp_path_factory):
 
 
 def test_the_constellation_is_available():
-    assert {"auth", "concierge"} <= set(available_pours())
+    assert set(available_pours()) == {"auth"}
 
 
 def test_pour_lands_in_satellites_and_tests(manifold):
@@ -30,6 +35,21 @@ def test_poured_packages_are_importable_shapes(manifold):
     assert (manifold / "satellites/__init__.py").exists()
     assert (manifold / "satellites/auth/__init__.py").exists()
     assert (manifold / "satellites/auth/components/__init__.py").exists()
+
+
+def test_auth_pour_declares_its_crypto_dependency(manifold):
+    assert '"curvature[auth,fastapi]"' in (manifold / "pyproject.toml").read_text()
+
+
+def test_extra_enablement_handles_plain_and_missing_project_dependencies(tmp_path):
+    _enable_curvature_extra(tmp_path, "auth")  # non-project owners may still pour source
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text('[project]\ndependencies = ["curvature>=0.2"]\n')
+    _enable_curvature_extra(tmp_path, "auth")
+    assert '"curvature[auth]>=0.2"' in pyproject.read_text()
+    pyproject.write_text('[project]\ndependencies = ["fastapi"]\n')
+    with pytest.raises(ValueError, match="must declare curvature"):
+        _enable_curvature_extra(tmp_path, "auth")
 
 
 def test_poured_source_parses(manifold):

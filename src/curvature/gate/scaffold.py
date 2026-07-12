@@ -10,6 +10,7 @@ human or an agent means pointing them at the directory.
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -133,10 +134,30 @@ def new_component(root: Path, dotted_path: str) -> list[Path]:
     return [target, test]
 
 POURS = Path(__file__).resolve().parent.parent / "pours"
+POUR_EXTRAS = {"auth": "auth"}
 
 
 def available_pours() -> list[str]:
     return sorted(p.name for p in POURS.iterdir() if p.is_dir())
+
+
+def _enable_curvature_extra(root: Path, extra: str) -> None:
+    """Keep a poured satellite's runtime dependency explicit in the app."""
+    pyproject = root / "pyproject.toml"
+    if not pyproject.exists():
+        return
+    source = pyproject.read_text()
+    pattern = re.compile(r'("curvature)(?:\[([^]]*)\])?([^"\n]*")')
+
+    def add_extra(match: re.Match[str]) -> str:
+        extras = {part.strip() for part in (match.group(2) or "").split(",") if part.strip()}
+        extras.add(extra)
+        return f'{match.group(1)}[{",".join(sorted(extras))}]{match.group(3)}'
+
+    updated, count = pattern.subn(add_extra, source, count=1)
+    if count == 0:
+        raise ValueError("pyproject.toml must declare curvature before pouring a satellite")
+    pyproject.write_text(updated)
 
 
 def pour_satellite(root: Path, name: str) -> list[Path]:
@@ -181,4 +202,6 @@ def pour_satellite(root: Path, name: str) -> list[Path]:
             if not marker.exists():
                 marker.touch()
                 created.append(marker)
+    if extra := POUR_EXTRAS.get(name):
+        _enable_curvature_extra(root, extra)
     return created

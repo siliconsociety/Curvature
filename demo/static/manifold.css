@@ -81,15 +81,3 @@ header { padding-top: 2.5rem; }
   color: var(--ink-soft);
   font-style: italic;
 }
-
-/* Offline (C-303): the banner is a style, not a script. curvature.js
- * reports the browser's connectivity as data-offline; CSS says the rest. */
-:root[data-offline] body::before {
-  content: "Offline — showing the last thing you saw. Git still keeps the time.";
-  display: block;
-  padding: 0.6rem 1.25rem;
-  background: var(--signal);
-  color: var(--signal-ink);
-  font-size: 0.85rem;
-  text-align: center;
-}

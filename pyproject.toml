@@ -8,13 +8,15 @@ license-files = ["LICENSE"]
 authors = [
     { name = "Robert Sharp", email = "webmaster@sharpdesigndigital.com" },
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 keywords = ["web", "framework", "agents", "progressive-enhancement", "server-rendered", "htmx-alternative"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
@@ -30,19 +32,24 @@ Issues = "https://github.com/siliconsociety/Curvature/issues"
 
 [project.optional-dependencies]
 fastapi = ["fastapi>=0.115", "python-multipart>=0.0.20"]
+auth = ["pyjwt[crypto]>=2.10"]
 
 [project.scripts]
 curvature = "curvature.gate.cli:main"
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0",
+    "pytest>=9.1",
     "pytest-cov>=7.0",
     "ruff>=0.14",
     "fastapi>=0.115",
     "python-multipart>=0.0.20",
     "uvicorn>=0.35",
+    "httpx>=0.28",
     "httpx2>=2.5.0",
+    "playwright>=1.61.0",
+    "pyright>=1.1.411",
+    "pyjwt[crypto]>=2.10",
 ]
 
 [build-system]
@@ -51,7 +58,7 @@ build-backend = "uv_build"
 
 [tool.ruff]
 line-length = 100
-target-version = "py314"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
@@ -59,12 +66,20 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = ["error"]
+
+[tool.pyright]
+include = ["src/curvature", "demo"]
+exclude = ["src/curvature/pours"]
+extraPaths = ["src", "."]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
 
 [tool.coverage.run]
 source = ["src/curvature"]
 branch = true
-# Pours are delivered code: tested by pouring them into an app and
-# running that app's suite, not by importing them here.
+# The badge is core-runtime coverage. Poured Auth is executed separately
+# from a fresh stranger app by tests/test_poured_auth_integration.py.
 omit = ["src/curvature/pours/*"]
 
 [tool.coverage.report]

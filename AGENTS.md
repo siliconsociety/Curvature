@@ -16,7 +16,7 @@ architecture (SPEC.md C-202).
 ## The one command that matters
 
 ```bash
-./gate.sh        # ruff + pytest with coverage + curvature check
+./gate.sh        # ruff + pyright + pytest with coverage + curvature check
 ```
 
 Green means done. Red means not done. There is no third state, and
@@ -62,7 +62,10 @@ Reads render; writes redirect. No exceptions you can grant yourself.
 @app.get("/laps")
 async def laps(request: Request, status: str = "all"):
     props = LapListProps(...)          # build typed props from state
-    return respond(request, lap_list(props), shell=shell)
+    return respond(
+        request, lap_list(props), shell=shell,
+        purpose="Review and filter recorded laps",
+    )
 
 
 @app.post("/laps")
@@ -81,8 +84,8 @@ async def create_lap(title: Annotated[str, Form()]):
 
 ## What you must never do
 
-- **Never write JavaScript.** The boost layer (`curvature.js`) is complete
-  and vendored. If a behavior seems to need JS, the behavior belongs on
+- **Never write application JavaScript.** The framework-owned boost layer
+  (`curvature.js`) is the sole sanctioned script. If a behavior seems to need JS, it belongs on
   the server or in native HTML (`<details>`, `<dialog>`, `popover`,
   CSS `:has()`). A `.js` file from your hands is an anomaly on sight
   (ANOM-120).
@@ -123,7 +126,6 @@ discovery is not.
 | grandfather | pinning an over-ceiling file at its high-water mark |
 | Manifold | the design tokens; the poured surface |
 | live | server-pushed fragment swaps over SSE; declared with data-live |
-| replay worker | offline reads from cache, never writes (data-offline-cache) |
 | chart | the machine-legible projection of a screen (agents read charts, not pixels) |
 | atlas | the screen linking every readable region; its chart is the machine atlas |
 | the geometry holds | `curvature check` exit 0 |

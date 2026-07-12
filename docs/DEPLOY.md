@@ -7,8 +7,8 @@ you're deploying a monolith like it owes you money.
 
 ## The shape
 
-A manifold is one process: uvicorn serving FastAPI, state in its
-store, static files mounted. Horizontal scale is more processes; there
+A manifold is uvicorn serving FastAPI, state in its store, static files
+mounted. Horizontal scale is more processes; there
 is no client-heap tax to amortize and no build step to run.
 
 ## Heroku (or any Procfile host)
@@ -32,9 +32,16 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 2
 
 behind Caddy or nginx. Two notes the defaults get wrong:
 
-- **TLS cookies**: flip `secure=False` to `True` in the Auth
-  satellite's `start_session` the day you have HTTPS. The comment in
-  the source says exactly this; the deploy is when it comes due.
+- **Auth is explicit**: capture Auth with `AuthConfig(allowed_origins=(
+  "https://your-domain.example",), secure_cookies=True)`. There is no
+  permissive production default. Put the same canonical origin at the
+  proxy and application boundary.
+- **Shared state**: the poured SQLite store is a safe single-host baseline,
+  with WAL, busy timeouts, database-backed OIDC/TOTP challenges, rate
+  limits, and sessions. Multiple workers must open the same durable SQLite
+  file. Heroku's ephemeral filesystem is demo-only; production Auth needs a
+  persistent volume or a store implementation with the same protocol and
+  atomic guarantees.
 - **SSE behind nginx**: Live streams already send
   `X-Accel-Buffering: no`; if you strip headers at the proxy, don't
   strip that one.
@@ -50,7 +57,7 @@ bounded (SIGTERM then SIGKILL); this is a laptop concern.
 ## What there isn't
 
 No container orchestration requirement, no sidecar, no bundler stage,
-no asset pipeline. `sqlite` ships in the dyno's filesystem (ephemeral
-on Heroku — fine for demos; give real data a volume or the Mongo
-satellite). The gate runs in CI or a pre-push hook the same way it
-runs on a laptop: `./gate.sh`.
+no asset pipeline. There is also no production Mongo adapter hiding behind
+the pour: unfinished stores were removed rather than advertised. The gate
+runs in CI or a pre-push hook the same way it runs on a laptop:
+`./gate.sh`.

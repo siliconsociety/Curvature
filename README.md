@@ -52,8 +52,9 @@ def lap(props: LapProps) -> Element:
   every open browser — the demo's roadmap redraws when anyone ships a
   card — with zero app JavaScript.
 - **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
-  forms into fragment swaps. Same route, same render, one header of
-  difference. Every failure path is real navigation.
+  GET forms into fragment swaps. Mutating forms stay native, so a lost
+  connection can never turn a POST into the wrong GET. Same route, same
+  render, one header of difference.
 - **The ratchet only tightens.** File ceilings fall, the coverage floor
   rises, and `curvature ratchet` is the only hand on the mechanism. The
   10,000-line file is never written because week two's gate refuses the
@@ -97,14 +98,16 @@ uv sync && ./gate.sh
 uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1   # Pit Board
 ```
 
-Then turn JavaScript off and use it again. Nothing changes. That is the
-whole point.
+Then turn JavaScript off and use it again. Links, forms, redirects, and
+refreshes still work; only enhancement (fragment swaps and live push)
+disappears. That is the boundary.
 
 ## Status
 
-Day one (2026-07-11). The contract, runtime, gate, and demo are real and
-self-hosting — this repo passes its own gate. The spec is versioned and
-arguable; argue by issue.
+Alpha. The contract, runtime, gate, demo, browser-level boost tests, and a
+fresh-pour Auth integration suite are real and self-hosting. Production
+readiness is earned by the gate and deployment checks, not asserted by the
+version label. The spec is versioned and arguable; argue by issue.
 
 MIT. Built by Robert Sharp, with Claude Fable 5 on its last day on the
 subscription — read the manifesto and you'll see why that detail

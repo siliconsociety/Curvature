@@ -52,7 +52,12 @@ def respond(
                 "layer swaps subtrees by id; give the root a stable identity"
             )
     if wants_chart(request):
-        chart = build_chart(fragments, url=str(request.url.path), purpose=purpose)
+        if purpose is None or not purpose.strip():
+            raise Anomaly("chart responses require a non-empty purpose (C-902)")
+        url = str(request.url.path)
+        if request.url.query:
+            url = f"{url}?{request.url.query}"
+        chart = build_chart(fragments, url=url, purpose=purpose)
         return JSONResponse(chart, status_code=status_code, headers={"vary": VARY})
     headers = {"vary": VARY, "curvature-chart": "available"}
     if is_boosted(request):

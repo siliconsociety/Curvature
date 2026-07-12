@@ -1,4 +1,8 @@
 import json
+import runpy
+import sys
+
+import pytest
 
 from curvature.gate.cli import main
 from curvature.gate.ratchet import Ratchet, load, previous_committed, save
@@ -79,3 +83,10 @@ def test_main_new_component_rejects_bad_paths(tmp_path, capsys, monkeypatch):
 
 def test_previous_committed_is_none_outside_git(tmp_path):
     assert previous_committed(tmp_path) is None
+
+
+def test_python_module_is_a_path_proof_cli_front_door(tmp_path, monkeypatch):
+    monkeypatch.setattr(sys, "argv", ["python -m curvature", "check", str(tmp_path)])
+    with pytest.raises(SystemExit) as stopped:
+        runpy.run_module("curvature.__main__", run_name="__main__")
+    assert stopped.value.code == 0

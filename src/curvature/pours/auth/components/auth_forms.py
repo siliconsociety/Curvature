@@ -8,8 +8,9 @@ from curvature import html as h
 
 ERRORS = {
     "credentials": "That email and password don't match our records.",
+    "email-invalid": "Enter a complete email address.",
     "email-taken": "An account with that email already exists.",
-    "password-short": "Passwords need at least 8 characters.",
+    "password-short": "Passwords need 12 to 1024 characters.",
 }
 
 
@@ -69,7 +70,8 @@ def register_form(props: RegisterFormProps) -> Element:
                      value=props.email, required=True, autocomplete="email"),
             h.label("Password", for_="password"),
             h.input_(type="password", name="password", id="password",
-                     required=True, minlength=8, autocomplete="new-password"),
+                     required=True, minlength=12, maxlength=1024,
+                     autocomplete="new-password"),
             h.button("Register", class_="auth-submit"),
             action="/auth/register",
             method="post",

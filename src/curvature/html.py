@@ -10,8 +10,10 @@ None render nothing.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from html import escape
+from types import MappingProxyType
 
 from curvature.errors import Anomaly
 
@@ -24,27 +26,73 @@ VOID_TAGS = frozenset(
 )
 
 
+@dataclass(frozen=True, slots=True)
 class Raw:
     """Pre-rendered HTML admitted verbatim. Every call site is a finding
     census entry (ANOM-122): use it for trusted, already-escaped markup only."""
 
-    __slots__ = ("text",)
-
-    def __init__(self, text: str) -> None:
-        self.text = text
+    text: str
 
 
 def raw(text: str) -> Raw:
     return Raw(text)
 
 
-class Element:
-    __slots__ = ("tag", "attrs", "children")
+def _freeze_children(children: Iterable[Child]) -> tuple:
+    frozen: list = []
+    for child in children:
+        if child is None or isinstance(child, Element | Raw | str | int | float):
+            frozen.append(child)
+        elif isinstance(child, Iterable):
+            frozen.extend(_freeze_children(child))
+        else:
+            raise Anomaly(
+                f"cannot render child of type {type(child).__name__}; "
+                "children are Elements, strings, numbers, raw(), or iterables of those"
+            )
+    return tuple(frozen)
 
-    def __init__(self, tag: str, attrs: dict[str, AttrValue], children: tuple) -> None:
-        self.tag = tag
-        self.attrs = attrs
-        self.children = children
+
+def _validate_element(tag: str, attrs: Mapping[str, AttrValue], children: tuple) -> None:
+    normalized = {_attr_name(name).casefold(): value for name, value in attrs.items()}
+    if "onclick" in normalized:  # curvature-allow: enforcement
+        raise Anomaly(  # curvature-allow: enforcement
+            "onclick is an anomaly (C-200): "  # curvature-allow: message
+            "behavior needs a real URL or form"
+        )
+    if tag == "a":
+        href = normalized.get("href")
+        if not isinstance(href, str) or not href or href == "#" or href.casefold().startswith(
+            "javascript:"  # curvature-allow: enforcement
+        ):
+            raise Anomaly(
+                f"href={href!r} is an anomaly (C-200): a link must carry a real URL"
+            )
+    elif tag == "form":
+        action = normalized.get("action")
+        method = normalized.get("method")
+        if not isinstance(action, str) or not action:
+            raise Anomaly("a form without an action is an anomaly (C-200)")
+        if not isinstance(method, str) or method.casefold() not in {"get", "post"}:
+            raise Anomaly("a form method must be GET or POST (C-200)")
+    elif tag == "script":
+        if not isinstance(normalized.get("src"), str) or children:
+            raise Anomaly("scripts require src and refuse inline bodies (C-302)")
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class Element:
+    tag: str
+    attrs: Mapping[str, AttrValue]
+    children: tuple
+
+    def __init__(self, tag: str, attrs: Mapping[str, AttrValue], children: tuple) -> None:
+        frozen_children = _freeze_children(children)
+        frozen_attrs = MappingProxyType(dict(attrs))
+        _validate_element(tag, frozen_attrs, frozen_children)
+        object.__setattr__(self, "tag", tag)
+        object.__setattr__(self, "attrs", frozen_attrs)
+        object.__setattr__(self, "children", frozen_children)
 
     @property
     def id(self) -> str | None:
@@ -59,7 +107,7 @@ def _attr_name(name: str) -> str:
     return name.removesuffix("_").replace("_", "-")
 
 
-def _render_attrs(attrs: dict[str, AttrValue]) -> str:
+def _render_attrs(attrs: Mapping[str, AttrValue]) -> str:
     parts: list[str] = []
     for name, value in attrs.items():
         if value is None or value is False:
@@ -85,13 +133,6 @@ def _render_children(children: tuple, out: list[str]) -> None:
                 out.append(escape(child))
             case int() | float():
                 out.append(escape(str(child)))
-            case Iterable():
-                _render_children(tuple(child), out)
-            case _:
-                raise Anomaly(
-                    f"cannot render child of type {type(child).__name__}; "
-                    "children are Elements, strings, numbers, raw(), or iterables of those"
-                )
 
 
 def render(element: Element) -> str:
@@ -195,7 +236,7 @@ menu = _factory("menu")
 
 def a(*children: Child, href: str, **attrs: AttrValue) -> Element:
     """A real link (C-200). href is required and must go somewhere."""
-    if href == "#" or href.startswith("javascript:"):  # curvature-allow: enforcement
+    if href == "#" or href.casefold().startswith("javascript:"):  # curvature-allow: enforcement
         raise Anomaly(
             f'href={href!r} is an anomaly (C-200): a link that goes nowhere '
             "is a button wearing a costume; use a form or a real URL"

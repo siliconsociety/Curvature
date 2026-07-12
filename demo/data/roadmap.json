@@ -10,7 +10,7 @@
       "id": "constellation",
       "title": "0.2.0 \u2014 the constellation",
       "lane": "shipped",
-      "note": "Satellites (capture, manifests, mass), curvature pour, Auth skeleton with the revolving-door store, C-203 construction-grade."
+      "note": "Satellites (explicit capture and honest component manifests), curvature pour, and the first Auth skeleton. Later hardening removed manifest fields and stores that the runtime did not truly enforce."
     },
     {
       "id": "chart-atlas",
@@ -20,9 +20,9 @@
     },
     {
       "id": "concierge-v1",
-      "title": "Concierge v1 \u2014 drafts, never deeds",
+      "title": "Retired: Concierge v1",
       "lane": "shipped",
-      "note": "The resident agent: intent becomes prefilled real forms the human fires. Zero mutating routes in its orbit, pinned by test."
+      "note": "Removed during production hardening. Resident-agent policy is a real product and trust-boundary decision, not an almost-free framework satellite. Chart/Atlas remains the lower-level substrate."
     },
     {
       "id": "website-manifold",
@@ -32,9 +32,9 @@
     },
     {
       "id": "model-resolver",
-      "title": "Model-backed Resolver for the Concierge",
-      "lane": "queued",
-      "note": "Owner's inference doctrine (2026-07-12): the ModelResolver takes a completion CALLABLE \u2014 keys never touch framework code; house-paid behind CurrentUser (open inference GETs are a cost-DoS faucet), keyword floor always free, BYOK possible but discouraged (secrets custody), BYOA is the pressure valve \u2014 harness chat off-app, sidecar chat on-app, both live today via chart + tokens + real forms; the in-DOM ask box is Concierge territory by law: the DOM belongs to the house, the harness to the user, the browser is where they meet. Curvature never meters, never phones home, never sits in the billing path."
+      "title": "Retired: Concierge model resolver",
+      "lane": "shipped",
+      "note": "Removed with Concierge. Model billing, authorization, intent resolution, and confirmation policy need a product boundary of their own."
     },
     {
       "id": "agent-tokens",
@@ -46,7 +46,7 @@
       "id": "auth-oidc-totp",
       "title": "Auth: direct OIDC + TOTP",
       "lane": "shipped",
-      "note": "TOTP from the stdlib (RFC 6238, forms only, binds after proof); direct OIDC to any issuer via PyJWT + JWKS with an injectable verifier seam; federation never skips the second factor. Proven in a poured app: 22 tests, both doors, zero anomalies. SAML remains outside, forever."
+      "note": "Hardened: explicit secure config, Origin/Referer protection for every browser write, expiring shared challenges and tokens, bounded TOTP attempts with replay prevention, OIDC issuer/subject identity, PKCE, nonce, mix-up defenses, and no email auto-link. Exercised after pouring into a fresh app."
     },
     {
       "id": "live-sse",
@@ -62,9 +62,9 @@
     },
     {
       "id": "mongo-satellite",
-      "title": "Mongo store satellite",
+      "title": "Retired: unfinished Auth stores",
       "lane": "shipped",
-      "note": "The third door on the revolving door: MongoAuthStore rides the Auth pour, twelve verbs on pymongo, constructor takes a database object so tests stay hermetic against an in-repo fake \u2014 Today's FakeCollection tradition, honored in the framework it inspired."
+      "note": "JSON and Mongo adapters were removed during production hardening. SQLite is the proved baseline; another store must demonstrate atomic challenges, replay prevention, shared limits, expiry, and concurrency before it ships."
     },
     {
       "id": "gate-audits",
@@ -86,9 +86,9 @@
     },
     {
       "id": "offline-cache",
-      "title": "Offline: a cache, never a database",
+      "title": "Retired: framework offline replay",
       "lane": "shipped",
-      "note": "curvature-offline.js: pure replay, GET only, no queues, no decisions \u2014 proven by killing the server under an open browser and reloading the full board from cache. En route: shells now version-bust the boost layer, fixing the real bug where upgrades stranded users on stale scripts."
+      "note": "Removed during production hardening. A generic worker cached authenticated HTML and one-time secrets without application authorization or invalidation knowledge. Offline is now an explicit product architecture, not a framework promise."
     },
     {
       "id": "new-demo",
@@ -110,9 +110,9 @@
     },
     {
       "id": "site-repo",
-      "title": "curvature-site: the stranger test",
-      "lane": "shipped",
-      "note": "DEPLOYED: live on Heroku via GitHub auto-deploy gated on CI. Poured by the published CLI, fed from PyPI, built only from commits the public gate blessed. The stranger test, complete at every layer."
+      "title": "curvature-site: live stranger test",
+      "lane": "on_track",
+      "note": "Live on Heroku and independently packaged, but currently behind the framework hardening branch. Update from the next release, add deployment headers and health checks, then verify the live HTML and Chart before calling the stranger test complete."
     },
     {
       "id": "public-gate",
@@ -125,6 +125,12 @@
       "title": "v0.2.1 \u2014 the bump becomes law (C-403)",
       "lane": "shipped",
       "note": "First publish under the standing blessing. ANOM-143 makes stale versions a gate matter; its arrival broke the 300-line ceiling on the gate's own modules \u2014 the first ANOM-140 in history forced the bounds-family split while it was cheap."
+    },
+    {
+      "id": "production-hardening-024",
+      "title": "0.2.4 production hardening",
+      "lane": "shipped",
+      "note": "Hardened boost failure semantics and races; immutable Elements; honest Chart fields; history-aware ratchet; pyright and Python 3.12\u20133.14 CI; fresh-pour Auth security tests; removal of Concierge, offline replay, unenforced manifest fields, and unfinished stores. Evidence: 195 framework tests, 98.5% coverage, a clean 3.12 wheel stranger with poured Auth, and the site gate against the exact candidate. Candidate is not yet published or deployed."
     }
   ]
 }

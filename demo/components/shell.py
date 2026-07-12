@@ -36,7 +36,6 @@ def shell(*fragments: Element) -> Element:
             ),
             h.main(*fragments),
             data_boost=True,
-            data_offline_cache="/curvature-offline.js",
         ),
         lang="en",
     )

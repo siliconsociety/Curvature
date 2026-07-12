@@ -4,9 +4,14 @@
 
     from curvature.satellites import capture
     from satellites.auth.satellite import auth
+    from satellites.auth.sessions import AuthConfig
     from satellites.auth.store import choose
 
     app.state.auth_store = choose(Path("data"))
+    app.state.auth_config = AuthConfig(
+        allowed_origins=frozenset({"https://your.app"}),
+        secure_cookies=True,
+    )
     capture(app, auth, orbit="/auth")
 
 Both lines explicit, both greppable. Identity is then a declared

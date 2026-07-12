@@ -126,7 +126,6 @@ def test_the_poured_constellation_is_honest(tmp_path):
 
     root = new_app(tmp_path, "probe_town")
     pour_satellite(root, "auth")
-    pour_satellite(root, "concierge")
     assert checks.check_manifest_honesty(root) == []
 
 

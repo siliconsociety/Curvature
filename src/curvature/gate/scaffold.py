@@ -91,7 +91,11 @@ def new_app(parent: Path, name: str) -> Path:
     for command in (
         ["git", "init", "--quiet"],
         ["git", "add", "-A"],
-        ["git", "commit", "--quiet", "-m", "Poured by curvature new app"],
+        # The pour commit is the scaffold's work, not the user's, so it
+        # carries the scaffold's identity — and works on machines (and CI
+        # runners) where git was never introduced to anyone.
+        ["git", "-c", "user.name=curvature", "-c", "user.email=pour@curvature.local",
+         "commit", "--quiet", "-m", "Poured by curvature new app"],
     ):
         done = subprocess.run(command, cwd=target, capture_output=True, timeout=15)
         if done.returncode != 0:

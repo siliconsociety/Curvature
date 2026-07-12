@@ -8,10 +8,12 @@
 [![Coverage floor](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsiliconsociety%2FCurvature%2Fmain%2Ffloor-badge.json)](https://github.com/siliconsociety/Curvature/blob/main/ratchet.toml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A web framework for code that agents maintain. Server-rendered Python,
-components as typed functions, real links and real forms, one small
-boost script for the single-page feel — and a gate that makes the
-maintainable path the only path that builds.
+A web framework for code that agents maintain. Live, dynamic web apps
+in pure Python — single-page feel, pages that update themselves in
+real time, zero JavaScript app code — and a gate that makes the
+maintainable path the only path that builds. (Not a static-site
+generator: state lives on the server, and open pages stay current over
+a live stream.)
 
 Curvature's design center is the maintainer nobody watches: the coding
 agent in its forty-third session, at 2 a.m., doing whatever the shape of
@@ -46,6 +48,9 @@ def lap(props: LapProps) -> Element:
   are POST → redirect → GET through real forms. Your test suite drives
   it with httpx — which executes no JS — so the degraded path is the
   tested path, permanently.
+- **Pages keep themselves current.** Live (SSE) pushes updates into
+  every open browser — the demo's roadmap redraws when anyone ships a
+  card — with zero app JavaScript.
 - **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
   forms into fragment swaps. Same route, same render, one header of
   difference. Every failure path is real navigation.

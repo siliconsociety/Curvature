@@ -1,7 +1,7 @@
 import pytest
 from starlette.requests import Request
 
-from curvature import FlatSpot, respond
+from curvature import Anomaly, respond
 from curvature import html as h
 from curvature.fragments import redirect
 
@@ -43,7 +43,7 @@ def test_both_branches_vary_on_the_boost_header():
 
 
 def test_fragment_without_id_is_refused():
-    with pytest.raises(FlatSpot, match="C-501"):
+    with pytest.raises(Anomaly, match="C-501"):
         respond(make_request(boosted=True), h.div("anonymous"), shell=shell)
 
 

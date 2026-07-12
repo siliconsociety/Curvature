@@ -1,4 +1,4 @@
-"""The vocabulary of the gate: findings are flat spots, not 'errors'.
+"""The vocabulary of the gate: findings are anomalies, not 'errors'.
 
 Rule IDs map one-to-one to SPEC.md's finding index. A finding names the
 invariant it serves, because the traceback should teach."""

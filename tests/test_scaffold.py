@@ -34,7 +34,7 @@ def test_scaffold_requires_a_valid_name(tmp_path):
 
 def test_scaffolded_component_passes_its_own_gate(tmp_path):
     """The scaffold's output must satisfy the component signature check —
-    the on-ramp may never pour flat concrete."""
+    the on-ramp never pours an anomaly."""
     from curvature.gate.checks import check_component_signatures
 
     new_component(tmp_path, "demo/components/fuel_gauge")

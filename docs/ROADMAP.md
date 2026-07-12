@@ -5,9 +5,9 @@ when its contract can be stated. Order is intent, not promise.
 
 ## 0.2 — the space expands
 
-- **Singularities doctrine (C-7xx).** The declared enclave for 60fps work:
+- **Event horizon doctrine (C-7xx).** The declared enclave for 60fps work:
   a fenced, vendored widget with a byte budget and a named owner,
-  embedded in a curved page. The gate learns to count singularities and
+  embedded in a curved page. The gate learns to count horizons and
   refuse undeclared ones. This closes the only honest technical gap
   between Curvature and consumer-scale surfaces.
 - **Server push (C-5xx extension).** Live updates as server-pushed
@@ -20,7 +20,7 @@ when its contract can be stated. Order is intent, not promise.
 - **`curvature new demo`.** Pit Board as a scaffold, not a package payload:
   extras deliver dependencies, only a pour delivers code. The demo
   arrives editable, which is what a demo is for.
-- **FLAT-150/151** as specced: orphan CSS selectors, registry patterns.
+- **ANOM-150/151** as specced: orphan CSS selectors, registry patterns.
 - **Deployment doc.** The boring truth: uvicorn workers behind a
   reverse proxy, one container, fragment-cache headers. Publish it so
   nobody invents a k8s ritual for a monolith.

@@ -17,7 +17,7 @@ from curvature.gate import checks, scaffold
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
 
-ALL_CHECKS = "the full finding index (FLAT-110 .. FLAT-142); see SPEC.md"
+ALL_CHECKS = "the full finding index (ANOM-110 .. ANOM-142); see SPEC.md"
 
 
 def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
@@ -33,7 +33,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *checks.check_ratchet_integrity(root, ratchet),
     ]
     info = [
-        f"raw() census: {checks.raw_census(root)} call sites (FLAT-122)",
+        f"raw() census: {checks.raw_census(root)} call sites (ANOM-122)",
         f"curvature-allow census: {checks.pragma_census(root)} pragmas",
     ]
     report = root / "coverage.json"
@@ -53,10 +53,10 @@ def command_check(root: Path) -> int:
         print(f"  {line}")
     count = len(findings)
     if count:
-        noun = "flat spot" if count == 1 else "flat spots"
+        noun = "anomaly" if count == 1 else "anomalies"
         print(f"{count} {noun}")
         return 1
-    print("0 flat spots — the geometry holds")
+    print("0 anomalies — the geometry holds")
     return 0
 
 
@@ -118,7 +118,7 @@ def command_new(root: Path, kind: str, path: str) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="curvature", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    check = sub.add_parser("check", help=f"report flat spots: {ALL_CHECKS}")
+    check = sub.add_parser("check", help=f"report anomalies: {ALL_CHECKS}")
     check.add_argument("root", nargs="?", default=".")
     ratchet = sub.add_parser("ratchet", help="tighten ratchet.toml to current actuals")
     ratchet.add_argument("root", nargs="?", default=".")

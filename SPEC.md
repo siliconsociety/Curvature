@@ -10,7 +10,7 @@ strongest first:
 
 - **construction** — the runtime refuses to build the violating thing;
   the code cannot express the mistake.
-- **gate** — `curvature check` reports it as a flat spot; the
+- **gate** — `curvature check` reports it as an anomaly; the
   build is red.
 - **ratchet** — a numeric bound recorded in `ratchet.toml`, moved only by
   `curvature ratchet`, and only in the tightening direction.
@@ -23,7 +23,7 @@ a `curvature.Props` subclass and whose return type is `curvature.Element`.
 No classes, no registries, no context vars. *Why:* an explicit, typed,
 import-traceable interface is the unit of composition — the thing every
 change has a default destination inside.
-*Enforcement:* gate (FLAT-110): every function in a `components/` tree that
+*Enforcement:* gate (ANOM-110): every function in a `components/` tree that
 returns `Element` must annotate its first parameter with a `Props`
 subclass.
 
@@ -40,7 +40,7 @@ HTML is constructed through `curvature.html` element functions returning
 explicit `raw()` wrapper. *Why:* one language, one type checker, one
 coverage report; injection safety as the default gradient.
 *Enforcement:* construction (element functions escape all text children;
-`raw()` is greppable and gate-counted, FLAT-122).
+`raw()` is greppable and gate-counted, ANOM-122).
 
 **C-103 · One source of truth per screen.**
 The component that renders a page's full document is the same component
@@ -57,14 +57,14 @@ Every `a` carries a real `href`; every `form` carries `action` and
 *Why:* the anchor and the form are the only two verbs the web guarantees
 without JavaScript; every behavior reachable through them is a behavior
 the test suite can drive. *Enforcement:* construction (`a()` and `form()`
-have required parameters; `href="#"` raises) + gate (FLAT-130: no `onclick`
+have required parameters; `href="#"` raises) + gate (ANOM-130: no `onclick`
 or `javascript:` URLs anywhere in source).
 
 **C-201 · Writes follow POST → redirect → GET.**
 Mutating handlers return a redirect (303) to a GET view; they never
 render a body. *Why:* refresh-safe, history-safe, and it forces every
 state change to have a canonical, linkable after-state.
-*Enforcement:* gate (FLAT-131: route functions registered for POST/PUT/
+*Enforcement:* gate (ANOM-131: route functions registered for POST/PUT/
 DELETE must return `Redirect`; heuristic AST check, escape hatch
 documented in AGENTS.md for the rare JSON endpoint).
 
@@ -80,19 +80,19 @@ it isn't testable, and coverage (C-401) starves until it is.
 **C-300 · One script.**
 The only first-party JavaScript in a curved project is the vendored,
 pinned `curvature.js` boost layer. *Why:* every additional script is a new
-sediment bed. *Enforcement:* gate (FLAT-120: any `.js` file outside
-`static/vendor/` is flat; the vendor directory is pinned by
+sediment bed. *Enforcement:* gate (ANOM-120: any `.js` file outside
+`static/vendor/` is an anomaly; the vendor directory is pinned by
 `VERSIONS.md` entry).
 
 **C-301 · JavaScript never speaks HTTP on its own.**
 No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
 `curvature.js`. *Why:* a script that can call the server is app logic
-wearing an enhancement's jacket. *Enforcement:* gate (FLAT-121: token scan
+wearing an enhancement's jacket. *Enforcement:* gate (ANOM-121: token scan
 of all non-vendor JS and inline script bodies).
 
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
-unauditable by FLAT-121 and untestable by anything.
+unauditable by ANOM-121 and untestable by anything.
 *Enforcement:* construction (`script()` with a text child raises).
 
 ## 4. The ratchet
@@ -102,19 +102,19 @@ Every source file has a line ceiling (defaults: Python 300, CSS 250, JS
 150). Existing violators are grandfathered into `ratchet.toml` at their
 current size and may only shrink. *Why:* the 10,000-line file is never
 written; it accretes. The ceiling forces the split while the split is
-cheap. *Enforcement:* ratchet (FLAT-140) — `curvature check` fails any file
+cheap. *Enforcement:* ratchet (ANOM-140) — `curvature check` fails any file
 over its bound; `curvature ratchet` lowers bounds to current actuals and
 never raises them.
 
 **C-401 · Coverage floor.**
 The pytest coverage percentage has a floor in `ratchet.toml`. It rises.
 *Why:* see every codebase you have ever inherited.
-*Enforcement:* ratchet (FLAT-141).
+*Enforcement:* ratchet (ANOM-141).
 
 **C-402 · The tool is the only hand on the ratchet.**
-Human edits to `ratchet.toml` that loosen any bound are flat.
+Human edits to `ratchet.toml` that loosen any bound are anomalies.
 *Why:* a ratchet with a reverse lever is a dial.
-*Enforcement:* gate (FLAT-142: `curvature check` recomputes actuals; any bound
+*Enforcement:* gate (ANOM-142: `curvature check` recomputes actuals; any bound
 looser than the recorded tightest-known state is refused).
 
 ## 5. Fragments and the boost protocol
@@ -143,7 +143,7 @@ roots) + curvature.js (fallback navigation on any mismatch).
 One directory per component for anything with style or breadth: the
 Python module, its CSS file, its test. Small pure components may share a
 module until they grow style. *Why:* co-location is what makes the
-default destination (C-100) physical. *Enforcement:* gate (FLAT-150: a
+default destination (C-100) physical. *Enforcement:* gate (ANOM-150: a
 component's CSS may only be in its directory; orphan selectors are
 findings) — *deferred to 0.2; directory convention documented in
 AGENTS.md meanwhile.*
@@ -152,25 +152,25 @@ AGENTS.md meanwhile.*
 No plugin registries, no auto-discovery, no metaclass registration, no
 import-time side effects. *Why:* an agent (or a human at 2 a.m.) must be
 able to answer "who calls this?" with grep.
-*Enforcement:* gate (FLAT-151: no `__init_subclass__` registration
+*Enforcement:* gate (ANOM-151: no `__init_subclass__` registration
 patterns, no module-scope route table mutation outside app assembly) —
 *heuristic, 0.2.*
 
-## Flat-spot finding index
+## Anomaly finding index
 
 | ID     | Invariant | Check |
 |--------|-----------|-------|
-| FLAT-110 | C-100 | component signature: first param is `Props` subclass |
-| FLAT-120 | C-300 | `.js` outside `static/vendor/` |
-| FLAT-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
-| FLAT-122 | C-102 | `raw()` call census (report, warn over budget) |
-| FLAT-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
-| FLAT-131 | C-201 | mutating route returns non-redirect |
-| FLAT-140 | C-400 | file lines over ceiling |
-| FLAT-141 | C-401 | coverage below floor |
-| FLAT-142 | C-402 | ratchet bound looser than tightest-known |
+| ANOM-110 | C-100 | component signature: first param is `Props` subclass |
+| ANOM-120 | C-300 | `.js` outside `static/vendor/` |
+| ANOM-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
+| ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
+| ANOM-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
+| ANOM-131 | C-201 | mutating route returns non-redirect |
+| ANOM-140 | C-400 | file lines over ceiling |
+| ANOM-141 | C-401 | coverage below floor |
+| ANOM-142 | C-402 | ratchet bound looser than tightest-known |
 
-Token checks (FLAT-121, FLAT-130) honor one escape hatch: a line carrying a
+Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a
 `curvature-allow` pragma with a reason. Enforcement code and tests that
 exercise refusals must spell the forbidden words; the pragma keeps them
 buildable while staying greppable — and `curvature check` publishes the

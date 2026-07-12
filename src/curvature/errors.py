@@ -1,4 +1,4 @@
-class FlatSpot(Exception):
+class Anomaly(Exception):
     """The construction-grade refusal (SPEC.md enforcement grade 1).
 
     Raised when code tries to build something the contract forbids —

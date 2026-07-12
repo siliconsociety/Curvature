@@ -12,7 +12,7 @@ from collections.abc import Callable
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 
-from curvature.errors import FlatSpot
+from curvature.errors import Anomaly
 from curvature.html import Element, render
 
 BOOST_HEADER = "curvature-boost"
@@ -37,7 +37,7 @@ def respond(
     """
     for fragment in fragments:
         if fragment.id is None:
-            raise FlatSpot(
+            raise Anomaly(
                 f"fragment root <{fragment.tag}> has no id (C-501): the boost "
                 "layer swaps subtrees by id; give the root a stable identity"
             )

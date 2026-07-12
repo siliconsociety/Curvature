@@ -22,7 +22,7 @@ architecture (SPEC.md C-202).
 Green means done. Red means not done. There is no third state, and
 "the finding seems wrong" is a conversation to have with the human, not
 a thing to route around. `curvature check` findings are called
-**flat spots** and each one names the invariant it serves — read the
+**anomalies** and each one names the invariant it serves — read the
 message; it tells you the fix.
 
 ## How to add a component
@@ -50,8 +50,8 @@ def lap_counter(props: LapCounterProps) -> Element:
    markup. Components are pure functions; their tests need no app.
 
 Rules the gate will hold you to: the first parameter is a Props subclass
-(FLAT-110); text is escaped unless you write `raw()`, and every `raw()` is
-counted out loud; the file stays under its line ceiling (FLAT-140) — when
+(ANOM-110); text is escaped unless you write `raw()`, and every `raw()` is
+counted out loud; the file stays under its line ceiling (ANOM-140) — when
 you approach it, split the component, never widen the ceiling.
 
 ## How to add a route
@@ -73,7 +73,7 @@ async def create_lap(title: Annotated[str, Form()]):
 
 - `respond()` needs every fragment root to carry an `id` — that id is
   how the boost layer swaps it in place.
-- A mutating route that renders is flat (FLAT-131). A genuine JSON
+- A mutating route that renders is an anomaly (ANOM-131). A genuine JSON
   endpoint carries `# curvature: json-endpoint` with a reason in review.
 - Forms are real forms (`action=`, `method=`); links are real links.
   The constructors refuse anything else, so you will not get far
@@ -84,11 +84,11 @@ async def create_lap(title: Annotated[str, Form()]):
 - **Never write JavaScript.** The boost layer (`curvature.js`) is complete
   and vendored. If a behavior seems to need JS, the behavior belongs on
   the server or in native HTML (`<details>`, `<dialog>`, `popover`,
-  CSS `:has()`). A `.js` file from your hands is flat on sight
-  (FLAT-120).
+  CSS `:has()`). A `.js` file from your hands is an anomaly on sight
+  (ANOM-120).
 - **Never edit `ratchet.toml`.** `curvature ratchet` is the only hand on
   the mechanism. Ceilings fall, floors rise; a loosened bound is caught
-  against git history (FLAT-142) and will not survive review.
+  against git history (ANOM-142) and will not survive review.
 - **Never bypass the gate.** No skipping tests, no weakening an
   assertion to get green, no deleting a check that fired. If the gate
   blocks work you believe is correct, stop and say so in your report.
@@ -108,7 +108,7 @@ discovery is not.
 
 | word | meaning |
 |------|---------|
-| flat spot | a contract violation; a region where the geometry fails to steer |
+| anomaly | a contract violation; a region where the geometry fails to steer |
 | boost | the enhancement layer; intercepted real navigation |
 | fragment | an id-carrying subtree, swappable by the boost layer |
 | shell | the combinator that pours the document around fragments |

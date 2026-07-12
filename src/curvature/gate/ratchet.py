@@ -3,7 +3,7 @@
 `curvature ratchet` is the only hand on the mechanism: it lowers ceilings to
 current actuals, raises the coverage floor to the current actual, drops
 exceptions that fit under the defaults, and never once turns the other
-direction. Loosening is a human editing the file, and FLAT-142 catches it
+direction. Loosening is a human editing the file, and ANOM-142 catches it
 against git history."""
 
 from __future__ import annotations
@@ -61,7 +61,7 @@ def save(root: Path, ratchet: Ratchet) -> None:
 
 
 def previous_committed(root: Path) -> Ratchet | None:
-    """The ratchet as git last saw it, for the loosening check (FLAT-142)."""
+    """The ratchet as git last saw it, for the loosening check (ANOM-142)."""
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "show", f"HEAD:{RATCHET_FILE}"],

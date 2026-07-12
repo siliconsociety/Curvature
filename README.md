@@ -12,7 +12,7 @@ agent in its forty-third session, at 2 a.m., doing whatever the shape of
 the code suggests. Frameworks built for humans enforce their discipline
 through culture. Curvature's discipline is machine-checked — every
 invariant in [SPEC.md](https://github.com/siliconsociety/Curvature/blob/main/SPEC.md) names the check that enforces it, and
-violations are reported by `curvature check` as **flat spots** — regions where the geometry failed to steer.
+violations are reported by `curvature check` as **anomalies** — regions where the geometry failed to steer.
 The canonical documentation is [AGENTS.md](https://github.com/siliconsociety/Curvature/blob/main/AGENTS.md); this README is
 the courtesy translation. The argument for all of it is the
 [MANIFESTO](https://github.com/siliconsociety/Curvature/blob/main/MANIFESTO.md).

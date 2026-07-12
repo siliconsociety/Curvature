@@ -14,13 +14,13 @@ def write(root: Path, relpath: str, text: str) -> Path:
     return path
 
 
-# --- FLAT-140 ceilings ---------------------------------------------------------
+# --- ANOM-140 ceilings ---------------------------------------------------------
 
 
 def test_file_over_ceiling_is_off_curvature(tmp_path):
     write(tmp_path, "app.py", "\n".join(["x = 1"] * 10))
     findings = checks.check_ceilings(tmp_path, Ratchet(ceilings={"py": 5}))
-    assert [f.rule for f in findings] == ["FLAT-140"]
+    assert [f.rule for f in findings] == ["ANOM-140"]
     assert "10 lines against a ceiling of 5" in findings[0].message
 
 
@@ -35,13 +35,13 @@ def test_vendored_files_have_no_ceiling(tmp_path):
     assert checks.check_ceilings(tmp_path, Ratchet()) == []
 
 
-# --- FLAT-120 / FLAT-121 JavaScript ----------------------------------------------
+# --- ANOM-120 / ANOM-121 JavaScript ----------------------------------------------
 
 
 def test_stray_first_party_js_is_off_curvature(tmp_path):
     write(tmp_path, "static/extra.js", "console.log(1)\n")
     findings = checks.check_js_placement(tmp_path)
-    assert [f.rule for f in findings] == ["FLAT-120"]
+    assert [f.rule for f in findings] == ["ANOM-120"]
 
 
 def test_boost_layer_and_vendor_are_allowed(tmp_path):
@@ -53,7 +53,7 @@ def test_boost_layer_and_vendor_are_allowed(tmp_path):
 def test_js_speaking_http_is_off_curvature(tmp_path):
     write(tmp_path, "static/extra.js", 'fetch("/api")\n')  # curvature-allow: exercises the check
     findings = checks.check_js_http(tmp_path)
-    assert [f.rule for f in findings] == ["FLAT-121"]
+    assert [f.rule for f in findings] == ["ANOM-121"]
 
 
 def test_pragma_line_is_allowed_and_counted(tmp_path):
@@ -62,25 +62,25 @@ def test_pragma_line_is_allowed_and_counted(tmp_path):
     assert checks.pragma_census(tmp_path) == 1
 
 
-# --- FLAT-130 DOM sins ----------------------------------------------------------
+# --- ANOM-130 DOM sins ----------------------------------------------------------
 
 
 def test_click_handler_attribute_is_off_curvature(tmp_path):
     sin = 'element("button", onclick="go()")\n'  # curvature-allow: probe
     write(tmp_path, "view.py", sin)
     findings = checks.check_dom_sins(tmp_path)
-    assert "FLAT-130" in [f.rule for f in findings]
+    assert "ANOM-130" in [f.rule for f in findings]
 
 
-def test_script_scheme_url_is_a_flat_spot(tmp_path):
+def test_script_scheme_url_is_an_anomaly(tmp_path):
     sin = 'link = element("a", href="javascript:go()")\n'  # curvature-allow: probe
     write(tmp_path, "view.py", sin)
     findings = checks.check_dom_sins(tmp_path)
-    assert [f.rule for f in findings] == ["FLAT-130"]
+    assert [f.rule for f in findings] == ["ANOM-130"]
     assert "URL" in findings[0].message
 
 
-# --- FLAT-110 component signatures ----------------------------------------------
+# --- ANOM-110 component signatures ----------------------------------------------
 
 
 def test_component_without_props_is_off_curvature(tmp_path):
@@ -89,7 +89,7 @@ def test_component_without_props_is_off_curvature(tmp_path):
             return div()
     """))
     findings = checks.check_component_signatures(tmp_path)
-    assert [f.rule for f in findings] == ["FLAT-110"]
+    assert [f.rule for f in findings] == ["ANOM-110"]
     assert "card()" in findings[0].message
 
 
@@ -117,7 +117,7 @@ def test_component_rule_only_applies_in_components_trees(tmp_path):
     assert checks.check_component_signatures(tmp_path) == []
 
 
-# --- FLAT-131 mutating routes -----------------------------------------------------
+# --- ANOM-131 mutating routes -----------------------------------------------------
 
 
 def test_post_route_that_renders_is_off_curvature(tmp_path):
@@ -127,7 +127,7 @@ def test_post_route_that_renders_is_off_curvature(tmp_path):
             return respond(request, fragment, shell=shell)
     """))
     findings = checks.check_mutating_routes(tmp_path)
-    assert [f.rule for f in findings] == ["FLAT-131"]
+    assert [f.rule for f in findings] == ["ANOM-131"]
 
 
 def test_post_route_that_redirects_passes(tmp_path):
@@ -158,25 +158,25 @@ def test_get_routes_are_not_mutating(tmp_path):
     assert checks.check_mutating_routes(tmp_path) == []
 
 
-# --- FLAT-141 coverage ------------------------------------------------------------
+# --- ANOM-141 coverage ------------------------------------------------------------
 
 
 def test_coverage_under_floor_is_off_curvature(tmp_path):
     write(tmp_path, "coverage.json", json.dumps({"totals": {"percent_covered": 71.0}}))
     findings = checks.check_coverage(tmp_path, Ratchet(coverage_floor=80.0))
-    assert [f.rule for f in findings] == ["FLAT-141"]
+    assert [f.rule for f in findings] == ["ANOM-141"]
 
 
 def test_missing_report_with_a_floor_is_off_curvature(tmp_path):
     findings = checks.check_coverage(tmp_path, Ratchet(coverage_floor=80.0))
-    assert [f.rule for f in findings] == ["FLAT-141"]
+    assert [f.rule for f in findings] == ["ANOM-141"]
 
 
 def test_no_floor_means_no_coverage_check(tmp_path):
     assert checks.check_coverage(tmp_path, Ratchet()) == []
 
 
-# --- FLAT-142 loosening -----------------------------------------------------------
+# --- ANOM-142 loosening -----------------------------------------------------------
 
 
 def test_every_loosening_is_named():
@@ -230,5 +230,5 @@ def test_command_check_red_and_counts(tmp_path, capsys):
     write(tmp_path, "static/extra.js", 'fetch("/x")\n')  # curvature-allow: exercises the check
     assert command_check(tmp_path) == 1
     out = capsys.readouterr().out
-    assert "flat" in out
-    assert "FLAT-120" in out and "FLAT-121" in out
+    assert "anomal" in out
+    assert "ANOM-120" in out and "ANOM-121" in out

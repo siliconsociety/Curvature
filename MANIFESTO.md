@@ -60,12 +60,12 @@ the space so that free fall *is* the discipline. A banked corner, if you
 want it at human scale, is just curved space poured in asphalt: the car
 steers itself because the road got there first.
 
-And where the geometry fails, we have a word for it. A **flat spot** is
-a region where nothing curves — where the space offers an agent no
-guidance and any direction looks as good as any other. Flat is where
-sediment forms. The gate does not report "errors"; it reports flat
-spots, each one naming the invariant that should have been bending the
-path there.
+And when the code's path deviates from what the geometry demands, we
+have a word for it — the word astronomy used when Mercury's orbit
+refused to match Newton: an **anomaly**. Explaining that anomaly took
+curvature; it always does. The gate does not report "errors"; it
+reports anomalies, each one naming the invariant whose geometry the
+observed path escaped.
 
 ## The tenets
 
@@ -83,7 +83,7 @@ its *tested* path. We had this once. We are taking it back.
 JavaScript Curvature ships — intercepts working links and working forms and
 swaps fragments instead of navigating. Enhancement, by definition:
 everything it touches already works without it. App logic in the browser is
-flat, and the gate knows what a `fetch` call looks like.
+an anomaly, and the gate knows what a `fetch` call looks like.
 
 **4. The UI is typed Python.** Components are functions of props; props are
 pydantic models. Your markup logic is type-checked by the same tools as
@@ -126,10 +126,12 @@ more machinery and less conviction.
 The honest boundary is not scale. It is the latency class of a single
 interaction: rendering happens where the state lives, so work that
 cannot tolerate a round-trip — the 60fps enclave of canvas editors,
-maps, collaborative cursors — belongs in a **singularity**: a declared,
-fenced, vendored region where different physics apply, with its own
-budget and its own contract (singularity doctrine, spec 0.2). Most
-applications are five percent singularity and ninety-five percent
+maps, collaborative cursors — belongs past an **event horizon**: a
+declared, fenced, vendored boundary beyond which different physics
+apply and the gate's sight deliberately ends, with its budget and its
+contract enforced at the horizon itself (event horizon doctrine, spec
+0.2). Most
+applications are five percent past the horizon and ninety-five percent
 ordinary space, and ordinary space is faster, cheaper, and testable
 with JavaScript off.
 

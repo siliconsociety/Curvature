@@ -18,7 +18,7 @@ def test_main_check_green(tmp_path, capsys):
 def test_main_check_red(tmp_path, capsys):
     write(tmp_path / "static/rogue.js", "let x = 1\n")
     assert main(["check", str(tmp_path)]) == 1
-    assert "FLAT-120" in capsys.readouterr().out
+    assert "ANOM-120" in capsys.readouterr().out
 
 
 def test_main_check_reports_coverage_info(tmp_path, capsys):

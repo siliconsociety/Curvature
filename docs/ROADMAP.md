@@ -12,6 +12,23 @@ Auth). One generic IFR capability in any agent harness drives every
 Curvature app ever poured. Per-app enduser skills are the SDK-per-
 service disease and are refused. (The Valet remains the owner's alone.)
 
+## Decision block — awaiting the owner (2026-07-11, EOD)
+
+1. Crew & timing for 0.2: Fable-now vs Codex-crew-tomorrow (specs are
+   fence-ready; Valet skill is the handbook either way).
+2. Blessed persistence default for poured manifolds: SQLite (stranger-
+   correct, F5 rec) vs Mongo (owner-fluent); Auth forces the choice.
+3. Satellite naming: exact-match underscores (curvature_auth both
+   sides, F5 rec) vs bare words vs hyphen-quirk (refused by owner law).
+4. C-203 CSRF posture sign-off: SameSite=Lax + Origin check on writes,
+   construction-grade, no token plumbing (F5 rec).
+5. IFR format: JSON Schema for form affordances in a minimal envelope
+   (F5 rec).
+6. Vocabulary ruling: Manifold = the app itself (the space that has the
+   curvature); mass = what alters it (a satellite's checks are its
+   mass; tighten-only = no negative mass); tokens file would rename
+   (surface.css candidate). Proposed, awaiting the mouth test.
+
 ## 0.2 — the space expands, in dependency order
 
 1. **Satellite mechanics** — C-800 capture(), manifests, ANOM-160/161.

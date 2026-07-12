@@ -29,6 +29,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *checks.check_dom_sins(root),
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),
+        *checks.check_purposes(root),
         *checks.check_coverage(root, ratchet),
         *checks.check_ratchet_integrity(root, ratchet),
     ]

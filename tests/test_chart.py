@@ -157,3 +157,41 @@ def test_form_without_button_has_no_prompt():
     form = h.form(h.input_(type="text", name="q"), action="/search", method="get")
     chart = build_chart((h.div(form, id="f"),), url="/x", purpose=None)
     assert chart["affordances"]["forms"][0]["prompt"] is None
+
+
+def test_the_atlas_is_a_screen_whose_chart_is_the_atlas():
+    from fastapi.testclient import TestClient
+
+    from demo.app import app
+
+    client = TestClient(app)
+    page = client.get("/atlas")
+    assert 'id="atlas"' in page.text  # humans get a sitemap of real links
+    chart = client.get("/atlas", headers={"Curvature-Chart": "1"}).json()
+    hrefs = {link["href"] for link in chart["affordances"]["links"]}
+    assert "/" in hrefs and "/atlas" in hrefs
+    assert "purpose" in chart and chart["purpose"]
+
+
+def test_anomaly_170_fires_on_unauthored_screens(tmp_path):
+    from curvature.gate.checks import check_purposes
+
+    (tmp_path / "views.py").write_text(
+        "def index(request):\n    return respond(request, board(), shell=shell)\n"
+    )
+    findings = check_purposes(tmp_path)
+    assert [f.rule for f in findings] == ["ANOM-170"]
+
+
+def test_anomaly_170_spares_tests_and_authored_screens(tmp_path):
+    from curvature.gate.checks import check_purposes
+
+    (tmp_path / "views.py").write_text(
+        'def index(request):\n    return respond(request, b(), shell=s, purpose="Why")\n'
+    )
+    tests_dir = tmp_path / "tests"
+    tests_dir.mkdir()
+    (tests_dir / "test_x.py").write_text(
+        "def test_it():\n    respond(req, frag, shell=shell)\n"
+    )
+    assert check_purposes(tmp_path) == []

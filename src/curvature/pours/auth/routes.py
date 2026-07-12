@@ -26,7 +26,10 @@ router = APIRouter()
 @router.get("/login")
 async def login_page(request: Request, error: str | None = None, email: str = ""):
     props = LoginFormProps(error=error, email=email)
-    return respond(request, login_form(props), shell=shell)
+    return respond(
+        request, login_form(props), shell=shell,
+        purpose="Sign in with email and password to act as yourself here.",
+    )
 
 
 @router.post("/login")
@@ -47,7 +50,10 @@ async def login(
 @router.get("/register")
 async def register_page(request: Request, error: str | None = None, email: str = ""):
     props = RegisterFormProps(error=error, email=email)
-    return respond(request, register_form(props), shell=shell)
+    return respond(
+        request, register_form(props), shell=shell,
+        purpose="Create an account: an email and a password of 8+ characters.",
+    )
 
 
 @router.post("/register")

@@ -234,8 +234,13 @@ of orientation a derivation cannot supply: what this screen is FOR.
 *Enforcement:* gate (ANOM-170, queued: chart-serving screens without
 purpose are anomalies).
 
-The **atlas** — the enumeration of every chart a manifold serves — is
-queued; the chart ships first.
+**C-903 · The atlas is a screen.**
+The enumeration of a manifold's readable regions is an ordinary
+fragment of real links (`curvature.atlas.atlas(app)`), mounted on an
+ordinary route. Its machine form needs no format of its own: the
+atlas's chart IS the atlas. *Why:* one mechanism, three heads, zero
+parallel protocols. *Enforcement:* construction (the atlas is built
+from app routes; there is nothing to hand-maintain).
 
 ## Anomaly finding index
 
@@ -250,6 +255,7 @@ queued; the chart ships first.
 | ANOM-140 | C-400 | file lines over ceiling |
 | ANOM-141 | C-401 | coverage below floor |
 | ANOM-142 | C-402 | ratchet bound looser than tightest-known |
+| ANOM-170 | C-902 | respond() without an authored purpose |
 
 Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a
 `curvature-allow` pragma with a reason. Enforcement code and tests that

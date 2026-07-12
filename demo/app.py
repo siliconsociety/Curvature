@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 
 import curvature
 from curvature import redirect, respond
+from curvature.atlas import atlas
 from demo.components.pit_board import FILTERS, PitBoardProps, pit_board
 from demo.components.shell import shell
 from demo.store import board
@@ -52,6 +53,14 @@ async def edit_task(request: Request, task_id: int, status: str = "all"):
     if task_id not in board.tasks:
         return redirect(f"/?status={status}")
     return await index(request, status=status, editing_task_id=task_id)
+
+
+@app.get("/atlas")
+async def atlas_page(request: Request):
+    return respond(
+        request, atlas(app), shell=shell,
+        purpose="Every readable region of Pit Board; agents fetch each region's chart.",
+    )
 
 
 @app.post("/tasks")

@@ -191,6 +191,35 @@ def check_mutating_routes(root: Path) -> list[Finding]:
     return findings
 
 
+def check_purposes(root: Path) -> list[Finding]:
+    """ANOM-170: every respond() call in app code authors a purpose
+    (C-902) — the one orientation line derivation cannot supply. Tests
+    exercise the runtime, not screens, and are exempt."""
+    findings = []
+    for path in walk_source(root, frozenset({".py"})):
+        if "tests" in path.parts or path.name.startswith("test_"):
+            continue
+        tree = ast.parse(path.read_text(), filename=str(path))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = ""
+            match node.func:
+                case ast.Name(id=id_):
+                    name = id_
+                case ast.Attribute(attr=attr):
+                    name = attr
+            if name != "respond":
+                continue
+            if not any(kw.arg == "purpose" for kw in node.keywords):
+                findings.append(Finding(
+                    "ANOM-170", str(path.relative_to(root)), node.lineno,
+                    "respond() without purpose= (C-902): the chart needs its "
+                    "one authored line of orientation",
+                ))
+    return findings
+
+
 def check_coverage(root: Path, ratchet: Ratchet) -> list[Finding]:
     """ANOM-141: the coverage floor holds (C-401)."""
     if ratchet.coverage_floor <= 0:

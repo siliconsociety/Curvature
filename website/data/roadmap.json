@@ -39,8 +39,8 @@
     {
       "id": "agent-tokens",
       "title": "Personal access tokens for visiting agents",
-      "lane": "queued",
-      "note": "Minted via a form, naturally. Completes borrowed authority: an enduser hands their agent credentials scoped to themselves."
+      "lane": "shipped",
+      "note": "Minted via a form, shown exactly once, stored hashed, presented as Bearer; revocable. Bearer writes skip C-203 by design \u2014 no cookie, no CSRF shape."
     },
     {
       "id": "auth-oidc-totp",

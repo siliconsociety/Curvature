@@ -92,3 +92,69 @@ def test_login_page_is_a_real_form_js_off(client):
     assert 'action="/auth/login"' in text
     assert 'method="post"' in text
     assert text.startswith("<!doctype html>")
+
+
+def mint(client, label="laptop assistant"):
+    register(client)
+    response = client.post(
+        "/auth/tokens", data={"label": label}, follow_redirects=False
+    )
+    reveal_url = response.headers["location"]
+    page = client.get(reveal_url).text
+    import re
+
+    return re.search(r'<code class="token-reveal">([^<]+)</code>', page).group(1)
+
+
+def test_minted_tokens_are_shown_exactly_once(client):
+    register(client)
+    response = client.post(
+        "/auth/tokens", data={"label": "one-shot"}, follow_redirects=False
+    )
+    reveal_url = response.headers["location"]
+    first = client.get(reveal_url).text
+    assert "Copy it now" in first
+    second = client.get(reveal_url).text
+    assert "Copy it now" not in second  # the nonce is consumed
+
+
+def test_a_bearer_agent_acts_as_its_human(client):
+    token = mint(client)
+    client.cookies.clear()  # the agent has no cookies, only the token
+    page = client.get("/auth/tokens", headers={"Authorization": f"Bearer {token}"})
+    assert page.status_code == 200
+    assert "laptop assistant" in page.text
+
+
+def test_bearer_writes_skip_c203_by_design(client):
+    token = mint(client)
+    client.cookies.clear()
+    response = client.post(
+        "/auth/tokens",
+        data={"label": "minted by an agent"},
+        headers={"Authorization": f"Bearer {token}", "origin": "https://far.example"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303  # no cookie rides, no CSRF shape
+
+
+def test_revoked_tokens_die(client):
+    from satellites.auth.security import hash_token
+
+    token = mint(client)
+    client.post("/auth/tokens/revoke", data={"token_hash": hash_token(token)})
+    client.cookies.clear()
+    response = client.get(
+        "/auth/tokens", headers={"Authorization": f"Bearer {token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303  # bounced to login: the authority is gone
+
+
+def test_bogus_bearer_tokens_are_nobody(client):
+    client.cookies.clear()
+    response = client.get(
+        "/auth/tokens", headers={"Authorization": "Bearer counterfeit"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303

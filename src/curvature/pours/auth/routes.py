@@ -14,9 +14,15 @@ from satellites.auth.components.auth_forms import (
     login_form,
     register_form,
 )
-from satellites.auth.security import hash_password, verify_password
+from satellites.auth.components.token_desk import TokenDeskProps, token_desk
+from satellites.auth.security import (
+    hash_password,
+    hash_token,
+    new_session_token,
+    verify_password,
+)
 from satellites.auth.sessions import CurrentUser, end_session, start_session
-from satellites.auth.store import UserRecord
+from satellites.auth.store import TokenRecord, UserRecord
 
 from curvature import redirect, respond
 
@@ -83,3 +89,46 @@ async def logout(request: Request, _user: CurrentUser):
     response = redirect("/")
     end_session(request, response, store)
     return response
+
+
+def _reveals(request: Request) -> dict[str, str]:
+    stash = getattr(request.app.state, "auth_token_reveals", None)
+    if stash is None:
+        stash = {}
+        request.app.state.auth_token_reveals = stash
+    return stash
+
+
+@router.get("/tokens")
+async def tokens_page(request: Request, user: CurrentUser, reveal: str = ""):
+    revealed = _reveals(request).pop(reveal, None) if reveal else None
+    store = request.app.state.auth_store
+    return respond(
+        request,
+        token_desk(TokenDeskProps(
+            tokens=tuple(store.list_tokens(user.id)), revealed=revealed,
+        )),
+        shell=shell,
+        purpose="Mint or revoke personal access tokens: credentials a human "
+                "hands their agent to act with the human's own authority.",
+    )
+
+
+@router.post("/tokens")
+async def mint_token(request: Request, user: CurrentUser, label: Annotated[str, Form()]):
+    token = new_session_token()
+    store = request.app.state.auth_store
+    store.save_token(TokenRecord(
+        token_hash=hash_token(token), user_id=user.id, label=label.strip() or "unlabeled",
+    ))
+    nonce = new_session_token()[:16]
+    _reveals(request)[nonce] = token
+    return redirect(f"/auth/tokens?reveal={nonce}")
+
+
+@router.post("/tokens/revoke")
+async def revoke_token(
+    request: Request, user: CurrentUser, token_hash: Annotated[str, Form()]
+):
+    request.app.state.auth_store.delete_token(token_hash, user.id)
+    return redirect("/auth/tokens")

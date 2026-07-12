@@ -25,8 +25,15 @@ class SessionRecord:
     expires_at: float
 
 
+@dataclass(frozen=True)
+class TokenRecord:
+    token_hash: str
+    user_id: str
+    label: str
+
+
 class AuthStore(Protocol):
-    """Seven verbs. If Auth ever needs an eighth, add it here and to
+    """Eleven verbs. If Auth ever needs a twelfth, add it here and to
     every backend in the same commit — the protocol is the contract."""
 
     def get_user_by_email(self, email: str) -> UserRecord | None: ...
@@ -36,6 +43,10 @@ class AuthStore(Protocol):
     def save_session(self, session: SessionRecord) -> None: ...
     def delete_session(self, token_hash: str) -> None: ...
     def purge_expired(self, now: float) -> None: ...
+    def get_token(self, token_hash: str) -> TokenRecord | None: ...
+    def save_token(self, token: TokenRecord) -> None: ...
+    def delete_token(self, token_hash: str, user_id: str) -> None: ...
+    def list_tokens(self, user_id: str) -> list[TokenRecord]: ...
 
 
 def choose(data_dir: Path) -> AuthStore:

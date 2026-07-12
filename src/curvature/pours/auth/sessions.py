@@ -52,8 +52,26 @@ def _origin_is_local(request: Request) -> bool:
     return origin.removeprefix("https://").removeprefix("http://") == host
 
 
+def bearer_user(request: Request) -> UserRecord | None:
+    """Borrowed authority: a visiting agent presents a personal access
+    token its human minted. No cookie rides, so C-203's Origin check
+    does not apply — that was the design, not an oversight."""
+    header = request.headers.get("authorization", "")
+    if not header.lower().startswith("bearer "):
+        return None
+    store: AuthStore = request.app.state.auth_store
+    record = store.get_token(hash_token(header[7:].strip()))
+    if record is None:
+        return None
+    return store.get_user_by_id(record.user_id)
+
+
 def session_user(request: Request) -> UserRecord | None:
-    """Resolve the cookie to a user, enforcing C-203 on writes."""
+    """Resolve bearer or cookie to a user, enforcing C-203 on cookie
+    writes."""
+    agent = bearer_user(request)
+    if agent is not None:
+        return agent
     token = request.cookies.get(SESSION_COOKIE)
     if token is None:
         return None

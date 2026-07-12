@@ -8,7 +8,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from satellites.auth.store import SessionRecord, UserRecord
+from satellites.auth.store import SessionRecord, TokenRecord, UserRecord
 
 
 class JsonAuthStore:
@@ -16,7 +16,7 @@ class JsonAuthStore:
         self._path = path
         path.parent.mkdir(parents=True, exist_ok=True)
         if not path.exists():
-            self._write({"users": [], "sessions": []})
+            self._write({"users": [], "sessions": [], "tokens": []})
 
     def _read(self) -> dict:
         return json.loads(self._path.read_text())
@@ -65,3 +65,29 @@ class JsonAuthStore:
         data = self._read()
         data["sessions"] = [s for s in data["sessions"] if s["expires_at"] >= now]
         self._write(data)
+
+    def get_token(self, token_hash: str) -> TokenRecord | None:
+        for token in self._read().get("tokens", []):
+            if token["token_hash"] == token_hash:
+                return TokenRecord(**token)
+        return None
+
+    def save_token(self, token: TokenRecord) -> None:
+        data = self._read()
+        data.setdefault("tokens", []).append(asdict(token))
+        self._write(data)
+
+    def delete_token(self, token_hash: str, user_id: str) -> None:
+        data = self._read()
+        data["tokens"] = [
+            t for t in data.get("tokens", [])
+            if not (t["token_hash"] == token_hash and t["user_id"] == user_id)
+        ]
+        self._write(data)
+
+    def list_tokens(self, user_id: str) -> list[TokenRecord]:
+        return sorted(
+            (TokenRecord(**t) for t in self._read().get("tokens", [])
+             if t["user_id"] == user_id),
+            key=lambda token: token.label,
+        )

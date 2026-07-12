@@ -6,7 +6,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-from satellites.auth.store import SessionRecord, UserRecord
+from satellites.auth.store import SessionRecord, TokenRecord, UserRecord
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -18,6 +18,11 @@ CREATE TABLE IF NOT EXISTS sessions (
     token_hash TEXT PRIMARY KEY,
     user_id TEXT NOT NULL REFERENCES users(id),
     expires_at REAL NOT NULL
+);
+CREATE TABLE IF NOT EXISTS tokens (
+    token_hash TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    label TEXT NOT NULL
 );
 """
 
@@ -77,3 +82,34 @@ class SqliteAuthStore:
     def purge_expired(self, now: float) -> None:
         with self._connect() as db:
             db.execute("DELETE FROM sessions WHERE expires_at < ?", (now,))
+
+    def get_token(self, token_hash: str) -> TokenRecord | None:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT token_hash, user_id, label FROM tokens WHERE token_hash = ?",
+                (token_hash,),
+            ).fetchone()
+        return TokenRecord(**row) if row else None
+
+    def save_token(self, token: TokenRecord) -> None:
+        with self._connect() as db:
+            db.execute(
+                "INSERT INTO tokens (token_hash, user_id, label) VALUES (?, ?, ?)",
+                (token.token_hash, token.user_id, token.label),
+            )
+
+    def delete_token(self, token_hash: str, user_id: str) -> None:
+        with self._connect() as db:
+            db.execute(
+                "DELETE FROM tokens WHERE token_hash = ? AND user_id = ?",
+                (token_hash, user_id),
+            )
+
+    def list_tokens(self, user_id: str) -> list[TokenRecord]:
+        with self._connect() as db:
+            rows = db.execute(
+                "SELECT token_hash, user_id, label FROM tokens WHERE user_id = ? "
+                "ORDER BY label",
+                (user_id,),
+            ).fetchall()
+        return [TokenRecord(**row) for row in rows]

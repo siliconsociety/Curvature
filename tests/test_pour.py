@@ -14,8 +14,8 @@ def manifold(tmp_path_factory):
     return root
 
 
-def test_auth_is_an_available_pour():
-    assert "auth" in available_pours()
+def test_the_constellation_is_available():
+    assert {"auth", "concierge"} <= set(available_pours())
 
 
 def test_pour_lands_in_satellites_and_tests(manifold):

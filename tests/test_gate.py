@@ -243,3 +243,23 @@ def test_command_check_red_and_counts(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "anomal" in out
     assert "ANOM-120" in out and "ANOM-121" in out
+
+
+def test_dom_sin_pragma_lines_are_skipped(tmp_path):
+    sin = 'element("b", onclick="x") # curvature-allow: probe\n'  # curvature-allow: probe
+    write(tmp_path, "view.py", sin)
+    assert checks.check_dom_sins(tmp_path) == []
+
+
+def test_component_props_via_attribute_annotation_passes(tmp_path):
+    write(tmp_path, "components/card.py", textwrap.dedent("""
+        def card(props: forms.CardProps) -> Element:
+            return div()
+
+
+        def helper(data: forms.Payload) -> Element:
+            return div()
+    """))
+    findings = checks.check_component_signatures(tmp_path)
+    assert [f.rule for f in findings] == ["ANOM-110"]
+    assert "helper()" in findings[0].message

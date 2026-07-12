@@ -1,4 +1,4 @@
-"""Honest benchmarks: published whatever they say.
+"""Time trials: published whatever they say.
 
 Two apps, one machine, same FastAPI substrate: a cambered page (full
 HTML render through respond()) against the JSON endpoint an equivalent
@@ -9,7 +9,7 @@ hydration costs are NOT charged here; reality bills the client for
 those separately, so these numbers are the SPA's best case.
 
 Run: uv run python scripts/bench.py
-Writes docs/BENCHMARKS.md with the results and the machine's name.
+Writes docs/TIME_TRIALS.md with the results and the machine's name.
 """
 
 from __future__ import annotations
@@ -126,7 +126,7 @@ def main() -> None:
         app_file.unlink()
 
     lines = [
-        "# Benchmarks",
+        "# Time Trials",
         "",
         "Published whatever they say. Same machine, same FastAPI substrate,",
         "same fifty-row dataset: the cambered render paths against the JSON",
@@ -151,7 +151,7 @@ def main() -> None:
         "",
         "Regenerate: `uv run python scripts/bench.py`",
     ]
-    (root / "docs" / "BENCHMARKS.md").write_text("\n".join(lines) + "\n")
+    (root / "docs" / "TIME_TRIALS.md").write_text("\n".join(lines) + "\n")
     for name, rps, size, p50 in results:
         print(f"{name:32} {rps:>9,.0f} req/s {size:>8,} B {p50:>7.1f} ms")
 

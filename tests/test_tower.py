@@ -24,7 +24,8 @@ def test_the_tower_reads_like_a_pit_board(client):
     for mark in ("PLAN A STINT", "ON TRACK", "SHIPPED", "STINT PLAN"):
         assert mark in text
     assert "P1" in text                      # shipped items hold positions
-    assert 'alt="Pit Board timing tower emblem"' in text
+    assert 'alt="Pit Board emblem"' in text
+    assert '/static/favicon.png' in text
 
 
 def test_the_plan_form_leads_the_board(client):

@@ -71,17 +71,8 @@ def _row(props: RowProps, *paddles: Element) -> Element:
 
 def tower(props: TowerProps) -> Element:
     return h.section(
-        h.header(
-            h.img(src="/static/tower-emblem.png", alt="Pit Board timing tower emblem",
-                  width="72", height="72", class_="emblem"),
-            h.div(
-                h.h2("ROADMAP"),
-                h.p("The crew's board. Git keeps the time.", class_="tower-sub"),
-                h.p("OUT → on track · FLAG → shipped · PIT → back one",
-                    class_="tower-legend"),
-            ),
-            class_="tower-head",
-        ),
+        h.p("OUT → on track · FLAG → shipped · PIT → back one",
+            class_="tower-legend"),
         h.h3("PLAN A STINT", class_="lane-mark"),
         h.form(
             h.input_(type="text", name="title", placeholder="Next stint…",

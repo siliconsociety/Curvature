@@ -1,4 +1,4 @@
-# Benchmarks
+# Time Trials
 
 Published whatever they say. Same machine, same FastAPI substrate,
 same fifty-row dataset: the cambered render paths against the JSON

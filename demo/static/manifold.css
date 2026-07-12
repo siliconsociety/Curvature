@@ -43,24 +43,37 @@ header, main {
   padding: 1rem 1.25rem;
 }
 
-header { padding-top: 3rem; }
+header { padding-top: 2.5rem; }
 
-header h1 { margin: 0; font-size: 1.6rem; }
+.board-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
 
-header h1::after {
+.emblem { border-radius: 14px; }
+
+.board-head h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  letter-spacing: 0.18em;
+}
+
+.board-head h1::after {
   content: "";
   display: block;
   width: 3.5rem;
   height: 4px;
-  margin-top: 0.4rem;
+  margin-top: 0.35rem;
   background: var(--signal);
   border-radius: 2px;
 }
 
-header p {
-  margin: 0.5rem 0 0;
+.board-sub {
+  margin: 0.45rem 0 0;
   color: var(--ink-soft);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .empty {

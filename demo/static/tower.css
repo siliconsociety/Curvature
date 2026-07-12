@@ -5,23 +5,6 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.tower-head {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 0.5rem 0 1.25rem;
-}
-
-.emblem { border-radius: 12px; }
-
-.tower-head h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  letter-spacing: 0.18em;
-}
-
-.tower-sub { margin: 0.15rem 0 0; color: var(--ink-soft); font-size: 0.85rem; }
-
 .tower-legend {
   margin: 0.35rem 0 0;
   color: var(--ink-soft);

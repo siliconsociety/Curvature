@@ -80,9 +80,9 @@
     },
     {
       "id": "benchmarks",
-      "title": "Honest benchmarks",
+      "title": "Time trials \u2014 honest numbers",
       "lane": "shipped",
-      "note": "Published whatever they said, and they said: ~2,000 req/s on every head, the full HTML page within 2% of the JSON-API baseline at the same p50 \u2014 the SPA saves bytes it later spends client-side. docs/BENCHMARKS.md; regenerate with scripts/bench.py."
+      "note": "Published whatever they said, and they said: ~2,000 req/s on every head, the full HTML page within 2% of the JSON-API baseline at the same p50 \u2014 the SPA saves bytes it later spends client-side. docs/TIME_TRIALS.md; regenerate with scripts/bench.py."
     },
     {
       "id": "offline-cache",

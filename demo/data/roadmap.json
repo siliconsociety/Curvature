@@ -2,9 +2,10 @@
   "items": [
     {
       "id": "site-redesign-roadmap",
+      "pit_id": "P15",
       "title": "Public site: new splash + living roadmap",
-      "lane": "pouring",
-      "note": "Replace the placeholder design with a deliberate marketing page and publish Pit Board as a read-only, Chart-readable roadmap. No public mutation controls; git remains the editor."
+      "lane": "shipped",
+      "note": "Launched the editorial splash and a read-only, Chart-readable /roadmap backed by the repository Pit Board. The deployed site keeps a last-known-good seed, refreshes through Live, and exposes no public mutation controls."
     },
     {
       "id": "public-live-playground",

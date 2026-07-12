@@ -38,9 +38,9 @@ def test_every_lane_is_recent_first(client):
     assert [item.id for item in lanes["queued"]] == [
         "public-live-playground", "live-production-hardening",
     ]
-    assert lanes["shipped"][0].id == "pit-board-roadmap-cleanup"
+    assert lanes["shipped"][0].id == "site-redesign-roadmap"
     assert lanes["shipped"][-1].id == "founding"
-    assert lanes["shipped"][0].pit_id == "P14"
+    assert lanes["shipped"][0].pit_id == "P15"
     assert lanes["shipped"][-1].pit_id == "P1"
     pit_numbers = [int((item.pit_id or "").removeprefix("P")) for item in lanes["shipped"]]
     assert pit_numbers == list(range(len(pit_numbers), 0, -1))
@@ -48,6 +48,7 @@ def test_every_lane_is_recent_first(client):
 
 def test_shipped_ids_survive_recent_first_sorting(client):
     text = client.get("/").text
+    assert text.index(">P15</span>") < text.index("Public site: new splash + living roadmap")
     assert text.index(">P14</span>") < text.index("Pit Board becomes a roadmap again")
     assert text.index(">P1</span>") < text.index("0.1.0 — the founding")
 

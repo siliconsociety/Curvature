@@ -106,3 +106,17 @@ def test_agents_read_the_tower_through_the_chart(client):
     assert plan["fields"]["required"] == ["title"]
     moves = [f for f in chart["affordances"]["forms"] if "/move" in f["action"]]
     assert moves and all(f["method"] == "post" for f in moves)
+
+
+def test_the_demo_enrolls_in_offline_replay(client):
+    text = client.get("/").text
+    assert 'data-offline-cache="/curvature-offline.js"' in text
+    worker = client.get("/curvature-offline.js")
+    assert worker.status_code == 200
+    assert "never a database" in worker.text
+
+
+def test_the_boost_layer_is_cache_busted_by_version(client):
+    from importlib.metadata import version
+
+    assert f'/static/lib/curvature.js?v={version("curvature")}' in client.get("/").text

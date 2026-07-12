@@ -123,6 +123,7 @@ discovery is not.
 | grandfather | pinning an over-ceiling file at its high-water mark |
 | Manifold | the design tokens; the poured surface |
 | live | server-pushed fragment swaps over SSE; declared with data-live |
+| replay worker | offline reads from cache, never writes (data-offline-cache) |
 | chart | the machine-legible projection of a screen (agents read charts, not pixels) |
 | atlas | the screen linking every readable region; its chart is the machine atlas |
 | the geometry holds | `curvature check` exit 0 |

@@ -87,8 +87,8 @@
     {
       "id": "offline-cache",
       "title": "Offline: a cache, never a database",
-      "lane": "pouring",
-      "note": "A pure-replay worker for reads; offline writes refused loudly and promised in the manifesto. The promise is worth more than the feature."
+      "lane": "shipped",
+      "note": "curvature-offline.js: pure replay, GET only, no queues, no decisions \u2014 proven by killing the server under an open browser and reloading the full board from cache. En route: shells now version-bust the boost layer, fixing the real bug where upgrades stranded users on stale scripts."
     },
     {
       "id": "new-demo",

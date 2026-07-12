@@ -1,7 +1,11 @@
 """The document shell — a combinator: it pours the page around fragments."""
 
+from importlib.metadata import version
+
 from curvature import Element
 from curvature import html as h
+
+ASSETS = version("curvature")
 
 
 def shell(*fragments: Element) -> Element:
@@ -11,7 +15,7 @@ def shell(*fragments: Element) -> Element:
             h.meta(name="viewport", content="width=device-width, initial-scale=1"),
             h.title("__CURVATURE_TITLE__"),
             h.style_link("/static/manifold.css"),
-            h.script(src="/static/lib/curvature.js"),
+            h.script(src=f"/static/lib/curvature.js?v={ASSETS}"),
         ),
         h.body(
             h.header(h.h1("__CURVATURE_TITLE__")),

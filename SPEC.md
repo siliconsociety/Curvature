@@ -99,6 +99,22 @@ No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
 wearing an enhancement's jacket. *Enforcement:* gate (ANOM-121: token scan
 of all non-vendor JS and inline script bodies).
 
+**C-303 · Offline is a cache, never a database.**
+The replay worker (`curvature-offline.js`, the boost layer's one
+sanctioned companion) remembers successful same-origin GETs and serves
+them back when the network dies. It never touches a write, holds no
+state beyond the HTTP cache, and decides nothing. Enrollment is
+declarative — `data-offline-cache="<worker-url>"` on any element, the
+worker served from the scope it protects — and the staleness banner is
+CSS keyed on the `data-offline` attribute the boost layer reflects
+from the browser's own connectivity events. Offline writes fail with
+the browser's honesty; that refusal is a promise (see MANIFESTO).
+*Why:* reads surviving a tunnel is nearly all the real-world value of
+offline at none of the architectural cost; the rest is the refused
+client-heap wearing a worker's uniform. *Enforcement:* construction
+(the worker's fetch handler returns early on non-GET) + gate (the
+sanctioned-script list is exactly two names).
+
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
 unauditable by ANOM-121 and untestable by anything.

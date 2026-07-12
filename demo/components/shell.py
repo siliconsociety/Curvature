@@ -3,8 +3,12 @@ fragments and pours the page around them. Runs only for unboosted requests."""
 
 from __future__ import annotations
 
+from importlib.metadata import version
+
 from curvature import Element
 from curvature import html as h
+
+ASSETS = version("curvature")
 
 
 def shell(*fragments: Element) -> Element:
@@ -15,7 +19,7 @@ def shell(*fragments: Element) -> Element:
             h.title("Pit Board — a Curvature demo"),
             h.style_link("/static/manifold.css"),
             h.style_link("/static/tower.css"),
-            h.script(src="/static/lib/curvature.js"),
+            h.script(src=f"/static/lib/curvature.js?v={ASSETS}"),
         ),
         h.body(
             h.header(
@@ -25,6 +29,7 @@ def shell(*fragments: Element) -> Element:
             ),
             h.main(*fragments),
             data_boost=True,
+            data_offline_cache="/curvature-offline.js",
         ),
         lang="en",
     )

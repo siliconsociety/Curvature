@@ -201,3 +201,10 @@ def test_walk_source_skips_excluded_dirs(tmp_path):
     assert names == ["real.py"]
 
 
+
+
+def test_the_replay_worker_is_sanctioned_company(tmp_path):
+    write(tmp_path, "static/curvature-offline.js", 'fetch("replays")\n')
+    write(tmp_path, "static/curvature.js", "// the boost layer\n")
+    assert checks.check_js_placement(tmp_path) == []
+    assert checks.check_js_http(tmp_path) == []

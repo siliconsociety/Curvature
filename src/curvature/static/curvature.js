@@ -104,5 +104,18 @@
     boostedFetch(new URL(location.href), { method: "GET" }, false);
   });
 
+  // Offline (C-303): register the replay worker when the page declares
+  // it, and report the browser's own connectivity fact as a data
+  // attribute — the banner itself is CSS; nothing here decides.
+  const offline = document.querySelector("[data-offline-cache]");
+  if (offline && "serviceWorker" in navigator) {
+    navigator.serviceWorker.register(offline.dataset.offlineCache);
+  }
+  const reflect = () =>
+    document.documentElement.toggleAttribute("data-offline", !navigator.onLine);
+  addEventListener("online", reflect);
+  addEventListener("offline", reflect);
+  reflect();
+
   startLive();
 })();

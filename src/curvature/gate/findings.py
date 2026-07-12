@@ -47,6 +47,11 @@ def is_vendored(path: Path) -> bool:
     )
 
 
+SANCTIONED_SCRIPTS = frozenset({"curvature.js", "curvature-offline.js"})
+
+
 def is_boost_layer(path: Path) -> bool:
-    """curvature.js under a static/ directory is the one first-party script."""
-    return path.name == "curvature.js" and "static" in path.parts
+    """The boost layer and its replay companion: the only first-party
+    scripts (C-300, C-303) — vendored by the framework, ceilinged like
+    everything else."""
+    return path.name in SANCTIONED_SCRIPTS and "static" in path.parts

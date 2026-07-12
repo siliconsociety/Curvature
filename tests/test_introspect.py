@@ -4,12 +4,11 @@ from curvature.introspect import fetch_chart
 from demo.app import app
 
 
-def test_the_resident_reads_the_house_chart():
+def test_server_side_tooling_reads_the_public_chart():
     chart = asyncio.run(fetch_chart(app, "/"))
     assert chart is not None and chart["chart"] == "curvature/1"
-    assert any(
-        form["action"] == "/roadmap/items" for form in chart["affordances"]["forms"]
-    )
+    assert chart["affordances"]["forms"] == []
+    assert "ON TRACK" in chart["headings"]
 
 
 def test_query_strings_reach_the_region():

@@ -61,18 +61,6 @@ class RoadmapStore:
             slug = f"{base}-{counter}"
             counter += 1
         item = Item(id=slug, title=title, lane=lane, note=note)
-        items.append(item)
+        items.insert(0, item)
         self._write(items)
         return item
-
-    def move(self, item_id: str, direction: str) -> None:
-        items = self._read()
-        for item in items:
-            if item.id != item_id:
-                continue
-            position = LANES.index(item.lane)
-            if direction == "advance" and position < len(LANES) - 1:
-                item.lane = LANES[position + 1]
-            elif direction == "back" and position > 0:
-                item.lane = LANES[position - 1]
-        self._write(items)

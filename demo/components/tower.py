@@ -1,10 +1,9 @@
 """The timing tower — the living roadmap wearing its true clothes.
 
 A pit board is the sign the crew hangs over the wall: what's on track,
-what's done, what the stint plan says. One vertical tower, monospace
-discipline, and every control a real form wearing a pit-crew paddle:
-OUT sends a planned item onto the track, FLAG takes the flag, PIT
-brings one back in. Git is the timekeeper.
+what comes next, and what shipped. One vertical tower, monospace
+discipline, recent work first. Git is the editor and timekeeper; Live
+reflects its changes into every open page.
 """
 
 from __future__ import annotations
@@ -27,32 +26,7 @@ class RowProps(Props):
     pulse: bool = False
 
 
-class PaddleProps(Props):
-    item: Item
-    direction: str
-    label: str
-
-
-PADDLE_HINTS = {
-    "OUT": "Send onto the track — start this work",
-    "FLAG": "Take the flag — mark it shipped",
-    "PIT": "Pull back one lane",
-}
-
-
-def _paddle(props: PaddleProps) -> Element:
-    return h.form(
-        h.input_(type="hidden", name="direction", value=props.direction),
-        h.button(props.label, class_="paddle",
-                 title=PADDLE_HINTS.get(props.label, props.label),
-                 aria_label=f"{props.label}: {props.item.title}"),
-        action=f"/roadmap/items/{props.item.id}/move",
-        method="post",
-        class_="paddle-form",
-    )
-
-
-def _row(props: RowProps, *paddles: Element) -> Element:
+def _row(props: RowProps) -> Element:
     item = props.item
     classes = "row"
     if props.dim:
@@ -60,62 +34,38 @@ def _row(props: RowProps, *paddles: Element) -> Element:
     return h.li(
         h.span(props.marker, class_="marker pulse" if props.pulse else "marker"),
         h.div(
-            h.h3(item.title),
+            h.h4(item.title),
             h.p(item.note, class_="row-note") if item.note else None,
             class_="row-body",
         ),
-        h.div(*paddles, class_="paddles"),
         class_=classes,
     )
 
 
 def tower(props: TowerProps) -> Element:
     return h.section(
-        h.p("OUT → on track · FLAG → shipped · PIT → back one",
-            class_="tower-legend"),
-        h.h3("PLAN A STINT", class_="lane-mark"),
-        h.form(
-            h.input_(type="text", name="title", placeholder="Next stint…",
-                     required=True, maxlength=120),
-            h.input_(type="text", name="note", placeholder="One honest sentence",
-                     maxlength=300),
-            h.input_(type="hidden", name="lane", value="queued"),
-            h.button("PLAN IT", class_="plan"),
-            action="/roadmap/items",
-            method="post",
-            class_="plan-form",
-        ),
+        h.p("LIVE ROADMAP · RECENT FIRST", class_="tower-legend"),
         h.h3("ON TRACK", class_="lane-mark lane-mark-track"),
         h.ul(
             (
-                _row(
-                    RowProps(item=item, marker="●", pulse=True),
-                    _paddle(PaddleProps(item=item, direction="back", label="PIT")),
-                    _paddle(PaddleProps(item=item, direction="advance", label="FLAG")),
-                )
+                _row(RowProps(item=item, marker="●", pulse=True))
                 for item in props.on_track
             ),
             class_="rows",
         ) if props.on_track else h.p("Track is clear.", class_="empty"),
-        h.h3("SHIPPED", class_="lane-mark lane-mark-shipped"),
+        h.h3("NEXT UP", class_="lane-mark"),
         h.ul(
             (
-                _row(
-                    RowProps(item=item, marker=f"P{position}"),
-                    _paddle(PaddleProps(item=item, direction="back", label="PIT")),
-                )
-                for position, item in enumerate(props.shipped, 1)
+                _row(RowProps(item=item, marker="—", dim=True))
+                for item in props.queued
             ),
             class_="rows",
         ),
-        h.h3("STINT PLAN", class_="lane-mark"),
+        h.h3("SHIPPED", class_="lane-mark lane-mark-shipped"),
         h.ul(
             (
-                _row(
-                    RowProps(item=item, marker="—", dim=True),
-                    _paddle(PaddleProps(item=item, direction="advance", label="OUT")),
-                )
-                for item in props.queued
+                _row(RowProps(item=item, marker=f"P{position}"))
+                for position, item in enumerate(props.shipped, 1)
             ),
             class_="rows",
         ),

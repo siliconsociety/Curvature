@@ -1,8 +1,7 @@
 """Pit Board — the living roadmap, and the canonical Curvature demo.
 
-One page. The tower streams itself: ship a card from anywhere — the
-app, a git pull, an editor — and every open browser updates. Real
-paddle forms move items; git keeps the time.
+One page. The tower streams itself: change a card through git or an
+editor and every open browser updates. Git keeps the time.
 
 Run it:  uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1
 (the flag matters: Live holds connections open, and graceful shutdown
@@ -13,9 +12,8 @@ from __future__ import annotations
 
 import asyncio
 from pathlib import Path
-from typing import Annotated
 
-from fastapi import FastAPI, Form, Request
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 import curvature
@@ -24,7 +22,7 @@ from curvature.atlas import atlas
 from curvature.live import live_stream
 from demo.components.shell import shell
 from demo.components.tower import TowerProps, tower
-from demo.roadmap_store import LANES, RoadmapStore
+from demo.roadmap_store import RoadmapStore
 
 app = FastAPI(title="Pit Board")
 app.mount("/static/lib", StaticFiles(directory=Path(curvature.__file__).parent / "static"))
@@ -46,35 +44,13 @@ def _tower_fragment(store: RoadmapStore):
 async def board(request: Request):
     return respond(
         request, _tower_fragment(request.app.state.roadmap_store), shell=shell,
-        purpose="The living roadmap as a timing tower: send a stint OUT, take the "
-                "FLAG, or PIT it back; git keeps the time.",
+        purpose="The living Curvature roadmap: current work, what comes next, "
+                "and recently shipped changes, reflected live from git.",
     )
 
 
 @app.get("/roadmap")
 async def old_address():
-    return redirect("/")
-
-
-@app.post("/roadmap/items")
-async def plan_item(
-    request: Request,
-    title: Annotated[str, Form()],
-    note: Annotated[str, Form()] = "",
-    lane: Annotated[str, Form()] = "queued",
-):
-    if lane not in LANES:
-        lane = "queued"
-    request.app.state.roadmap_store.add(title.strip(), note.strip(), lane)
-    return redirect("/")
-
-
-@app.post("/roadmap/items/{item_id}/move")
-async def move_item(
-    request: Request, item_id: str, direction: Annotated[str, Form()]
-):
-    if direction in {"advance", "back"}:
-        request.app.state.roadmap_store.move(item_id, direction)
     return redirect("/")
 
 

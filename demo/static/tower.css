@@ -29,7 +29,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 3.2rem 1fr auto;
+  grid-template-columns: 3.2rem 1fr;
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 0.35rem;
@@ -57,61 +57,11 @@
   50% { opacity: 0.35; }
 }
 
-.row-body h3 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+.row-body h4 { margin: 0; font-size: 0.95rem; font-weight: 600; }
 
 .row-note {
   margin: 0.2rem 0 0;
   color: var(--ink-soft);
   font-size: 0.8rem;
   font-family: system-ui, sans-serif;
-}
-
-.paddles { display: flex; gap: 0.4rem; }
-
-.paddle-form { display: flex; }
-
-.paddle {
-  font: inherit;
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: color var(--pace), border-color var(--pace), background var(--pace);
-}
-
-.paddle:hover {
-  color: var(--signal-ink);
-  background: var(--signal);
-  border-color: var(--signal);
-}
-
-.plan-form { display: flex; gap: 0.5rem; margin: 0.25rem 0 0.5rem; flex-wrap: wrap; }
-
-.plan-form input[type="text"] {
-  flex: 1;
-  min-width: 11rem;
-  padding: 0.55rem 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--card);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.85rem;
-}
-
-.plan {
-  font: inherit;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
-  padding: 0.55rem 1rem;
-  border: 0;
-  border-radius: 8px;
-  background: var(--signal);
-  color: var(--signal-ink);
-  font-weight: 700;
-  cursor: pointer;
 }

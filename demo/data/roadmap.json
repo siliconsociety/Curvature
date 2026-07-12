@@ -1,136 +1,106 @@
 {
   "items": [
     {
-      "id": "founding",
-      "title": "0.1.0 \u2014 the founding",
-      "lane": "shipped",
-      "note": "Contract, runtime, gate, ratchet, scaffolds, Pit Board, AGENTS.md-first docs. Steerability lab #1 passed with zero JS."
+      "id": "site-redesign-roadmap",
+      "title": "Public site: new splash + living roadmap",
+      "lane": "pouring",
+      "note": "Replace the placeholder design with a deliberate marketing page and publish Pit Board as a read-only, Chart-readable roadmap. No public mutation controls; git remains the editor."
     },
     {
-      "id": "constellation",
-      "title": "0.2.0 \u2014 the constellation",
-      "lane": "shipped",
-      "note": "Satellites (explicit capture and honest component manifests), curvature pour, and the first Auth skeleton. Later hardening removed manifest fields and stores that the runtime did not truly enforce."
-    },
-    {
-      "id": "chart-atlas",
-      "title": "Chart + atlas \u2014 the third render head",
-      "lane": "shipped",
-      "note": "Agents read coordinates, not pixels. The atlas is a screen whose chart is the atlas. ANOM-170: purposes are law."
-    },
-    {
-      "id": "concierge-v1",
-      "title": "Retired: Concierge v1",
-      "lane": "shipped",
-      "note": "Removed during production hardening. Resident-agent policy is a real product and trust-boundary decision, not an almost-free framework satellite. Chart/Atlas remains the lower-level substrate."
-    },
-    {
-      "id": "website-manifold",
-      "title": "The website-manifold",
-      "lane": "shipped",
-      "note": "Recast by the owner: the board came home to the demo as the timing tower; the public site becomes its own repo \u2014 the stranger test."
-    },
-    {
-      "id": "model-resolver",
-      "title": "Retired: Concierge model resolver",
-      "lane": "shipped",
-      "note": "Removed with Concierge. Model billing, authorization, intent resolution, and confirmation policy need a product boundary of their own."
-    },
-    {
-      "id": "agent-tokens",
-      "title": "Personal access tokens for visiting agents",
-      "lane": "shipped",
-      "note": "Minted via a form, shown exactly once, stored hashed, presented as Bearer; revocable. Bearer writes skip C-203 by design \u2014 no cookie, no CSRF shape."
-    },
-    {
-      "id": "auth-oidc-totp",
-      "title": "Auth: direct OIDC + TOTP",
-      "lane": "shipped",
-      "note": "Hardened: explicit secure config, Origin/Referer protection for every browser write, expiring shared challenges and tokens, bounded TOTP attempts with replay prevention, OIDC issuer/subject identity, PKCE, nonce, mix-up defenses, and no email auto-link. Exercised after pouring into a fresh app."
-    },
-    {
-      "id": "live-sse",
-      "title": "Live \u2014 server-pushed fragment swaps",
-      "lane": "shipped",
-      "note": "data-live opens the stream; the server pushes fragments; the boost layer swaps by id, skipping missing targets. Proven: curl POSTs, an open browser updates itself, zero reloads."
-    },
-    {
-      "id": "event-horizons",
-      "title": "Event horizon doctrine (C-7xx)",
+      "id": "public-live-playground",
+      "title": "/demo: a small Live playground",
       "lane": "queued",
-      "note": "The declared boundary where the gate's sight deliberately ends: budgeted, fenced, vendored 60fps enclaves."
+      "note": "Invite controlled vandalism in a bounded, resettable toy instead of the roadmap. It should be simple, playful, visibly multi-user, and safe to abandon or reset."
     },
     {
-      "id": "mongo-satellite",
-      "title": "Retired: unfinished Auth stores",
-      "lane": "shipped",
-      "note": "JSON and Mongo adapters were removed during production hardening. SQLite is the proved baseline; another store must demonstrate atomic challenges, replay prevention, shared limits, expiry, and concurrency before it ships."
-    },
-    {
-      "id": "gate-audits",
-      "title": "ANOM-150/151/160/161",
-      "lane": "shipped",
-      "note": "ANOM-150 orphan CSS (its test replants the lap-board rot and catches it), ANOM-151 registry patterns, ANOM-161 manifest honesty (first catch: Auth's own manifest, missing token_desk), and `curvature audit <pkg>` reaching into installed third-party source per C-801."
-    },
-    {
-      "id": "deploy-doc",
-      "title": "Deployment doc",
-      "lane": "shipped",
-      "note": "docs/DEPLOY.md, written from curvature-site's actual Procfile: one process, four files, two honest proxy notes. No k8s ritual materialized."
-    },
-    {
-      "id": "benchmarks",
-      "title": "Time trials \u2014 honest numbers",
-      "lane": "shipped",
-      "note": "Published whatever they said, and they said: ~2,000 req/s on every head, the full HTML page within 2% of the JSON-API baseline at the same p50 \u2014 the SPA saves bytes it later spends client-side. docs/TIME_TRIALS.md; regenerate with scripts/bench.py."
-    },
-    {
-      "id": "offline-cache",
-      "title": "Retired: framework offline replay",
-      "lane": "shipped",
-      "note": "Removed during production hardening. A generic worker cached authenticated HTML and one-time secrets without application authorization or invalidation knowledge. Offline is now an explicit product architecture, not a framework promise."
-    },
-    {
-      "id": "new-demo",
-      "title": "curvature new demo",
+      "id": "live-production-hardening",
+      "title": "Live: production contract",
       "lane": "queued",
-      "note": "Pit Board as a scaffold: only a pour delivers code."
+      "note": "State the single-process guarantee; add heartbeats, bounded subscriber queues, disconnect cleanup, and deployed proxy-duration tests. Add a shared bus only when multi-worker delivery is required."
     },
     {
-      "id": "design-system",
-      "title": "The design idea (owner's, sealed)",
-      "lane": "queued",
-      "note": "Requires semantic HTML, which the substrate already speaks. Tailwind remains heresy. Details live in the owner's head."
-    },
-    {
-      "id": "timing-tower",
-      "title": "Timing tower \u2014 the board wears its true clothes",
+      "id": "pit-board-roadmap-cleanup",
+      "title": "Pit Board becomes a roadmap again",
       "lane": "shipped",
-      "note": "ON TRACK, SHIPPED with positions, STINT PLAN; paddle forms (OUT/FLAG/PIT); Nano Banana 2 emblem. Poured awake, with an idea in it."
-    },
-    {
-      "id": "site-repo",
-      "title": "curvature-site: live stranger test",
-      "lane": "shipped",
-      "note": "LIVE on Heroku with released Curvature 0.2.4. Public CI passed; browser render, Chart, restricted Atlas, CSP and deployment headers, cache policy, versioned framework asset, and /healthz were verified against the deployed dyno."
-    },
-    {
-      "id": "public-gate",
-      "title": "The gate goes public \u2014 CI on both repos",
-      "lane": "shipped",
-      "note": "Same ./gate.sh, witnessed on GitHub. Its first run caught a real bug: CI runners have no git identity, so pour commits now carry the scaffold's own. The badge means what it says."
-    },
-    {
-      "id": "v021-and-c403",
-      "title": "v0.2.1 \u2014 the bump becomes law (C-403)",
-      "lane": "shipped",
-      "note": "First publish under the standing blessing. ANOM-143 makes stale versions a gate matter; its arrival broke the 300-line ceiling on the gate's own modules \u2014 the first ANOM-140 in history forced the bounds-family split while it was cheap."
+      "note": "Removed unused editing controls, renamed the plan lane to NEXT UP, ordered lanes ON TRACK → NEXT UP → SHIPPED, made every lane recent-first, and pruned dead plans. File changes still appear live."
     },
     {
       "id": "production-hardening-024",
       "title": "0.2.4 production hardening",
       "lane": "shipped",
-      "note": "Released and deployed 2026-07-12. Hardened boost failure semantics and races; immutable Elements; honest Chart fields; history-aware ratchet; pyright and Python 3.12\u20133.14 CI; fresh-pour Auth security tests; removal of Concierge, offline replay, unenforced manifest fields, and unfinished stores. Evidence: 195 framework tests, 98.5% coverage, a clean 3.12 wheel stranger with poured Auth, and the live site on the released artifact."
+      "note": "Released and deployed 2026-07-12. Hardened boost, immutable Elements, Chart, ratchet history, Python 3.12–3.14, poured Auth, packaging, and the public stranger site. Removed Concierge, offline replay, unenforced manifest fields, and unfinished stores."
+    },
+    {
+      "id": "site-repo",
+      "title": "curvature-site: live stranger test",
+      "lane": "shipped",
+      "note": "LIVE on Heroku with Curvature 0.2.4. Public CI, browser render, Chart, restricted Atlas, security headers, cache policy, versioned assets, and /healthz verified against the deployed dyno."
+    },
+    {
+      "id": "v021-and-c403",
+      "title": "v0.2.1 — the bump becomes law (C-403)",
+      "lane": "shipped",
+      "note": "ANOM-143 makes stale versions a gate matter. Its arrival broke the gate's own 300-line ceiling, and ANOM-140 forced the bounds-family split while it was cheap."
+    },
+    {
+      "id": "public-gate",
+      "title": "The gate goes public — CI on both repos",
+      "lane": "shipped",
+      "note": "The same ./gate.sh runs locally and on GitHub. Its first public run caught a real scaffold bug: CI runners have no git identity, so pour commits now carry their own."
+    },
+    {
+      "id": "timing-tower",
+      "title": "Timing tower — the board wears its true clothes",
+      "lane": "shipped",
+      "note": "The living roadmap became a pit board with recent-first positions and Live file reflection. The editor is git; public interactivity belongs in a separate playground."
+    },
+    {
+      "id": "benchmarks",
+      "title": "Time trials — honest numbers",
+      "lane": "shipped",
+      "note": "Published the measured result: roughly 2,000 requests per second on every render head, with the full HTML page within 2% of the JSON baseline at the same p50. Reproducible in docs/TIME_TRIALS.md."
+    },
+    {
+      "id": "deploy-doc",
+      "title": "Deployment doc",
+      "lane": "shipped",
+      "note": "Documented the actual Procfile deployment, explicit Auth configuration, durable SQLite boundary, SSE proxy behavior, and the absence of a Kubernetes ritual."
+    },
+    {
+      "id": "gate-audits",
+      "title": "ANOM-150/151/161",
+      "lane": "shipped",
+      "note": "Added orphan CSS, registry-pattern, and manifest-honesty checks plus explicit audit reach into installed package source."
+    },
+    {
+      "id": "live-sse",
+      "title": "Live — server-pushed fragment swaps",
+      "lane": "shipped",
+      "note": "data-live opens an SSE stream; the server pushes identified fragments; the boost layer swaps them by id and skips missing targets. Proven in a real browser with no reload."
+    },
+    {
+      "id": "auth-oidc-totp",
+      "title": "Auth: sessions, direct OIDC, TOTP + tokens",
+      "lane": "shipped",
+      "note": "Explicit secure config, Origin/Referer protection, expiring shared challenges, bounded TOTP with replay prevention, OIDC PKCE and nonce, issuer/subject identity, signed-token verification, and hashed personal tokens."
+    },
+    {
+      "id": "chart-atlas",
+      "title": "Chart + Atlas — the third render head",
+      "lane": "shipped",
+      "note": "Agents read coordinates, not pixels. Charts derive from the rendered tree, purposes are law, and the Atlas is an ordinary screen whose Chart is the machine atlas."
+    },
+    {
+      "id": "constellation",
+      "title": "0.2.0 — explicit satellites",
+      "lane": "shipped",
+      "note": "Added explicit satellite capture and source pouring. Later hardening narrowed manifests to identity, router, and components: only facts capture actually enforces."
+    },
+    {
+      "id": "founding",
+      "title": "0.1.0 — the founding",
+      "lane": "shipped",
+      "note": "Contract, runtime, gate, ratchet, scaffolds, Pit Board, and AGENTS.md-first documentation. Steerability lab #1 passed with zero application JavaScript."
     }
   ]
 }

@@ -12,10 +12,10 @@ from collections.abc import Callable
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 
-from camber.errors import OffCamber
-from camber.html import Element, render
+from curvature.errors import FlatSpot
+from curvature.html import Element, render
 
-BOOST_HEADER = "camber-boost"
+BOOST_HEADER = "curvature-boost"
 
 
 def is_boosted(request: Request) -> bool:
@@ -37,11 +37,11 @@ def respond(
     """
     for fragment in fragments:
         if fragment.id is None:
-            raise OffCamber(
+            raise FlatSpot(
                 f"fragment root <{fragment.tag}> has no id (C-501): the boost "
                 "layer swaps subtrees by id; give the root a stable identity"
             )
-    headers = {"vary": "Camber-Boost"}
+    headers = {"vary": "Curvature-Boost"}
     if is_boosted(request):
         markup = "".join(render(fragment) for fragment in fragments)
         return HTMLResponse(markup, status_code=status_code, headers=headers)

@@ -1,13 +1,13 @@
 import pytest
 from starlette.requests import Request
 
-from camber import OffCamber, respond
-from camber import html as h
-from camber.fragments import redirect
+from curvature import FlatSpot, respond
+from curvature import html as h
+from curvature.fragments import redirect
 
 
 def make_request(*, boosted: bool) -> Request:
-    headers = [(b"camber-boost", b"1")] if boosted else []
+    headers = [(b"curvature-boost", b"1")] if boosted else []
     return Request({"type": "http", "method": "GET", "headers": headers})
 
 
@@ -39,11 +39,11 @@ def test_multiple_fragments_render_in_order():
 def test_both_branches_vary_on_the_boost_header():
     for boosted in (True, False):
         response = respond(make_request(boosted=boosted), h.div(id="p"), shell=shell)
-        assert response.headers["vary"] == "Camber-Boost"
+        assert response.headers["vary"] == "Curvature-Boost"
 
 
 def test_fragment_without_id_is_refused():
-    with pytest.raises(OffCamber, match="C-501"):
+    with pytest.raises(FlatSpot, match="C-501"):
         respond(make_request(boosted=True), h.div("anonymous"), shell=shell)
 
 

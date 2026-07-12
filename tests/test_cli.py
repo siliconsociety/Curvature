@@ -1,7 +1,7 @@
 import json
 
-from camber.gate.cli import main
-from camber.gate.ratchet import Ratchet, load, previous_committed, save
+from curvature.gate.cli import main
+from curvature.gate.ratchet import Ratchet, load, previous_committed, save
 
 
 def write(path, text):
@@ -12,13 +12,13 @@ def write(path, text):
 def test_main_check_green(tmp_path, capsys):
     write(tmp_path / "app.py", "x = 1\n")
     assert main(["check", str(tmp_path)]) == 0
-    assert "the road holds" in capsys.readouterr().out
+    assert "the geometry holds" in capsys.readouterr().out
 
 
 def test_main_check_red(tmp_path, capsys):
     write(tmp_path / "static/rogue.js", "let x = 1\n")
     assert main(["check", str(tmp_path)]) == 1
-    assert "OC-120" in capsys.readouterr().out
+    assert "FLAT-120" in capsys.readouterr().out
 
 
 def test_main_check_reports_coverage_info(tmp_path, capsys):

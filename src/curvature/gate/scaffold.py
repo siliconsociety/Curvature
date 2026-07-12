@@ -1,9 +1,9 @@
-"""camber new — the paved on-ramp.
+"""curvature new — the paved on-ramp.
 
 A scaffold is steering, not convenience: the generated file already has
 the Props model, the id-carrying root, and the test, so the easy next
 move is to fill in the interface — not to invent a different shape.
-`camber new app` extends the same idea to zero: the poured repo carries
+`curvature new app` extends the same idea to zero: the poured repo carries
 its own gate, its own ratchet, and its own AGENTS.md, so onboarding a
 human or an agent means pointing them at the directory.
 """
@@ -13,7 +13,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from camber.gate.ratchet import Ratchet, save
+from curvature.gate.ratchet import Ratchet, save
 
 TEMPLATES = Path(__file__).parent / "templates"
 
@@ -28,12 +28,12 @@ APP_FILES = {
     "shell.py.tmpl": "app/components/shell.py",
     "welcome.py.tmpl": "app/components/welcome.py",
     "test_app.py.tmpl": "tests/test_app.py",
-    "tarmac.css.tmpl": "app/static/tarmac.css",
+    "manifold.css.tmpl": "app/static/manifold.css",
 }
 
 COMPONENT_TEMPLATE = '''\
-from camber import Element, Props
-from camber import html as h
+from curvature import Element, Props
+from curvature import html as h
 
 
 class {class_name}Props(Props):
@@ -47,7 +47,7 @@ def {name}(props: {class_name}Props) -> Element:
 '''
 
 TEST_TEMPLATE = '''\
-from camber import render
+from curvature import render
 
 from {import_path} import {class_name}Props, {name}
 
@@ -63,7 +63,7 @@ def _class_name(name: str) -> str:
 
 
 def new_app(parent: Path, name: str) -> Path:
-    """Pour a complete cambered app: code, tests, gate, ratchet, AGENTS.md.
+    """Pour a complete curved app: code, tests, gate, ratchet, AGENTS.md.
     Green from birth; refuses to overwrite; git-initialized when git is
     willing (the ratchet integrity check reads git history)."""
     if not name.isidentifier() or name != name.lower():
@@ -75,8 +75,8 @@ def new_app(parent: Path, name: str) -> Path:
     title = name.replace("_", " ").title()
     for template_name, relpath in APP_FILES.items():
         text = (TEMPLATES / template_name).read_text()
-        text = text.replace("__CAMBER_NAME__", name).replace("__CAMBER_TITLE__", title)
-        if "__CAMBER_" in text:
+        text = text.replace("__CURVATURE_NAME__", name).replace("__CURVATURE_TITLE__", title)
+        if "__CURVATURE_" in text:
             raise ValueError(f"unfilled placeholder in {template_name}")
         destination = target / relpath
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -91,7 +91,7 @@ def new_app(parent: Path, name: str) -> Path:
     for command in (
         ["git", "init", "--quiet"],
         ["git", "add", "-A"],
-        ["git", "commit", "--quiet", "-m", "Poured by camber new app"],
+        ["git", "commit", "--quiet", "-m", "Poured by curvature new app"],
     ):
         done = subprocess.run(command, cwd=target, capture_output=True, timeout=15)
         if done.returncode != 0:

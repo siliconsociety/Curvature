@@ -1,7 +1,7 @@
 [project]
-name = "camber"
+name = "curvature"
 version = "0.1.0"
-description = "A web framework for code that agents maintain. Pour the road so the car steers itself."
+description = "A web framework for code that agents maintain. The right path is free fall."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -24,15 +24,15 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/siliconsociety/Camber"
-Repository = "https://github.com/siliconsociety/Camber"
-Issues = "https://github.com/siliconsociety/Camber/issues"
+Homepage = "https://github.com/siliconsociety/Curvature"
+Repository = "https://github.com/siliconsociety/Curvature"
+Issues = "https://github.com/siliconsociety/Curvature/issues"
 
 [project.optional-dependencies]
 fastapi = ["fastapi>=0.115", "python-multipart>=0.0.20"]
 
 [project.scripts]
-camber = "camber.gate.cli:main"
+curvature = "curvature.gate.cli:main"
 
 [dependency-groups]
 dev = [
@@ -61,7 +61,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 
 [tool.coverage.run]
-source = ["src/camber"]
+source = ["src/curvature"]
 branch = true
 
 [tool.coverage.report]

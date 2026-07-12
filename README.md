@@ -1,27 +1,27 @@
-# Camber
+# Curvature
 
-*Pour the road so the car steers itself.*
+*The right path is free fall.*
 
 A web framework for code that agents maintain. Server-rendered Python,
 components as typed functions, real links and real forms, one small
 boost script for the single-page feel — and a gate that makes the
 maintainable path the only path that builds.
 
-Camber's design center is the maintainer nobody watches: the coding
+Curvature's design center is the maintainer nobody watches: the coding
 agent in its forty-third session, at 2 a.m., doing whatever the shape of
 the code suggests. Frameworks built for humans enforce their discipline
-through culture. Camber's discipline is machine-checked — every
-invariant in [SPEC.md](https://github.com/siliconsociety/Camber/blob/main/SPEC.md) names the check that enforces it, and
-violations are reported by `camber check` as **off-camber findings**.
-The canonical documentation is [AGENTS.md](https://github.com/siliconsociety/Camber/blob/main/AGENTS.md); this README is
+through culture. Curvature's discipline is machine-checked — every
+invariant in [SPEC.md](https://github.com/siliconsociety/Curvature/blob/main/SPEC.md) names the check that enforces it, and
+violations are reported by `curvature check` as **flat spots** — regions where the geometry failed to steer.
+The canonical documentation is [AGENTS.md](https://github.com/siliconsociety/Curvature/blob/main/AGENTS.md); this README is
 the courtesy translation. The argument for all of it is the
-[MANIFESTO](https://github.com/siliconsociety/Camber/blob/main/MANIFESTO.md).
+[MANIFESTO](https://github.com/siliconsociety/Curvature/blob/main/MANIFESTO.md).
 
 ## The shape of it
 
 ```python
-from camber import Element, Props, redirect, respond
-from camber import html as h
+from curvature import Element, Props, redirect, respond
+from curvature import html as h
 
 
 class LapProps(Props):
@@ -40,24 +40,24 @@ def lap(props: LapProps) -> Element:
   are POST → redirect → GET through real forms. Your test suite drives
   it with httpx — which executes no JS — so the degraded path is the
   tested path, permanently.
-- **camber.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
+- **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
   forms into fragment swaps. Same route, same render, one header of
   difference. Every failure path is real navigation.
 - **The ratchet only tightens.** File ceilings fall, the coverage floor
-  rises, and `camber ratchet` is the only hand on the mechanism. The
+  rises, and `curvature ratchet` is the only hand on the mechanism. The
   10,000-line file is never written because week two's gate refuses the
   sediment while the split is still cheap.
 
 ## Start from nothing
 
 ```bash
-uvx camber new app pitstop     # no install, no venv, no Python even — uv brings it
+uvx curvature new app pitstop     # no install, no venv, no Python even — uv brings it
 cd pitstop
 ./gate.sh                      # green before you write a line
 ./run.sh                       # http://127.0.0.1:8000
 ```
 
-Only have pip? `pip install camber && python -m camber new app pitstop`
+Only have pip? `pip install curvature && python -m curvature new app pitstop`
 — the `python -m` form dodges PATH entirely; the poured README carries
 the rest of the old ritual. 
 
@@ -70,7 +70,7 @@ the directory and ask for a feature — the repo is the prompt.
 PyPI ships the framework; the repo ships Pit Board, the demo:
 
 ```bash
-git clone https://github.com/siliconsociety/Camber && cd Camber
+git clone https://github.com/siliconsociety/Curvature && cd Curvature
 uv sync && ./gate.sh
 uv run uvicorn demo.app:app --reload   # Pit Board
 ```

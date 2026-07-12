@@ -1,7 +1,7 @@
-# The Camber Spec
+# The Curvature Spec
 
 Version 0.1 — 2026-07-11. Protocol of record for the runtime, the gate,
-and every codebase that claims to be cambered.
+and every codebase that claims to be curved.
 
 The rule of this document: **an invariant that names no enforcement is a
 wish, and wishes get deleted.** Every invariant below carries an ID, a
@@ -10,20 +10,20 @@ strongest first:
 
 - **construction** — the runtime refuses to build the violating thing;
   the code cannot express the mistake.
-- **gate** — `camber check` reports it as an off-camber finding; the
+- **gate** — `curvature check` reports it as a flat spot; the
   build is red.
 - **ratchet** — a numeric bound recorded in `ratchet.toml`, moved only by
-  `camber ratchet`, and only in the tightening direction.
+  `curvature ratchet`, and only in the tightening direction.
 
 ## 1. Rendering
 
 **C-100 · Components are functions of props.**
 A component is a plain Python function whose single required parameter is
-a `camber.Props` subclass and whose return type is `camber.Element`.
+a `curvature.Props` subclass and whose return type is `curvature.Element`.
 No classes, no registries, no context vars. *Why:* an explicit, typed,
 import-traceable interface is the unit of composition — the thing every
 change has a default destination inside.
-*Enforcement:* gate (OC-110): every function in a `components/` tree that
+*Enforcement:* gate (FLAT-110): every function in a `components/` tree that
 returns `Element` must annotate its first parameter with a `Props`
 subclass.
 
@@ -35,12 +35,12 @@ prop is a loud failure at the call site, not a quiet default downstream.
 subclasses inherit).
 
 **C-102 · Markup is built, not templated.**
-HTML is constructed through `camber.html` element functions returning
+HTML is constructed through `curvature.html` element functions returning
 `Element` trees. Text is escaped by default; raw HTML requires the
 explicit `raw()` wrapper. *Why:* one language, one type checker, one
 coverage report; injection safety as the default gradient.
 *Enforcement:* construction (element functions escape all text children;
-`raw()` is greppable and gate-counted, OC-122).
+`raw()` is greppable and gate-counted, FLAT-122).
 
 **C-103 · One source of truth per screen.**
 The component that renders a page's full document is the same component
@@ -57,14 +57,14 @@ Every `a` carries a real `href`; every `form` carries `action` and
 *Why:* the anchor and the form are the only two verbs the web guarantees
 without JavaScript; every behavior reachable through them is a behavior
 the test suite can drive. *Enforcement:* construction (`a()` and `form()`
-have required parameters; `href="#"` raises) + gate (OC-130: no `onclick`
+have required parameters; `href="#"` raises) + gate (FLAT-130: no `onclick`
 or `javascript:` URLs anywhere in source).
 
 **C-201 · Writes follow POST → redirect → GET.**
 Mutating handlers return a redirect (303) to a GET view; they never
 render a body. *Why:* refresh-safe, history-safe, and it forces every
 state change to have a canonical, linkable after-state.
-*Enforcement:* gate (OC-131: route functions registered for POST/PUT/
+*Enforcement:* gate (FLAT-131: route functions registered for POST/PUT/
 DELETE must return `Redirect`; heuristic AST check, escape hatch
 documented in AGENTS.md for the rare JSON endpoint).
 
@@ -78,21 +78,21 @@ it isn't testable, and coverage (C-401) starves until it is.
 ## 3. JavaScript
 
 **C-300 · One script.**
-The only first-party JavaScript in a cambered project is the vendored,
-pinned `camber.js` boost layer. *Why:* every additional script is a new
-sediment bed. *Enforcement:* gate (OC-120: any `.js` file outside
-`static/vendor/` is off-camber; the vendor directory is pinned by
+The only first-party JavaScript in a curved project is the vendored,
+pinned `curvature.js` boost layer. *Why:* every additional script is a new
+sediment bed. *Enforcement:* gate (FLAT-120: any `.js` file outside
+`static/vendor/` is flat; the vendor directory is pinned by
 `VERSIONS.md` entry).
 
 **C-301 · JavaScript never speaks HTTP on its own.**
 No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
-`camber.js`. *Why:* a script that can call the server is app logic
-wearing an enhancement's jacket. *Enforcement:* gate (OC-121: token scan
+`curvature.js`. *Why:* a script that can call the server is app logic
+wearing an enhancement's jacket. *Enforcement:* gate (FLAT-121: token scan
 of all non-vendor JS and inline script bodies).
 
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
-unauditable by OC-121 and untestable by anything.
+unauditable by FLAT-121 and untestable by anything.
 *Enforcement:* construction (`script()` with a text child raises).
 
 ## 4. The ratchet
@@ -102,28 +102,28 @@ Every source file has a line ceiling (defaults: Python 300, CSS 250, JS
 150). Existing violators are grandfathered into `ratchet.toml` at their
 current size and may only shrink. *Why:* the 10,000-line file is never
 written; it accretes. The ceiling forces the split while the split is
-cheap. *Enforcement:* ratchet (OC-140) — `camber check` fails any file
-over its bound; `camber ratchet` lowers bounds to current actuals and
+cheap. *Enforcement:* ratchet (FLAT-140) — `curvature check` fails any file
+over its bound; `curvature ratchet` lowers bounds to current actuals and
 never raises them.
 
 **C-401 · Coverage floor.**
 The pytest coverage percentage has a floor in `ratchet.toml`. It rises.
 *Why:* see every codebase you have ever inherited.
-*Enforcement:* ratchet (OC-141).
+*Enforcement:* ratchet (FLAT-141).
 
 **C-402 · The tool is the only hand on the ratchet.**
-Human edits to `ratchet.toml` that loosen any bound are off-camber.
+Human edits to `ratchet.toml` that loosen any bound are flat.
 *Why:* a ratchet with a reverse lever is a dial.
-*Enforcement:* gate (OC-142: `camber check` recomputes actuals; any bound
+*Enforcement:* gate (FLAT-142: `curvature check` recomputes actuals; any bound
 looser than the recorded tightest-known state is refused).
 
 ## 5. Fragments and the boost protocol
 
 **C-500 · Negotiation is one header.**
-A boosted request carries `Camber-Boost: 1`. The server responds with
+A boosted request carries `Curvature-Boost: 1`. The server responds with
 either the full document (header absent) or the fragment subtree(s)
 (header present), from the same render (C-103). Responses set
-`Vary: Camber-Boost`. *Why:* the protocol surface between server and
+`Vary: Curvature-Boost`. *Why:* the protocol surface between server and
 boost layer must fit in one sentence, or it will grow until it is a
 framework nobody chose. *Enforcement:* construction (`respond()` is the
 only fragment emitter).
@@ -135,7 +135,7 @@ the response. Anything else — a fragment without an id, an id not on the
 page — triggers full navigation to the same URL. *Why:* the failure mode
 of enhancement must be the working baseline, never a broken screen.
 *Enforcement:* construction (`respond()` raises on id-less fragment
-roots) + camber.js (fallback navigation on any mismatch).
+roots) + curvature.js (fallback navigation on any mismatch).
 
 ## 6. Project shape
 
@@ -143,7 +143,7 @@ roots) + camber.js (fallback navigation on any mismatch).
 One directory per component for anything with style or breadth: the
 Python module, its CSS file, its test. Small pure components may share a
 module until they grow style. *Why:* co-location is what makes the
-default destination (C-100) physical. *Enforcement:* gate (OC-150: a
+default destination (C-100) physical. *Enforcement:* gate (FLAT-150: a
 component's CSS may only be in its directory; orphan selectors are
 findings) — *deferred to 0.2; directory convention documented in
 AGENTS.md meanwhile.*
@@ -152,30 +152,30 @@ AGENTS.md meanwhile.*
 No plugin registries, no auto-discovery, no metaclass registration, no
 import-time side effects. *Why:* an agent (or a human at 2 a.m.) must be
 able to answer "who calls this?" with grep.
-*Enforcement:* gate (OC-151: no `__init_subclass__` registration
+*Enforcement:* gate (FLAT-151: no `__init_subclass__` registration
 patterns, no module-scope route table mutation outside app assembly) —
 *heuristic, 0.2.*
 
-## Off-camber finding index
+## Flat-spot finding index
 
 | ID     | Invariant | Check |
 |--------|-----------|-------|
-| OC-110 | C-100 | component signature: first param is `Props` subclass |
-| OC-120 | C-300 | `.js` outside `static/vendor/` |
-| OC-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
-| OC-122 | C-102 | `raw()` call census (report, warn over budget) |
-| OC-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
-| OC-131 | C-201 | mutating route returns non-redirect |
-| OC-140 | C-400 | file lines over ceiling |
-| OC-141 | C-401 | coverage below floor |
-| OC-142 | C-402 | ratchet bound looser than tightest-known |
+| FLAT-110 | C-100 | component signature: first param is `Props` subclass |
+| FLAT-120 | C-300 | `.js` outside `static/vendor/` |
+| FLAT-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
+| FLAT-122 | C-102 | `raw()` call census (report, warn over budget) |
+| FLAT-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
+| FLAT-131 | C-201 | mutating route returns non-redirect |
+| FLAT-140 | C-400 | file lines over ceiling |
+| FLAT-141 | C-401 | coverage below floor |
+| FLAT-142 | C-402 | ratchet bound looser than tightest-known |
 
-Token checks (OC-121, OC-130) honor one escape hatch: a line carrying a
-`camber-allow` pragma with a reason. Enforcement code and tests that
+Token checks (FLAT-121, FLAT-130) honor one escape hatch: a line carrying a
+`curvature-allow` pragma with a reason. Enforcement code and tests that
 exercise refusals must spell the forbidden words; the pragma keeps them
-buildable while staying greppable — and `camber check` publishes the
+buildable while staying greppable — and `curvature check` publishes the
 pragma census on every run, so the escape hatch can never go quietly.
 
-A cambered repo is one where `camber check` exits 0 and has *teeth it
+A curved repo is one where `curvature check` exits 0 and has *teeth it
 can show*: the finding index above is the minimum. Projects may add
 rules; they may never remove one that has fired.

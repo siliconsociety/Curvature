@@ -3,8 +3,8 @@ root, so boosted and unboosted requests re-render the same truth."""
 
 from __future__ import annotations
 
-from camber import Element, Props
-from camber import html as h
+from curvature import Element, Props
+from curvature import html as h
 from demo.store import Task
 
 FILTERS = ("all", "open", "done")

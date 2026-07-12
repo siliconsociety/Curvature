@@ -1,7 +1,7 @@
 import pydantic
 import pytest
 
-from camber import Props
+from curvature import Props
 
 
 class CardProps(Props):

@@ -22,4 +22,4 @@ uv publish
 
 version=$(uv run python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
 git tag -a "v${version}" -m "Published v${version} to PyPI"
-echo "published ${version} and tagged v${version} — verify with: uvx camber new app anything"
+echo "published ${version} and tagged v${version} — verify with: uvx curvature new app anything"

@@ -1,7 +1,7 @@
 import pytest
 
-from camber import OffCamber, element, raw, render
-from camber import html as h
+from curvature import FlatSpot, element, raw, render
+from curvature import html as h
 
 
 def test_text_children_are_escaped():
@@ -39,12 +39,12 @@ def test_void_elements_render_without_closing_tag():
 
 
 def test_void_elements_refuse_children():
-    with pytest.raises(OffCamber, match="void element"):
+    with pytest.raises(FlatSpot, match="void element"):
         render(element("img", "caption", src="x.png"))
 
 
 def test_unknown_child_type_is_refused():
-    with pytest.raises(OffCamber, match="cannot render child"):
+    with pytest.raises(FlatSpot, match="cannot render child"):
         render(h.p(object()))
 
 
@@ -53,13 +53,13 @@ def test_html_root_gets_doctype():
 
 
 def test_anchor_requires_a_real_href():
-    with pytest.raises(OffCamber, match="C-200"):
+    with pytest.raises(FlatSpot, match="C-200"):
         h.a("click", href="#")
 
 
 def test_anchor_refuses_javascript_urls():
-    with pytest.raises(OffCamber, match="C-200"):
-        h.a("click", href="javascript:void(0)")  # camber-allow: exercises the refusal
+    with pytest.raises(FlatSpot, match="C-200"):
+        h.a("click", href="javascript:void(0)")  # curvature-allow: exercises the refusal
 
 
 def test_anchor_href_is_keyword_required():
@@ -78,13 +78,13 @@ def test_form_defaults_to_post_and_normalizes_method():
 
 
 def test_form_refuses_exotic_methods():
-    with pytest.raises(OffCamber, match="C-200"):
+    with pytest.raises(FlatSpot, match="C-200"):
         h.form(action="/tasks", method="delete")
 
 
 def test_script_takes_src_only():
-    assert render(h.script(src="/static/camber.js")) == (
-        '<script src="/static/camber.js" defer></script>'
+    assert render(h.script(src="/static/curvature.js")) == (
+        '<script src="/static/curvature.js" defer></script>'
     )
     with pytest.raises(TypeError):
         h.script("alert(1)", src="/x.js")  # type: ignore[call-arg]

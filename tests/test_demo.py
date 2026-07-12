@@ -4,7 +4,7 @@ every assertion here is a promise about the degraded path (C-202)."""
 import pytest
 from fastapi.testclient import TestClient
 
-from camber import BOOST_HEADER
+from curvature import BOOST_HEADER
 from demo.app import app
 from demo.store import board
 
@@ -101,7 +101,7 @@ def test_boosted_request_gets_the_fragment_only(client):
     response = client.get("/", headers={BOOST_HEADER: "1"})
     assert response.text.startswith('<section id="pit-board">')
     assert "<!doctype html>" not in response.text
-    assert response.headers["vary"] == "Camber-Boost"
+    assert response.headers["vary"] == "Curvature-Boost"
 
 
 def test_boosted_create_lands_on_a_fragment(client):

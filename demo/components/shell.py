@@ -3,8 +3,8 @@ fragments and pours the page around them. Runs only for unboosted requests."""
 
 from __future__ import annotations
 
-from camber import Element
-from camber import html as h
+from curvature import Element
+from curvature import html as h
 
 
 def shell(*fragments: Element) -> Element:
@@ -12,9 +12,9 @@ def shell(*fragments: Element) -> Element:
         h.head(
             h.meta(charset="utf-8"),
             h.meta(name="viewport", content="width=device-width, initial-scale=1"),
-            h.title("Pit Board — a Camber demo"),
-            h.style_link("/static/tarmac.css"),
-            h.script(src="/static/lib/camber.js"),
+            h.title("Pit Board — a Curvature demo"),
+            h.style_link("/static/manifold.css"),
+            h.script(src="/static/lib/curvature.js"),
         ),
         h.body(
             h.header(

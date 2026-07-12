@@ -1,4 +1,4 @@
-"""The vocabulary of the gate: findings are off-camber, not 'errors'.
+"""The vocabulary of the gate: findings are flat spots, not 'errors'.
 
 Rule IDs map one-to-one to SPEC.md's finding index. A finding names the
 invariant it serves, because the traceback should teach."""
@@ -48,5 +48,5 @@ def is_vendored(path: Path) -> bool:
 
 
 def is_boost_layer(path: Path) -> bool:
-    """camber.js under a static/ directory is the one first-party script."""
-    return path.name == "camber.js" and "static" in path.parts
+    """curvature.js under a static/ directory is the one first-party script."""
+    return path.name == "curvature.js" and "static" in path.parts

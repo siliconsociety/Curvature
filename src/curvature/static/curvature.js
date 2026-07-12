@@ -1,7 +1,7 @@
-/* camber.js — the boost layer. The only script (C-300).
+/* curvature.js — the boost layer. The only script (C-300).
  *
  * It intercepts working links and working forms inside a [data-boost]
- * scope, refetches with the Camber-Boost header, and swaps the returned
+ * scope, refetches with the Curvature-Boost header, and swaps the returned
  * subtrees by id. Every path out of here on trouble is the same: real
  * navigation to a real URL. The app never needs this file; it only
  * enjoys it.
@@ -9,7 +9,7 @@
 (() => {
   "use strict";
 
-  const HEADER = { "Camber-Boost": "1" };
+  const HEADER = { "Curvature-Boost": "1" };
 
   const sameOrigin = (url) => url.origin === location.origin;
 
@@ -30,7 +30,7 @@
       const auto = root.querySelector("[autofocus]");
       if (auto) { auto.focus(); break; }
     }
-    if (push) history.pushState({ camber: true }, "", url);
+    if (push) history.pushState({ curvature: true }, "", url);
   };
 
   const boostedFetch = async (url, options, push) => {

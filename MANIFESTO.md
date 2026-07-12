@@ -1,6 +1,9 @@
-# The Camber Manifesto
+# The Curvature Manifesto
 
-*Pour the road so the car steers itself.*
+*The right path is free fall.*
+
+> Structure tells agents how to move; the gate tells structure how to
+> curve. — after Wheeler
 
 ## The observation
 
@@ -37,25 +40,32 @@ Entropy doesn't read the docs. Neither does the thing maintaining your code.
 
 ## The inversion
 
-Camber is not a framework with a linter attached. It is the inversion:
+Curvature is not a framework with a linter attached. It is the inversion:
 **a contract that happens to ship a runtime.**
 
-Every invariant Camber cares about is written down next to the machine that
+Every invariant Curvature cares about is written down next to the machine that
 enforces it. If a rule cannot be checked, it is not a rule — it is a wish,
-and Camber does not ship wishes. Convention over configuration was a bet on
+and Curvature does not ship wishes. Convention over configuration was a bet on
 human culture. **Constraint over convention** is a bet on verification.
 
-The name is the design. Camber is the tilt engineered into a road so the
-car steers true without the driver thinking about it. You do not resist the
-force — you redirect it. A monk does not stop the opponent's strike; he
-turns its strength into the throw. The agent's tirelessness, its literalism,
-its perfect gradient-following: Camber does not fight these. It pours a
-surface where following the gradient *is* the discipline.
+The name is the design. Einstein's whole move was this: gravity is not a
+force, it is geometry — a falling body isn't being pushed, it is
+following the straightest available line through space that something
+massive has curved. That is precisely the relationship Curvature wants
+with your agents. You do not resist the force — you shape the space it
+falls through. A monk does not stop the opponent's strike; he turns its
+strength into the throw. The agent's tirelessness, its literalism, its
+perfect gradient-following: Curvature does not fight these. It curves
+the space so that free fall *is* the discipline. A banked corner, if you
+want it at human scale, is just curved space poured in asphalt: the car
+steers itself because the road got there first.
 
-And when code fights the tilt, we have a word for it. In racing, an
-off-camber corner slopes against you — the surface itself works to throw
-you off the line. The gate does not report "errors." It reports
-**off-camber findings**. The road told you which way to lean.
+And where the geometry fails, we have a word for it. A **flat spot** is
+a region where nothing curves — where the space offers an agent no
+guidance and any direction looks as good as any other. Flat is where
+sediment forms. The gate does not report "errors"; it reports flat
+spots, each one naming the invariant that should have been bending the
+path there.
 
 ## The tenets
 
@@ -70,10 +80,10 @@ tests drive real forms through real URLs is an app whose degraded path is
 its *tested* path. We had this once. We are taking it back.
 
 **3. JavaScript annotates; it never decides.** The boost layer — the only
-JavaScript Camber ships — intercepts working links and working forms and
+JavaScript Curvature ships — intercepts working links and working forms and
 swaps fragments instead of navigating. Enhancement, by definition:
 everything it touches already works without it. App logic in the browser is
-off-camber, and the gate knows what a `fetch` call looks like.
+flat, and the gate knows what a `fetch` call looks like.
 
 **4. The UI is typed Python.** Components are functions of props; props are
 pydantic models. Your markup logic is type-checked by the same tools as
@@ -92,7 +102,7 @@ is silent, so the gate is not silent.
 
 **7. Documentation is written for the maintainer.** The maintainer is an
 agent. AGENTS.md is the canonical documentation; the README is a courtesy
-translation for humans. Camber is, as far as we know, the first framework
+translation for humans. Curvature is, as far as we know, the first framework
 to declare this out loud — every framework that survives the next decade
 will do the same, and will pretend it always had.
 
@@ -100,7 +110,7 @@ will do the same, and will pretend it always had.
 
 No bundler. No build step. No client-side state store. No plugin registry.
 No mixin. No configuration sprawl. No abstraction admitted before the
-second concrete need. Each refusal is load-bearing: every artifact Camber
+second concrete need. Each refusal is load-bearing: every artifact Curvature
 does not have is an artifact that cannot silt up.
 
 ## Who this is for
@@ -116,18 +126,20 @@ more machinery and less conviction.
 The honest boundary is not scale. It is the latency class of a single
 interaction: rendering happens where the state lives, so work that
 cannot tolerate a round-trip — the 60fps enclave of canvas editors,
-maps, collaborative cursors — belongs on an **island**: a declared,
-fenced, vendored enclave inside a cambered page, with its own budget
-and its own contract (islands doctrine, spec 0.2). Most applications
-are five percent island and ninety-five percent road, and the road is
-faster, cheaper, and testable with JavaScript off.
+maps, collaborative cursors — belongs in a **singularity**: a declared,
+fenced, vendored region where different physics apply, with its own
+budget and its own contract (singularity doctrine, spec 0.2). Most
+applications are five percent singularity and ninety-five percent
+ordinary space, and ordinary space is faster, cheaper, and testable
+with JavaScript off.
 
-Heavy traffic is not the argument against banked corners; it is the
-argument for them. The client-heap taxes scale with your users —
-bundles, hydration, API chatter, and a UI state no one but the pixels
-can see. A cambered app scales with requests, caches as HTML, and keeps
-its entire capability surface on the server, legible to any client you
-point at it — including the ones arriving next, which do not have eyes.
+Heavy traffic is not the argument against curvature; it is the argument
+for it — more mass wants more geometry. The client-heap taxes scale
+with your users: bundles, hydration, API chatter, and a UI state no one
+but the pixels can see. A curved app scales with requests, caches as
+HTML, and keeps its entire capability surface on the server, legible to
+any client you point at it — including the ones arriving next, which do
+not have eyes.
 
-The road is paved for whoever maintains it after you stop looking.
-Nobody is looking at week twelve. The road has to do it.
+The space is curved for whoever maintains it after you stop looking.
+Nobody is looking at week twelve. The geometry has to do it.

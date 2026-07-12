@@ -14,6 +14,6 @@ def test_the_page_renders_whole():
 
 
 def test_boosted_requests_get_the_fragment():
-    response = TestClient(app).get("/", headers={"Camber-Boost": "1"})
+    response = TestClient(app).get("/", headers={"Curvature-Boost": "1"})
     assert response.text.startswith('<section id="welcome">')
     assert "<!doctype html>" not in response.text

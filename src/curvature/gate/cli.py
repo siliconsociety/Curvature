@@ -1,7 +1,7 @@
-"""camber — the gate at the command line.
+"""curvature — the gate at the command line.
 
-`camber check` shows the road's findings and exits red or green.
-`camber ratchet` tightens the numbers to current actuals — the only hand
+`curvature check` shows the road's findings and exits red or green.
+`curvature ratchet` tightens the numbers to current actuals — the only hand
 on the mechanism, and it only turns one way.
 """
 
@@ -13,11 +13,11 @@ import math
 import sys
 from pathlib import Path
 
-from camber.gate import checks, scaffold
-from camber.gate.findings import Finding, walk_source
-from camber.gate.ratchet import load, save
+from curvature.gate import checks, scaffold
+from curvature.gate.findings import Finding, walk_source
+from curvature.gate.ratchet import load, save
 
-ALL_CHECKS = "the full finding index (OC-110 .. OC-142); see SPEC.md"
+ALL_CHECKS = "the full finding index (FLAT-110 .. FLAT-142); see SPEC.md"
 
 
 def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
@@ -33,8 +33,8 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *checks.check_ratchet_integrity(root, ratchet),
     ]
     info = [
-        f"raw() census: {checks.raw_census(root)} call sites (OC-122)",
-        f"camber-allow census: {checks.pragma_census(root)} pragmas",
+        f"raw() census: {checks.raw_census(root)} call sites (FLAT-122)",
+        f"curvature-allow census: {checks.pragma_census(root)} pragmas",
     ]
     report = root / "coverage.json"
     if report.exists():
@@ -53,9 +53,10 @@ def command_check(root: Path) -> int:
         print(f"  {line}")
     count = len(findings)
     if count:
-        print(f"{count} off-camber")
+        noun = "flat spot" if count == 1 else "flat spots"
+        print(f"{count} {noun}")
         return 1
-    print("0 off-camber — the road holds")
+    print("0 flat spots — the geometry holds")
     return 0
 
 
@@ -115,9 +116,9 @@ def command_new(root: Path, kind: str, path: str) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="camber", description=__doc__)
+    parser = argparse.ArgumentParser(prog="curvature", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    check = sub.add_parser("check", help=f"report off-camber findings: {ALL_CHECKS}")
+    check = sub.add_parser("check", help=f"report flat spots: {ALL_CHECKS}")
     check.add_argument("root", nargs="?", default=".")
     ratchet = sub.add_parser("ratchet", help="tighten ratchet.toml to current actuals")
     ratchet.add_argument("root", nargs="?", default=".")
@@ -126,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
         help="pin an over-ceiling file at its current size (adoption only)",
     )
     new = sub.add_parser(
-        "new", help="scaffold: camber new app <name> | camber new component <dir/name>"
+        "new", help="scaffold: curvature new app <name> | curvature new component <dir/name>"
     )
     new.add_argument("kind", choices=["app", "component"])
     new.add_argument("path", help="app name, or component path like app/components/gauge")

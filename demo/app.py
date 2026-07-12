@@ -1,7 +1,7 @@
-"""Pit Board — the canonical Camber demo.
+"""Pit Board — the canonical Curvature demo.
 
 Three routes, two of them writes. Every write is POST -> redirect -> GET.
-The whole app works with JavaScript switched off; camber.js only makes it
+The whole app works with JavaScript switched off; curvature.js only makes it
 feel like it never left the page.
 
 Run it:  uv run uvicorn demo.app:app --reload
@@ -15,14 +15,14 @@ from typing import Annotated
 from fastapi import FastAPI, Form, Request
 from fastapi.staticfiles import StaticFiles
 
-import camber
-from camber import redirect, respond
+import curvature
+from curvature import redirect, respond
 from demo.components.pit_board import FILTERS, PitBoardProps, pit_board
 from demo.components.shell import shell
 from demo.store import board
 
 app = FastAPI(title="Pit Board")
-app.mount("/static/lib", StaticFiles(directory=Path(camber.__file__).parent / "static"))
+app.mount("/static/lib", StaticFiles(directory=Path(curvature.__file__).parent / "static"))
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"))
 
 

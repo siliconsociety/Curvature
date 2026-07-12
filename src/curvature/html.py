@@ -13,7 +13,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from html import escape
 
-from camber.errors import OffCamber
+from curvature.errors import FlatSpot
 
 type AttrValue = str | int | float | bool | None
 type Child = "Element | Raw | str | int | float | None | Iterable[Child]"
@@ -26,7 +26,7 @@ VOID_TAGS = frozenset(
 
 class Raw:
     """Pre-rendered HTML admitted verbatim. Every call site is a finding
-    census entry (OC-122): use it for trusted, already-escaped markup only."""
+    census entry (FLAT-122): use it for trusted, already-escaped markup only."""
 
     __slots__ = ("text",)
 
@@ -88,7 +88,7 @@ def _render_children(children: tuple, out: list[str]) -> None:
             case Iterable():
                 _render_children(tuple(child), out)
             case _:
-                raise OffCamber(
+                raise FlatSpot(
                     f"cannot render child of type {type(child).__name__}; "
                     "children are Elements, strings, numbers, raw(), or iterables of those"
                 )
@@ -99,7 +99,7 @@ def render(element: Element) -> str:
     open_tag = f"<{element.tag}{_render_attrs(element.attrs)}>"
     if element.tag in VOID_TAGS:
         if element.children:
-            raise OffCamber(f"<{element.tag}> is a void element and takes no children")
+            raise FlatSpot(f"<{element.tag}> is a void element and takes no children")
         rendered = open_tag
     else:
         body: list[str] = []
@@ -195,9 +195,9 @@ menu = _factory("menu")
 
 def a(*children: Child, href: str, **attrs: AttrValue) -> Element:
     """A real link (C-200). href is required and must go somewhere."""
-    if href == "#" or href.startswith("javascript:"):  # camber-allow: enforcement
-        raise OffCamber(
-            f'href={href!r} is off-camber (C-200): a link that goes nowhere '
+    if href == "#" or href.startswith("javascript:"):  # curvature-allow: enforcement
+        raise FlatSpot(
+            f'href={href!r} is flat (C-200): a link that goes nowhere '
             "is a button wearing a costume; use a form or a real URL"
         )
     return Element("a", {"href": href, **attrs}, children)
@@ -207,8 +207,8 @@ def form(*children: Child, action: str, method: str = "post", **attrs: AttrValue
     """A real form (C-200). action and method are the contract, not decoration."""
     normalized = method.lower()
     if normalized not in {"get", "post"}:
-        raise OffCamber(
-            f"form method {method!r} is off-camber (C-200): browsers submit "
+        raise FlatSpot(
+            f"form method {method!r} is flat (C-200): browsers submit "
             "GET and POST; other verbs belong to boosted routes via POST"
         )
     return Element("form", {"action": action, "method": normalized, **attrs}, children)

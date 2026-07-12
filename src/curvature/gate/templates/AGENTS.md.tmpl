@@ -1,23 +1,23 @@
 # AGENTS.md — your onboarding
 
-You are maintaining __CAMBER_TITLE__, a Camber app. This file is the
+You are maintaining __CURVATURE_TITLE__, a Curvature app. This file is the
 documentation; everything else is enforced, not remembered.
 
 ## The one command
 
 ```bash
-./gate.sh        # ruff + pytest with coverage + camber check
+./gate.sh        # ruff + pytest with coverage + curvature check
 ```
 
-Green means done. Red means not done. `camber check` findings are
-called off-camber; each names the invariant it serves and the message
+Green means done. Red means not done. `curvature check` findings are
+called flat; each names the invariant it serves and the message
 tells you the fix. If a finding seems wrong, stop and say so — never
 route around the gate.
 
 ## Recipes
 
-**Component**: `uv run camber new component app/components/<name>` —
-pours the file pair (component + test) already on-camber. Declare the
+**Component**: `uv run curvature new component app/components/<name>` —
+pours the file pair (component + test) already on-curve. Declare the
 Props model first; the component is a pure function of it. Its CSS
 lives beside it.
 
@@ -42,7 +42,7 @@ links — the constructors refuse anything else.
 
 1. Never write JavaScript. The boost layer is complete; behavior
    belongs on the server or in native HTML.
-2. Never edit ratchet.toml. `uv run camber ratchet` is the only hand on
+2. Never edit ratchet.toml. `uv run curvature ratchet` is the only hand on
    the mechanism.
 3. Never bypass the gate — no skipped tests, no weakened assertions.
 4. Never add a template language, bundler, client state store, or
@@ -50,7 +50,7 @@ links — the constructors refuse anything else.
 
 ## When you finish
 
-Run ./gate.sh. If green and coverage rose, run `uv run camber ratchet`
+Run ./gate.sh. If green and coverage rose, run `uv run curvature ratchet`
 and include the tightened file in your change. Report what you built,
 what the gate said, and every shortcut, doubt, or failed attempt that
 shaped the result.

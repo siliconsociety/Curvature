@@ -3,24 +3,24 @@
 Held to the same rule as everything else here: an item earns code only
 when its contract can be stated. Order is intent, not promise.
 
-## 0.2 — the road widens
+## 0.2 — the space expands
 
-- **Islands doctrine (C-7xx).** The declared enclave for 60fps work:
+- **Singularities doctrine (C-7xx).** The declared enclave for 60fps work:
   a fenced, vendored widget with a byte budget and a named owner,
-  embedded in a cambered page. The gate learns to count islands and
+  embedded in a curved page. The gate learns to count singularities and
   refuse undeclared ones. This closes the only honest technical gap
-  between Camber and consumer-scale surfaces.
+  between Curvature and consumer-scale surfaces.
 - **Server push (C-5xx extension).** Live updates as server-pushed
-  fragment swaps over SSE — same id-swap protocol camber.js already
+  fragment swaps over SSE — same id-swap protocol curvature.js already
   speaks, the server stays the only author of the DOM. Chat-class apps
   become possible without a word of app JS.
-- **`camber new app`.** The quickstart IS a scaffold: one command pours
-  a running cambered app (shell, first component, gate.sh, ratchet.toml,
+- **`curvature new app`.** The quickstart IS a scaffold: one command pours
+  a running curved app (shell, first component, gate.sh, ratchet.toml,
   AGENTS.md). The README quickstart then fits in five lines.
-- **`camber new demo`.** Pit Board as a scaffold, not a package payload:
+- **`curvature new demo`.** Pit Board as a scaffold, not a package payload:
   extras deliver dependencies, only a pour delivers code. The demo
   arrives editable, which is what a demo is for.
-- **OC-150/151** as specced: orphan CSS selectors, registry patterns.
+- **FLAT-150/151** as specced: orphan CSS selectors, registry patterns.
 - **Deployment doc.** The boring truth: uvicorn workers behind a
   reverse proxy, one container, fragment-cache headers. Publish it so
   nobody invents a k8s ritual for a monolith.
@@ -33,8 +33,8 @@ when its contract can be stated. Order is intent, not promise.
   what it measures.
 - **Offline posture.** The genuine weak flank of server-owned logic.
   Investigate service-worker page caching for read paths; state loudly
-  what Camber will not pretend to do.
-- **PyPI.** Names `camber` and `camberworks` verified free 2026-07-11.
+  what Curvature will not pretend to do.
+- **PyPI.** Names `curvature` and `curvatureworks` verified free 2026-07-11.
   The ritual since Fortuna's day: 2FA mandatory, token- or
   trusted-publisher-based (`uv publish` handles both); trusted
   publishing wants a public CI identity, tokens work from a laptop.

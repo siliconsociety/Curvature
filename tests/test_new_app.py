@@ -4,8 +4,8 @@ import sys
 
 import pytest
 
-from camber.gate.cli import main, run_checks
-from camber.gate.scaffold import APP_FILES, new_app
+from curvature.gate.cli import main, run_checks
+from curvature.gate.scaffold import APP_FILES, new_app
 
 
 @pytest.fixture(scope="module")
@@ -22,7 +22,7 @@ def test_pours_every_file(poured):
 
 def test_no_placeholder_residue(poured):
     for relpath in APP_FILES.values():
-        assert "__CAMBER_" not in (poured / relpath).read_text(), relpath
+        assert "__CURVATURE_" not in (poured / relpath).read_text(), relpath
 
 
 def test_title_derived_from_name(poured):
@@ -41,7 +41,7 @@ def test_poured_python_parses(poured):
             ast.parse((poured / relpath).read_text(), filename=relpath)
 
 
-def test_poured_app_is_on_camber_from_birth(poured):
+def test_poured_app_is_on_curvature_from_birth(poured):
     findings, _info = run_checks(poured)
     assert findings == []
 
@@ -51,7 +51,7 @@ def test_poured_app_is_a_git_repo_with_one_commit(poured):
         ["git", "-C", str(poured), "log", "--oneline"], capture_output=True, text=True
     )
     assert done.returncode == 0
-    assert "Poured by camber new app" in done.stdout
+    assert "Poured by curvature new app" in done.stdout
 
 
 def test_refuses_to_overwrite(poured):
@@ -73,10 +73,10 @@ def test_cli_pours_an_app(tmp_path, capsys, monkeypatch):
     assert (tmp_path / "night_race/app/main.py").exists()
 
 
-def test_python_dash_m_camber_works(tmp_path):
+def test_python_dash_m_curvature_works(tmp_path):
     done = subprocess.run(
-        [sys.executable, "-m", "camber", "check", str(tmp_path)],
+        [sys.executable, "-m", "curvature", "check", str(tmp_path)],
         capture_output=True, text=True, timeout=60,
     )
     assert done.returncode == 0
-    assert "the road holds" in done.stdout
+    assert "the geometry holds" in done.stdout

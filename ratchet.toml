@@ -1,4 +1,4 @@
-# Managed by `camber ratchet`. The numbers in this file move one way.
+# Managed by `curvature ratchet`. The numbers in this file move one way.
 
 [ceilings]
 css = 250
@@ -6,4 +6,4 @@ js = 150
 py = 300
 
 [floors]
-coverage = 95.4
+coverage = 95.7

@@ -1,9 +1,9 @@
 """ratchet.toml — the numbers that move one way (C-400, C-401, C-402).
 
-`camber ratchet` is the only hand on the mechanism: it lowers ceilings to
+`curvature ratchet` is the only hand on the mechanism: it lowers ceilings to
 current actuals, raises the coverage floor to the current actual, drops
 exceptions that fit under the defaults, and never once turns the other
-direction. Loosening is a human editing the file, and OC-142 catches it
+direction. Loosening is a human editing the file, and FLAT-142 catches it
 against git history."""
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def load(root: Path) -> Ratchet:
 
 
 def dump(ratchet: Ratchet) -> str:
-    lines = ["# Managed by `camber ratchet`. The numbers in this file move one way.",
+    lines = ["# Managed by `curvature ratchet`. The numbers in this file move one way.",
              "", "[ceilings]"]
     for suffix, ceiling in sorted(ratchet.ceilings.items()):
         lines.append(f"{suffix} = {ceiling}")
@@ -61,7 +61,7 @@ def save(root: Path, ratchet: Ratchet) -> None:
 
 
 def previous_committed(root: Path) -> Ratchet | None:
-    """The ratchet as git last saw it, for the loosening check (OC-142)."""
+    """The ratchet as git last saw it, for the loosening check (FLAT-142)."""
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "show", f"HEAD:{RATCHET_FILE}"],

@@ -1,6 +1,6 @@
 import pytest
 
-from camber.gate.scaffold import new_component
+from curvature.gate.scaffold import new_component
 
 
 def test_scaffold_pours_component_and_test(tmp_path):
@@ -34,8 +34,8 @@ def test_scaffold_requires_a_valid_name(tmp_path):
 
 def test_scaffolded_component_passes_its_own_gate(tmp_path):
     """The scaffold's output must satisfy the component signature check —
-    the on-ramp may never pour off-camber concrete."""
-    from camber.gate.checks import check_component_signatures
+    the on-ramp may never pour flat concrete."""
+    from curvature.gate.checks import check_component_signatures
 
     new_component(tmp_path, "demo/components/fuel_gauge")
     assert check_component_signatures(tmp_path) == []

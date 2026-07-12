@@ -1,6 +1,12 @@
 {
   "items": [
     {
+      "id": "site-visual-identity",
+      "title": "Public site: a sharper identity",
+      "lane": "pouring",
+      "note": "Loosen headline spacing, contain the hero columns, replace the target with a scientific gravity-well drawing, adopt the orange boomerang as the brand mark, bring the Manifesto onsite, and surface the installed Curvature version."
+    },
+    {
       "id": "site-redesign-roadmap",
       "pit_id": "P15",
       "title": "Public site: new splash + living roadmap",

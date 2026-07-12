@@ -75,8 +75,8 @@
     {
       "id": "deploy-doc",
       "title": "Deployment doc",
-      "lane": "pouring",
-      "note": "The boring truth: uvicorn workers behind a proxy, one container. Published so nobody invents a k8s ritual for a monolith."
+      "lane": "shipped",
+      "note": "docs/DEPLOY.md, written from curvature-site's actual Procfile: one process, four files, two honest proxy notes. No k8s ritual materialized."
     },
     {
       "id": "benchmarks",
@@ -112,7 +112,7 @@
       "id": "site-repo",
       "title": "curvature-site: the stranger test",
       "lane": "pouring",
-      "note": "The public site as its own repo, poured by the published CLI, consuming Curvature like any outsider. Heroku-ready; the deploy button is the owner's."
+      "note": "LIVE at github.com/siliconsociety/curvature-site: poured by the published CLI, gate green against git-main, Procfile ready. Deploy button remains the owner's."
     }
   ]
 }

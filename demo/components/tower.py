@@ -64,8 +64,8 @@ def tower(props: TowerProps) -> Element:
         h.h3("SHIPPED", class_="lane-mark lane-mark-shipped"),
         h.ul(
             (
-                _row(RowProps(item=item, marker=f"P{position}"))
-                for position, item in enumerate(props.shipped, 1)
+                _row(RowProps(item=item, marker=item.pit_id or "—"))
+                for item in props.shipped
             ),
             class_="rows",
         ),

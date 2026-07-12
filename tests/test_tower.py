@@ -23,7 +23,7 @@ def test_the_tower_reads_like_a_pit_board(client):
     text = client.get("/").text
     for mark in ("ON TRACK", "NEXT UP", "SHIPPED"):
         assert mark in text
-    assert "P1" in text                      # shipped items hold positions
+    assert "P14" in text                     # shipped items keep their identity
     assert 'alt="Pit Board emblem"' in text
     assert '/static/favicon.png' in text
 
@@ -40,6 +40,16 @@ def test_every_lane_is_recent_first(client):
     ]
     assert lanes["shipped"][0].id == "pit-board-roadmap-cleanup"
     assert lanes["shipped"][-1].id == "founding"
+    assert lanes["shipped"][0].pit_id == "P14"
+    assert lanes["shipped"][-1].pit_id == "P1"
+    pit_numbers = [int((item.pit_id or "").removeprefix("P")) for item in lanes["shipped"]]
+    assert pit_numbers == list(range(len(pit_numbers), 0, -1))
+
+
+def test_shipped_ids_survive_recent_first_sorting(client):
+    text = client.get("/").text
+    assert text.index(">P14</span>") < text.index("Pit Board becomes a roadmap again")
+    assert text.index(">P1</span>") < text.index("0.1.0 — the founding")
 
 
 def test_new_items_are_recent_first(client):

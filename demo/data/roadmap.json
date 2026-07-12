@@ -20,84 +20,98 @@
     },
     {
       "id": "pit-board-roadmap-cleanup",
+      "pit_id": "P14",
       "title": "Pit Board becomes a roadmap again",
       "lane": "shipped",
       "note": "Removed unused editing controls, renamed the plan lane to NEXT UP, ordered lanes ON TRACK → NEXT UP → SHIPPED, made every lane recent-first, and pruned dead plans. File changes still appear live."
     },
     {
       "id": "production-hardening-024",
+      "pit_id": "P13",
       "title": "0.2.4 production hardening",
       "lane": "shipped",
       "note": "Released and deployed 2026-07-12. Hardened boost, immutable Elements, Chart, ratchet history, Python 3.12–3.14, poured Auth, packaging, and the public stranger site. Removed Concierge, offline replay, unenforced manifest fields, and unfinished stores."
     },
     {
       "id": "site-repo",
+      "pit_id": "P12",
       "title": "curvature-site: live stranger test",
       "lane": "shipped",
       "note": "LIVE on Heroku with Curvature 0.2.4. Public CI, browser render, Chart, restricted Atlas, security headers, cache policy, versioned assets, and /healthz verified against the deployed dyno."
     },
     {
       "id": "v021-and-c403",
+      "pit_id": "P11",
       "title": "v0.2.1 — the bump becomes law (C-403)",
       "lane": "shipped",
       "note": "ANOM-143 makes stale versions a gate matter. Its arrival broke the gate's own 300-line ceiling, and ANOM-140 forced the bounds-family split while it was cheap."
     },
     {
       "id": "public-gate",
+      "pit_id": "P10",
       "title": "The gate goes public — CI on both repos",
       "lane": "shipped",
       "note": "The same ./gate.sh runs locally and on GitHub. Its first public run caught a real scaffold bug: CI runners have no git identity, so pour commits now carry their own."
     },
     {
       "id": "timing-tower",
+      "pit_id": "P9",
       "title": "Timing tower — the board wears its true clothes",
       "lane": "shipped",
       "note": "The living roadmap became a pit board with recent-first positions and Live file reflection. The editor is git; public interactivity belongs in a separate playground."
     },
     {
       "id": "benchmarks",
+      "pit_id": "P8",
       "title": "Time trials — honest numbers",
       "lane": "shipped",
       "note": "Published the measured result: roughly 2,000 requests per second on every render head, with the full HTML page within 2% of the JSON baseline at the same p50. Reproducible in docs/TIME_TRIALS.md."
     },
     {
       "id": "deploy-doc",
+      "pit_id": "P7",
       "title": "Deployment doc",
       "lane": "shipped",
       "note": "Documented the actual Procfile deployment, explicit Auth configuration, durable SQLite boundary, SSE proxy behavior, and the absence of a Kubernetes ritual."
     },
     {
       "id": "gate-audits",
+      "pit_id": "P6",
       "title": "ANOM-150/151/161",
       "lane": "shipped",
       "note": "Added orphan CSS, registry-pattern, and manifest-honesty checks plus explicit audit reach into installed package source."
     },
     {
       "id": "live-sse",
+      "pit_id": "P5",
       "title": "Live — server-pushed fragment swaps",
       "lane": "shipped",
       "note": "data-live opens an SSE stream; the server pushes identified fragments; the boost layer swaps them by id and skips missing targets. Proven in a real browser with no reload."
     },
     {
       "id": "auth-oidc-totp",
+      "pit_id": "P4",
       "title": "Auth: sessions, direct OIDC, TOTP + tokens",
       "lane": "shipped",
       "note": "Explicit secure config, Origin/Referer protection, expiring shared challenges, bounded TOTP with replay prevention, OIDC PKCE and nonce, issuer/subject identity, signed-token verification, and hashed personal tokens."
     },
     {
       "id": "chart-atlas",
+      "pit_id": "P3",
       "title": "Chart + Atlas — the third render head",
       "lane": "shipped",
       "note": "Agents read coordinates, not pixels. Charts derive from the rendered tree, purposes are law, and the Atlas is an ordinary screen whose Chart is the machine atlas."
     },
     {
       "id": "constellation",
+      "pit_id": "P2",
       "title": "0.2.0 — explicit satellites",
       "lane": "shipped",
       "note": "Added explicit satellite capture and source pouring. Later hardening narrowed manifests to identity, router, and components: only facts capture actually enforces."
     },
     {
       "id": "founding",
+      "pit_id": "P1",
       "title": "0.1.0 — the founding",
       "lane": "shipped",
       "note": "Contract, runtime, gate, ratchet, scaffolds, Pit Board, and AGENTS.md-first documentation. Steerability lab #1 passed with zero application JavaScript."

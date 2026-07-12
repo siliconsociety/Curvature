@@ -19,6 +19,7 @@ class Item:
     title: str
     lane: str
     note: str = ""
+    pit_id: str | None = None
 
 
 def slugify(title: str) -> str:

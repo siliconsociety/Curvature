@@ -30,7 +30,7 @@
 .row {
   display: grid;
   grid-template-columns: 3.2rem 1fr;
-  align-items: center;
+  align-items: baseline;
   gap: 0.75rem;
   padding: 0.55rem 0.35rem;
   border-bottom: 1px solid var(--line);
@@ -42,6 +42,7 @@
   text-align: right;
   color: var(--go);
   font-weight: 700;
+  line-height: 1.25;
   letter-spacing: 0.05em;
 }
 
@@ -57,7 +58,7 @@
   50% { opacity: 0.35; }
 }
 
-.row-body h4 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+.row-body h4 { margin: 0; font-size: 0.95rem; font-weight: 600; line-height: 1.25; }
 
 .row-note {
   margin: 0.2rem 0 0;

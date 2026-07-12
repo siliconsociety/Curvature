@@ -2,32 +2,32 @@
   "items": [
     {
       "id": "founding",
-      "title": "0.1.0 — the founding",
+      "title": "0.1.0 \u2014 the founding",
       "lane": "shipped",
       "note": "Contract, runtime, gate, ratchet, scaffolds, Pit Board, AGENTS.md-first docs. Steerability lab #1 passed with zero JS."
     },
     {
       "id": "constellation",
-      "title": "0.2.0 — the constellation",
+      "title": "0.2.0 \u2014 the constellation",
       "lane": "shipped",
       "note": "Satellites (capture, manifests, mass), curvature pour, Auth skeleton with the revolving-door store, C-203 construction-grade."
     },
     {
       "id": "chart-atlas",
-      "title": "Chart + atlas — the third render head",
+      "title": "Chart + atlas \u2014 the third render head",
       "lane": "shipped",
       "note": "Agents read coordinates, not pixels. The atlas is a screen whose chart is the atlas. ANOM-170: purposes are law."
     },
     {
       "id": "concierge-v1",
-      "title": "Concierge v1 — drafts, never deeds",
+      "title": "Concierge v1 \u2014 drafts, never deeds",
       "lane": "shipped",
       "note": "The resident agent: intent becomes prefilled real forms the human fires. Zero mutating routes in its orbit, pinned by test."
     },
     {
       "id": "website-manifold",
       "title": "The website-manifold",
-      "lane": "pouring",
+      "lane": "shipped",
       "note": "This very board: the living roadmap as a Curvature app, its data in git, its chart served to agents. The markdown becomes a pointer."
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "id": "live-sse",
-      "title": "Live — server-pushed fragment swaps",
+      "title": "Live \u2014 server-pushed fragment swaps",
       "lane": "queued",
       "note": "Same id-swap protocol curvature.js already speaks, flowing downhill over SSE. Chat-class apps without a word of app JS."
     },

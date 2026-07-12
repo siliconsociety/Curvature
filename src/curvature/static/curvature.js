@@ -15,22 +15,41 @@
 
   const fallback = (url) => location.assign(url);
 
-  const swap = (markup, url, push) => {
+  const swap = (markup, url, push, soft) => {
     const template = document.createElement("template");
     template.innerHTML = markup;
     const roots = [...template.content.children];
-    if (roots.length === 0) return fallback(url);
-    for (const root of roots) {
-      if (!root.id || !document.getElementById(root.id)) return fallback(url);
+    if (roots.length === 0) return soft ? undefined : fallback(url);
+    if (!soft) {
+      for (const root of roots) {
+        if (!root.id || !document.getElementById(root.id)) return fallback(url);
+      }
     }
     for (const root of roots) {
-      document.getElementById(root.id).replaceWith(root);
+      const target = root.id && document.getElementById(root.id);
+      if (target) target.replaceWith(root);
     }
+    if (soft) return startLive();
     for (const root of roots) {
       const auto = root.querySelector("[autofocus]");
       if (auto) { auto.focus(); break; }
     }
     if (push) history.pushState({ curvature: true }, "", url);
+    startLive();
+  };
+
+  // Live (C-502): the boost swap flowing downhill. One EventSource per
+  // stream URL, however many swaps arrive; missing targets are skipped,
+  // never navigated — an enhancement stream must not hijack the page.
+  const liveStreams = new Set();
+  const startLive = () => {
+    for (const el of document.querySelectorAll("[data-live]")) {
+      const stream = el.dataset.live;
+      if (!stream || liveStreams.has(stream)) continue;
+      liveStreams.add(stream);
+      const source = new EventSource(stream);
+      source.onmessage = (event) => swap(event.data, location.href, false, true);
+    }
   };
 
   const boostedFetch = async (url, options, push) => {
@@ -84,4 +103,6 @@
   addEventListener("popstate", () => {
     boostedFetch(new URL(location.href), { method: "GET" }, false);
   });
+
+  startLive();
 })();

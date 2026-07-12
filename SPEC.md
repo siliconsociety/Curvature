@@ -146,6 +146,19 @@ of enhancement must be the working baseline, never a broken screen.
 *Enforcement:* construction (`respond()` raises on id-less fragment
 roots) + curvature.js (fallback navigation on any mismatch).
 
+**C-502 · Live is the boost swap flowing downhill.**
+A `data-live="<stream>"` attribute opens one EventSource per stream URL;
+the server pushes rendered fragments over SSE (`curvature.live`), and
+the boost layer swaps them by id under the same law as everything else
+(C-501) — with one inversion: missing targets are SKIPPED, never
+navigated, because an enhancement stream must not hijack the page it
+decorates. Live regions are display surfaces; don't stream a form
+someone might be typing into. JS-off degradation is already honest:
+reads render whole, refresh is the fallback. *Why:* chat-class
+liveness without a word of app JS or a gram of client state.
+*Enforcement:* construction (sse_event refuses anonymous fragments) +
+the boost layer (EventSource lives only in curvature.js, C-301).
+
 ## 6. Project shape
 
 **C-600 · Components live in `components/`.**

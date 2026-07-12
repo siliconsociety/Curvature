@@ -99,7 +99,7 @@ def test_unknown_status_falls_back_to_all(client):
 
 def test_boosted_request_gets_the_fragment_only(client):
     response = client.get("/", headers={BOOST_HEADER: "1"})
-    assert response.text.startswith('<section id="pit-board">')
+    assert response.text.startswith('<section id="pit-board"')
     assert "<!doctype html>" not in response.text
     assert response.headers["vary"] == "Curvature-Boost, Curvature-Chart"
 
@@ -110,7 +110,7 @@ def test_boosted_create_lands_on_a_fragment(client):
         data={"title": "Fuel calc", "status": "open"},
         headers={BOOST_HEADER: "1"},
     )
-    assert response.text.startswith('<section id="pit-board">')
+    assert response.text.startswith('<section id="pit-board"')
     assert "Fuel calc" in response.text
 
 

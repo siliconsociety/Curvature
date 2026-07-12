@@ -107,4 +107,5 @@ def pit_board(props: PitBoardProps) -> Element:
         if props.tasks
         else h.p("Nothing on the board. The stint is yours.", class_="empty"),
         id="pit-board",
+        data_live="/live",
     )

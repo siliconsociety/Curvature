@@ -115,6 +115,7 @@ discovery is not.
 | ratchet | a bound that moves one way (ceilings fall, floors rise) |
 | grandfather | pinning an over-ceiling file at its high-water mark |
 | Manifold | the design tokens; the poured surface |
+| live | server-pushed fragment swaps over SSE; declared with data-live |
 | chart | the machine-legible projection of a screen (agents read charts, not pixels) |
 | atlas | the screen linking every readable region; its chart is the machine atlas |
 | the geometry holds | `curvature check` exit 0 |

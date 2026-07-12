@@ -1,5 +1,7 @@
 """Pit Board — the canonical Curvature demo.
 
+Live: the board streams itself. Open two windows; add a lap in one.
+
 Three routes, two of them writes. Every write is POST -> redirect -> GET.
 The whole app works with JavaScript switched off; curvature.js only makes it
 feel like it never left the page.
@@ -18,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 import curvature
 from curvature import redirect, respond
 from curvature.atlas import atlas
+from curvature.live import live_stream
 from demo.components.pit_board import FILTERS, PitBoardProps, pit_board
 from demo.components.shell import shell
 from demo.store import board
@@ -53,6 +56,31 @@ async def edit_task(request: Request, task_id: int, status: str = "all"):
     if task_id not in board.tasks:
         return redirect(f"/?status={status}")
     return await index(request, status=status, editing_task_id=task_id)
+
+
+def _board_fragment():
+    return pit_board(PitBoardProps(
+        tasks=tuple(board.visible("all")),
+        status="all",
+        open_count=len(board.visible("open")),
+        done_count=len(board.visible("done")),
+    ))
+
+
+async def _board_events():
+    import asyncio
+
+    seen = -1
+    while True:
+        if board.version != seen:
+            seen = board.version
+            yield _board_fragment()
+        await asyncio.sleep(0.4)
+
+
+@app.get("/live")
+async def live():
+    return live_stream(_board_events())
 
 
 @app.get("/atlas")

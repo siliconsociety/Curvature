@@ -16,20 +16,24 @@ class Task:
 class PitBoard:
     tasks: dict[int, Task] = field(default_factory=dict)
     next_id: int = 1
+    version: int = 0
 
     def add(self, title: str) -> Task:
         task = Task(id=self.next_id, title=title)
         self.tasks[task.id] = task
         self.next_id += 1
+        self.version += 1
         return task
 
     def toggle(self, task_id: int) -> None:
         if task_id in self.tasks:
             self.tasks[task_id].done = not self.tasks[task_id].done
+            self.version += 1
 
     def update_title(self, task_id: int, title: str) -> None:
         if task_id in self.tasks:
             self.tasks[task_id].title = title
+            self.version += 1
 
     def visible(self, status: str) -> list[Task]:
         tasks = list(self.tasks.values())
@@ -44,6 +48,7 @@ class PitBoard:
     def reset(self) -> None:
         self.tasks.clear()
         self.next_id = 1
+        self.version = 0
 
 
 board = PitBoard()

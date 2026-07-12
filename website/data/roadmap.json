@@ -51,8 +51,8 @@
     {
       "id": "live-sse",
       "title": "Live \u2014 server-pushed fragment swaps",
-      "lane": "queued",
-      "note": "Same id-swap protocol curvature.js already speaks, flowing downhill over SSE. Chat-class apps without a word of app JS."
+      "lane": "shipped",
+      "note": "data-live opens the stream; the server pushes fragments; the boost layer swaps by id, skipping missing targets. Proven: curl POSTs, an open browser updates itself, zero reloads."
     },
     {
       "id": "event-horizons",

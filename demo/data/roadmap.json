@@ -45,7 +45,7 @@
     {
       "id": "auth-oidc-totp",
       "title": "Auth: direct OIDC + TOTP",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "Social login is one standard, zero middlemen. SAML stays outside forever, brokered at the edge."
     },
     {
@@ -63,13 +63,13 @@
     {
       "id": "mongo-satellite",
       "title": "Mongo store satellite",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "A real server on purpose, first-class, never default."
     },
     {
       "id": "gate-audits",
       "title": "ANOM-150/151/160/161",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "Orphan CSS, registry patterns, third-party satellite audits, undeclared orbit contributions."
     },
     {
@@ -81,13 +81,13 @@
     {
       "id": "benchmarks",
       "title": "Honest benchmarks",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "Render cost, cache behavior, requests-per-core against an equivalent SPA + JSON API. Published whatever they say."
     },
     {
       "id": "offline-cache",
       "title": "Offline: a cache, never a database",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "A pure-replay worker for reads; offline writes refused loudly and promised in the manifesto. The promise is worth more than the feature."
     },
     {

@@ -96,6 +96,13 @@ async def create_lap(title: Annotated[str, Form()]):
   a plugin registry.** Their absence is a design decision with a
   paragraph in MANIFESTO.md, not an oversight.
 
+## The board keeps the time
+
+This repo's living roadmap is the Pit Board (demo/data/roadmap.json,
+rendered at /). Work that ships moves or creates its card in the same
+commit; work that starts goes ON TRACK. A board that lags the repo is
+a stale instrument.
+
 ## When you finish
 
 Run `./gate.sh`. If it is green and coverage rose, run `curvature ratchet`

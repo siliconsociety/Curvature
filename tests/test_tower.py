@@ -21,10 +21,15 @@ def client(tmp_path):
 
 def test_the_tower_reads_like_a_pit_board(client):
     text = client.get("/").text
-    for mark in ("ON TRACK", "SHIPPED", "STINT PLAN"):
+    for mark in ("PLAN A STINT", "ON TRACK", "SHIPPED", "STINT PLAN"):
         assert mark in text
     assert "P1" in text                      # shipped items hold positions
     assert 'alt="Pit Board timing tower emblem"' in text
+
+
+def test_the_plan_form_leads_the_board(client):
+    text = client.get("/").text
+    assert text.index("PLAN A STINT") < text.index("ON TRACK") < text.index("SHIPPED")
 
 
 def test_paddles_are_real_forms(client):

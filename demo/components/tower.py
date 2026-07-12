@@ -82,6 +82,18 @@ def tower(props: TowerProps) -> Element:
             ),
             class_="tower-head",
         ),
+        h.h3("PLAN A STINT", class_="lane-mark"),
+        h.form(
+            h.input_(type="text", name="title", placeholder="Next stint…",
+                     required=True, maxlength=120),
+            h.input_(type="text", name="note", placeholder="One honest sentence",
+                     maxlength=300),
+            h.input_(type="hidden", name="lane", value="queued"),
+            h.button("PLAN IT", class_="plan"),
+            action="/roadmap/items",
+            method="post",
+            class_="plan-form",
+        ),
         h.h3("ON TRACK", class_="lane-mark lane-mark-track"),
         h.ul(
             (
@@ -115,17 +127,6 @@ def tower(props: TowerProps) -> Element:
                 for item in props.queued
             ),
             class_="rows",
-        ),
-        h.form(
-            h.input_(type="text", name="title", placeholder="Next stint…",
-                     required=True, maxlength=120),
-            h.input_(type="text", name="note", placeholder="One honest sentence",
-                     maxlength=300),
-            h.input_(type="hidden", name="lane", value="queued"),
-            h.button("PLAN IT", class_="plan"),
-            action="/roadmap/items",
-            method="post",
-            class_="plan-form",
         ),
         id="pit-tower",
         data_live="/live",

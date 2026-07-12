@@ -68,10 +68,14 @@ service disease and are refused. (The Valet remains the owner's alone.)
    declared enhancement. DISCOVERED CORE WORK — C-203: sessions demand
    CSRF posture in the runtime itself (SameSite=Lax + Origin check on
    writes), construction-grade, not satellite code.
-3. **The chart** (name awaiting the owner's gavel: chart/atlas) — the
-   third render head: JSON Schema affordances, discovery header, one
-   authored purpose line per screen. THE current blocker; everything
-   agent-facing stacks on it.
+3. ~~The chart~~ — SHIPPED (C-900..902; Chart/Atlas ratified on
+   sight). Queued from it: the atlas endpoint, ANOM-170 (chart-serving
+   screens must author a purpose).
+3b. **The roadmap-manifold** (owner's ruling, 2026-07-12): this file's
+   replacement is a Curvature app — the living roadmap IS the pit
+   board, converged with the website-as-manifold, chart-native from
+   birth so agents read Curvature's roadmap through Curvature's own
+   projection. This markdown becomes seed data, then a pointer.
 4. **Concierge** — the capstone: IFR consumed first-party + satellite
    packaging + a small-model client + the confirm-vs-do policy.
 

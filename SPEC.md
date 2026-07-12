@@ -172,18 +172,16 @@ the boost layer (EventSource lives only in curvature.js, C-301).
 One directory per component for anything with style or breadth: the
 Python module, its CSS file, its test. Small pure components may share a
 module until they grow style. *Why:* co-location is what makes the
-default destination (C-100) physical. *Enforcement:* gate (ANOM-150: a
-component's CSS may only be in its directory; orphan selectors are
-findings) — *deferred to 0.2; directory convention documented in
-AGENTS.md meanwhile.*
+default destination (C-100) physical. *Enforcement:* gate (ANOM-150,
+landed: orphan class selectors — defined in project CSS, referenced
+nowhere in project markup — are findings; vendored CSS exempt).
 
 **C-601 · Explicit imports only.**
 No plugin registries, no auto-discovery, no metaclass registration, no
 import-time side effects. *Why:* an agent (or a human at 2 a.m.) must be
 able to answer "who calls this?" with grep.
-*Enforcement:* gate (ANOM-151: no `__init_subclass__` registration
-patterns, no module-scope route table mutation outside app assembly) —
-*heuristic, 0.2.*
+*Enforcement:* gate (ANOM-151, landed: `__init_subclass__` and
+`metaclass=` are findings — the manifold refuses invisible machinery).
 
 ## 7. Satellites — DRAFT, lands in 0.2
 
@@ -206,12 +204,12 @@ by grep, and only a pour delivers code. *Enforcement:* construction
 site-packages included — under the full anomaly index. No satellite
 JavaScript; a satellite needing client physics declares an event
 horizon with a budget in its manifest. *Why:* a contract that stops at
-the repo boundary is a costume. *Enforcement:* gate (ANOM-160, 0.2).
+the repo boundary is a costume. *Enforcement:* `curvature audit <package>` (landed): the source checks walk any installed package's directory.
 
 **C-802 · Declared orbit only.**
 Every route prefix, component, and check a satellite contributes is in
 its manifest; contribution outside the declaration is an anomaly.
-*Why:* the manifest is the fence. *Enforcement:* gate (ANOM-161, 0.2).
+*Why:* the manifest is the fence. *Enforcement:* gate (ANOM-161, landed: a manifest's declared components must match its components/ directory — ghosts and stowaways are findings).
 
 **C-803 · Satellites tighten, never flatten.**
 A satellite may add gate checks (rule-packs); it may never remove,
@@ -276,6 +274,9 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-141 | C-401 | coverage below floor |
 | ANOM-142 | C-402 | ratchet bound looser than tightest-known |
 | ANOM-143 | C-403 | published version with commits past its tag |
+| ANOM-150 | C-600 | orphan CSS class selector |
+| ANOM-151 | C-601 | registration magic (__init_subclass__, metaclass) |
+| ANOM-161 | C-802 | satellite manifest disagrees with its directory |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 
 Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a

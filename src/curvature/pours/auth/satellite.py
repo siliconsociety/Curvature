@@ -28,5 +28,5 @@ auth = Satellite(
     name="auth",
     version="0.1.0",
     router=router,
-    components=("auth_forms",),
+    components=("auth_forms", "token_desk"),
 )

@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from curvature.gate import bounds, checks, scaffold
+from curvature.gate.css import check_orphan_css
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
 
@@ -30,6 +31,9 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),
         *checks.check_purposes(root),
+        *checks.check_registry_patterns(root),
+        *checks.check_manifest_honesty(root),
+        *check_orphan_css(root),
         *bounds.check_coverage(root, ratchet),
         *bounds.check_ratchet_integrity(root, ratchet),
         *bounds.check_version_currency(root),
@@ -130,6 +134,37 @@ def command_pour(root: Path, name: str) -> int:
     return 0
 
 
+def command_audit(module_name: str) -> int:
+    """C-801: the contract follows the code. Walk an installed package's
+    source with the source checks — third-party satellites answer to the
+    same law as everything poured."""
+    import importlib.util
+
+    spec = importlib.util.find_spec(module_name)
+    if spec is None or not spec.origin:
+        print(f"cannot find installed module {module_name!r}")
+        return 1
+    root = Path(spec.origin).parent
+    findings = [
+        *checks.check_js_placement(root),
+        *checks.check_js_http(root),
+        *checks.check_dom_sins(root),
+        *checks.check_component_signatures(root),
+        *checks.check_mutating_routes(root),
+        *checks.check_registry_patterns(root),
+        *check_orphan_css(root),
+    ]
+    for finding in findings:
+        print(finding)
+    count = len(findings)
+    if count:
+        noun = "anomaly" if count == 1 else "anomalies"
+        print(f"{count} {noun} in {module_name} ({root})")
+        return 1
+    print(f"0 anomalies — {module_name} honors the contract")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="curvature", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -149,11 +184,15 @@ def main(argv: list[str] | None = None) -> int:
     pour = sub.add_parser("pour", help="deliver a first-party satellite as owned code")
     pour.add_argument("name", help="e.g. auth")
     pour.add_argument("root", nargs="?", default=".")
+    audit = sub.add_parser("audit", help="run the source checks on an installed package")
+    audit.add_argument("module", help="import name, e.g. some_satellite")
     args = parser.parse_args(argv)
     if args.command == "new":
         return command_new(Path.cwd(), args.kind, args.path)
     if args.command == "pour":
         return command_pour(Path(args.root).resolve(), args.name)
+    if args.command == "audit":
+        return command_audit(args.module)
     root = Path(args.root).resolve()
     if args.command == "check":
         return command_check(root)

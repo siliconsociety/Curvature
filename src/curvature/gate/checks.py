@@ -171,6 +171,65 @@ def check_mutating_routes(root: Path) -> list[Finding]:
     return findings
 
 
+def check_registry_patterns(root: Path) -> list[Finding]:
+    """ANOM-151: no registration magic (C-601). __init_subclass__ and
+    metaclasses make "who calls this?" unanswerable by grep."""
+    findings = []
+    for path in walk_source(root, frozenset({".py"})):
+        tree = ast.parse(path.read_text(), filename=str(path))
+        relpath = str(path.relative_to(root))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef) and node.name == "__init_subclass__":
+                findings.append(Finding(
+                    "ANOM-151", relpath, node.lineno,
+                    "__init_subclass__ registration (C-601): explicit imports "
+                    "over magic — capture, don't discover",
+                ))
+            if isinstance(node, ast.ClassDef):
+                for keyword in node.keywords:
+                    if keyword.arg == "metaclass":
+                        findings.append(Finding(
+                            "ANOM-151", relpath, node.lineno,
+                            f"class {node.name} uses a metaclass (C-601); "
+                            "the manifold refuses invisible machinery",
+                        ))
+    return findings
+
+
+def check_manifest_honesty(root: Path) -> list[Finding]:
+    """ANOM-161: a satellite's manifest declares what its directory
+    actually contains (C-802). The manifest is the fence; a fence that
+    disagrees with the yard is worse than no fence."""
+    findings = []
+    for manifest in walk_source(root, frozenset({".py"})):
+        if manifest.name != "satellite.py" or "satellites" not in manifest.parts:
+            continue
+        tree = ast.parse(manifest.read_text(), filename=str(manifest))
+        declared: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.keyword) and node.arg == "components":
+                for element in ast.walk(node.value):
+                    if isinstance(element, ast.Constant) and isinstance(element.value, str):
+                        declared.add(element.value)
+        components_dir = manifest.parent / "components"
+        actual = {
+            p.stem for p in components_dir.glob("*.py") if p.stem != "__init__"
+        } if components_dir.is_dir() else set()
+        relpath = str(manifest.relative_to(root))
+        for ghost in sorted(declared - actual):
+            findings.append(Finding(
+                "ANOM-161", relpath, None,
+                f"manifest declares component {ghost!r} that does not exist (C-802)",
+            ))
+        for stowaway in sorted(actual - declared):
+            findings.append(Finding(
+                "ANOM-161", relpath, None,
+                f"component {stowaway!r} exists but the manifest does not declare "
+                "it (C-802): the fence must agree with the yard",
+            ))
+    return findings
+
+
 def check_purposes(root: Path) -> list[Finding]:
     """ANOM-170: every respond() call in app code authors a purpose
     (C-902) — the one orientation line derivation cannot supply. Tests

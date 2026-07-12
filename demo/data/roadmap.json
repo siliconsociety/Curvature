@@ -69,8 +69,8 @@
     {
       "id": "gate-audits",
       "title": "ANOM-150/151/160/161",
-      "lane": "pouring",
-      "note": "Orphan CSS, registry patterns, third-party satellite audits, undeclared orbit contributions."
+      "lane": "shipped",
+      "note": "ANOM-150 orphan CSS (its test replants the lap-board rot and catches it), ANOM-151 registry patterns, ANOM-161 manifest honesty (first catch: Auth's own manifest, missing token_desk), and `curvature audit <pkg>` reaching into installed third-party source per C-801."
     },
     {
       "id": "deploy-doc",

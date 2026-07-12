@@ -83,9 +83,26 @@ service disease and are refused. (The Valet remains the owner's alone.)
   requests-per-core against an equivalent SPA + JSON API. Publish the
   numbers whatever they say; the architecture argument is only worth
   what it measures.
-- **Offline posture.** The genuine weak flank of server-owned logic.
-  Investigate service-worker page caching for read paths; state loudly
-  what Curvature will not pretend to do.
+- **Offline posture (owner's Socratic pass, 2026-07-12).** The worst
+  way: rebuild the entire client-heap inside a service worker — shadow
+  database in IndexedDB, sync queues, conflict resolution — the app
+  implemented twice, the second copy invisible to the gate and
+  untestable JS-off by definition. The inverse, what's left: **offline
+  is a cache, never a database.** Reads: a sanctioned pure-replay
+  worker (cache pages on visit, serve them when unreachable, banner
+  the staleness) — it never decides, only replays, C-301 in spirit.
+  Writes offline: refused loudly, and the refusal is PROMISED in the
+  manifesto — it is the fence that keeps every write on the server,
+  which is what makes one-source-of-truth, the chart, and C-202
+  coherent. Market honesty: JS-gated storage (localStorage/IndexedDB/
+  OPFS) is indeed the only client persistence the platform offers —
+  there is no declarative offline; almost no sites have real offline;
+  web users do not expect it (the dinosaur game is a cultural
+  institution precisely because offline means dead). The promise is
+  worth more than the feature.
+- **The website.** Curvature's site is a manifold — built with
+  Curvature, docs rendered from this repo's markdown, dogfood and demo
+  in one. Hosting rides on the deployment doc.
 - **PyPI.** Names `curvature` and `curvatureworks` verified free 2026-07-11.
   The ritual since Fortuna's day: 2FA mandatory, token- or
   trusted-publisher-based (`uv publish` handles both); trusted

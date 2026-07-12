@@ -1,6 +1,6 @@
 [project]
 name = "curvature"
-version = "0.1.0"
+version = "0.2.0"
 description = "A web framework for code that agents maintain. The right path is free fall."
 readme = "README.md"
 license = "MIT"
@@ -41,8 +41,8 @@ dev = [
     "ruff>=0.14",
     "fastapi>=0.115",
     "python-multipart>=0.0.20",
-    "httpx>=0.28",
     "uvicorn>=0.35",
+    "httpx2>=2.5.0",
 ]
 
 [build-system]

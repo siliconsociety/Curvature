@@ -156,6 +156,46 @@ able to answer "who calls this?" with grep.
 patterns, no module-scope route table mutation outside app assembly) —
 *heuristic, 0.2.*
 
+## 7. Satellites — DRAFT, lands in 0.2
+
+Extensibility without a registry: a satellite is a body captured into
+the app's gravity by explicit assembly, never discovered. The refusals
+stand — there is no registry, no entry point, no import-time magic.
+
+**C-800 · A satellite is a value, not a discovery.**
+A frozen, typed manifest (name, version, routes, components, assets,
+checks) validated at `capture(app, satellite, orbit=...)`. *Why:* "who
+runs in my app?" must be answerable by grep. *Enforcement:*
+construction (capture validates; nothing else mounts anything).
+
+**C-801 · The contract follows the code.**
+`curvature check` audits captured satellites' installed source —
+site-packages included — under the full anomaly index. No satellite
+JavaScript; a satellite needing client physics declares an event
+horizon with a budget in its manifest. *Why:* a contract that stops at
+the repo boundary is a costume. *Enforcement:* gate (ANOM-160, 0.2).
+
+**C-802 · Declared orbit only.**
+Every route prefix, component, and check a satellite contributes is in
+its manifest; contribution outside the declaration is an anomaly.
+*Why:* the manifest is the fence. *Enforcement:* gate (ANOM-161, 0.2).
+
+**C-803 · Satellites tighten, never flatten.**
+A satellite may add gate checks (rule-packs); it may never remove,
+weaken, or reorder one. *Why:* the ratchet philosophy, applied to the
+rule set itself. *Enforcement:* construction (the check API is
+append-only).
+
+**C-804 · No interception, no ordering.**
+Satellites cannot observe each other, wrap each other, or add global
+middleware; offered capabilities are opted into explicitly at use
+sites. *Why:* capture order must be meaningless by construction.
+*Enforcement:* construction (the capture API has no hook surface).
+
+Doctrine: satellites are how features audition for core. First
+constellation: Concierge (the resident agent), IFR (the agent
+projection), Auth, Admin, Live (SSE push), and rule-packs.
+
 ## Anomaly finding index
 
 | ID     | Invariant | Check |

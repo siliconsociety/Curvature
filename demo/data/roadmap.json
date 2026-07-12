@@ -111,8 +111,8 @@
     {
       "id": "site-repo",
       "title": "curvature-site: live stranger test",
-      "lane": "on_track",
-      "note": "Live on Heroku and independently packaged, but currently behind the framework hardening branch. Update from the next release, add deployment headers and health checks, then verify the live HTML and Chart before calling the stranger test complete."
+      "lane": "shipped",
+      "note": "LIVE on Heroku with released Curvature 0.2.4. Public CI passed; browser render, Chart, restricted Atlas, CSP and deployment headers, cache policy, versioned framework asset, and /healthz were verified against the deployed dyno."
     },
     {
       "id": "public-gate",
@@ -130,7 +130,7 @@
       "id": "production-hardening-024",
       "title": "0.2.4 production hardening",
       "lane": "shipped",
-      "note": "Hardened boost failure semantics and races; immutable Elements; honest Chart fields; history-aware ratchet; pyright and Python 3.12\u20133.14 CI; fresh-pour Auth security tests; removal of Concierge, offline replay, unenforced manifest fields, and unfinished stores. Evidence: 195 framework tests, 98.5% coverage, a clean 3.12 wheel stranger with poured Auth, and the site gate against the exact candidate. Candidate is not yet published or deployed."
+      "note": "Released and deployed 2026-07-12. Hardened boost failure semantics and races; immutable Elements; honest Chart fields; history-aware ratchet; pyright and Python 3.12\u20133.14 CI; fresh-pour Auth security tests; removal of Concierge, offline replay, unenforced manifest fields, and unfinished stores. Evidence: 195 framework tests, 98.5% coverage, a clean 3.12 wheel stranger with poured Auth, and the live site on the released artifact."
     }
   ]
 }

@@ -12,7 +12,8 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL
+    password_hash TEXT NOT NULL,
+    totp_secret TEXT
 );
 CREATE TABLE IF NOT EXISTS sessions (
     token_hash TEXT PRIMARY KEY,
@@ -42,22 +43,29 @@ class SqliteAuthStore:
     def get_user_by_email(self, email: str) -> UserRecord | None:
         with self._connect() as db:
             row = db.execute(
-                "SELECT id, email, password_hash FROM users WHERE email = ?", (email,)
+                "SELECT id, email, password_hash, totp_secret FROM users WHERE email = ?", (email,)
             ).fetchone()
         return UserRecord(**row) if row else None
 
     def get_user_by_id(self, user_id: str) -> UserRecord | None:
         with self._connect() as db:
             row = db.execute(
-                "SELECT id, email, password_hash FROM users WHERE id = ?", (user_id,)
+                "SELECT id, email, password_hash, totp_secret FROM users WHERE id = ?", (user_id,)
             ).fetchone()
         return UserRecord(**row) if row else None
 
     def save_user(self, user: UserRecord) -> None:
         with self._connect() as db:
             db.execute(
-                "INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)",
-                (user.id, user.email, user.password_hash),
+                "INSERT INTO users (id, email, password_hash, totp_secret) "
+                "VALUES (?, ?, ?, ?)",
+                (user.id, user.email, user.password_hash, user.totp_secret),
+            )
+
+    def set_totp_secret(self, user_id: str, secret: str | None) -> None:
+        with self._connect() as db:
+            db.execute(
+                "UPDATE users SET totp_secret = ? WHERE id = ?", (secret, user_id)
             )
 
     def get_session(self, token_hash: str) -> SessionRecord | None:

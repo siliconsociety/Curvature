@@ -45,8 +45,8 @@
     {
       "id": "auth-oidc-totp",
       "title": "Auth: direct OIDC + TOTP",
-      "lane": "pouring",
-      "note": "Social login is one standard, zero middlemen. SAML stays outside forever, brokered at the edge."
+      "lane": "shipped",
+      "note": "TOTP from the stdlib (RFC 6238, forms only, binds after proof); direct OIDC to any issuer via PyJWT + JWKS with an injectable verifier seam; federation never skips the second factor. Proven in a poured app: 22 tests, both doors, zero anomalies. SAML remains outside, forever."
     },
     {
       "id": "live-sse",

@@ -16,6 +16,7 @@ ERRORS = {
 class LoginFormProps(Props):
     error: str | None = None
     email: str = ""
+    providers: tuple[str, ...] = ()
 
 
 class RegisterFormProps(Props):
@@ -46,6 +47,14 @@ def login_form(props: LoginFormProps) -> Element:
             class_="auth-form",
         ),
         h.p(h.a("Need an account? Register", href="/auth/register")),
+        h.nav(
+            (
+                h.a(f"Sign in with {name.title()}",
+                    href=f"/auth/oidc/{name}/login", class_="oidc-link")
+                for name in props.providers
+            ),
+            class_="oidc-links",
+        ) if props.providers else None,
         id="auth-login",
     )
 

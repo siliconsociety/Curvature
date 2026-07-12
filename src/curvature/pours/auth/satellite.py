@@ -20,13 +20,21 @@ dependency wherever you want it:
 
 from __future__ import annotations
 
-from satellites.auth.routes import router
+from fastapi import APIRouter
+from satellites.auth.routes import router as base_router
+from satellites.auth.routes_oidc import router as oidc_router
+from satellites.auth.routes_totp import router as totp_router
 
 from curvature.satellites import Satellite
 
+router = APIRouter()
+router.include_router(base_router)
+router.include_router(totp_router)
+router.include_router(oidc_router)
+
 auth = Satellite(
     name="auth",
-    version="0.1.0",
+    version="0.2.0",
     router=router,
-    components=("auth_forms", "token_desk"),
+    components=("auth_forms", "token_desk", "totp_desk"),
 )

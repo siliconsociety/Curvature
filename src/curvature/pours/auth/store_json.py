@@ -85,6 +85,13 @@ class JsonAuthStore:
         ]
         self._write(data)
 
+    def set_totp_secret(self, user_id: str, secret: str | None) -> None:
+        data = self._read()
+        for user in data["users"]:
+            if user["id"] == user_id:
+                user["totp_secret"] = secret
+        self._write(data)
+
     def list_tokens(self, user_id: str) -> list[TokenRecord]:
         return sorted(
             (TokenRecord(**t) for t in self._read().get("tokens", [])

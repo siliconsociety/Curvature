@@ -16,6 +16,7 @@ class UserRecord:
     id: str
     email: str
     password_hash: str
+    totp_secret: str | None = None
 
 
 @dataclass(frozen=True)
@@ -33,7 +34,7 @@ class TokenRecord:
 
 
 class AuthStore(Protocol):
-    """Eleven verbs. If Auth ever needs a twelfth, add it here and to
+    """Twelve verbs. If Auth ever needs a thirteenth, add it here and to
     every backend in the same commit — the protocol is the contract."""
 
     def get_user_by_email(self, email: str) -> UserRecord | None: ...
@@ -47,6 +48,7 @@ class AuthStore(Protocol):
     def save_token(self, token: TokenRecord) -> None: ...
     def delete_token(self, token_hash: str, user_id: str) -> None: ...
     def list_tokens(self, user_id: str) -> list[TokenRecord]: ...
+    def set_totp_secret(self, user_id: str, secret: str | None) -> None: ...
 
 
 def choose(data_dir: Path) -> AuthStore:

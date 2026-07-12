@@ -15,6 +15,7 @@ from satellites.auth.components.auth_forms import (
     register_form,
 )
 from satellites.auth.components.token_desk import TokenDeskProps, token_desk
+from satellites.auth.routes_totp import stash_pending
 from satellites.auth.security import (
     hash_password,
     hash_token,
@@ -31,7 +32,8 @@ router = APIRouter()
 
 @router.get("/login")
 async def login_page(request: Request, error: str | None = None, email: str = ""):
-    props = LoginFormProps(error=error, email=email)
+    providers = tuple(getattr(request.app.state, "auth_oidc", {}))
+    props = LoginFormProps(error=error, email=email, providers=providers)
     return respond(
         request, login_form(props), shell=shell,
         purpose="Sign in with email and password to act as yourself here.",
@@ -48,6 +50,9 @@ async def login(
     user = store.get_user_by_email(email.strip().lower())
     if user is None or not verify_password(password, user.password_hash):
         return redirect(f"/auth/login?error=credentials&email={email.strip().lower()}")
+    if user.totp_secret:
+        nonce = stash_pending(request, user.id)
+        return redirect(f"/auth/totp/check?pending={nonce}")
     response = redirect("/")
     start_session(response, store, user)
     return response

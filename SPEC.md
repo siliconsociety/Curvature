@@ -68,6 +68,15 @@ state change to have a canonical, linkable after-state.
 DELETE must return `Redirect`; heuristic AST check, escape hatch
 documented in AGENTS.md for the rare JSON endpoint).
 
+**C-203 · Sessions carry the CSRF posture.**
+Session cookies are HttpOnly and SameSite=Lax; the session-resolving
+dependency refuses writes bearing a foreign Origin header (403) before
+any handler runs. Bearer-token clients carry no cookies and are
+untouched. *Why:* cookies plus cross-site POST is the CSRF shape; the
+defense lives in the one dependency every authenticated route already
+declares. *Enforcement:* construction (the Auth satellite's session
+dependency; landed 0.2).
+
 **C-202 · The app works with JavaScript off.**
 Full stop. The unboosted path is not a fallback; it is the application.
 *Why:* §2 of the manifesto — the degraded path must be the tested path.
@@ -164,9 +173,13 @@ stand — there is no registry, no entry point, no import-time magic.
 
 **C-800 · A satellite is a value, not a discovery.**
 A frozen, typed manifest (name, version, routes, components, assets,
-checks) validated at `capture(app, satellite, orbit=...)`. *Why:* "who
-runs in my app?" must be answerable by grep. *Enforcement:*
-construction (capture validates; nothing else mounts anything).
+checks) validated at `capture(app, satellite, orbit=...)`. First-party
+satellites are POURED — `curvature pour <name>` delivers their source
+into `satellites/<name>/`, owned by the manifold and audited by its own
+gate natively; third-party satellites may install from an index, where
+C-801's reach applies. *Why:* "who runs in my app?" must be answerable
+by grep, and only a pour delivers code. *Enforcement:* construction
+(capture validates; nothing else mounts anything). **Landed in 0.2.**
 
 **C-801 · The contract follows the code.**
 `curvature check` audits captured satellites' installed source —

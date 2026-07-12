@@ -39,13 +39,28 @@ when its contract can be stated. Order is intent, not promise.
   trusted-publisher-based (`uv publish` handles both); trusted
   publishing wants a public CI identity, tokens work from a laptop.
 
-## The lurking act — the agent projection
+## The lurking act — two agents, one substrate
 
 The UI state already lives server-side as a typed Element tree of real
-forms and real links. That tree IS a capability surface. A third render
-head — content-negotiated alongside page and fragment — would hand an
-agent the same truth the pixels get: what this screen is for
-(orientation), what state it shows, which actions it affords, with
-typed fields and constraints. Voice and accessibility fall out of the
-same projection. Working name in the house vocabulary: **IFR mode** —
-same aircraft, flown on instruments.
+forms and real links. That tree IS a capability surface, and it feeds
+two distinct architectures (clarified 2026-07-11, RS/F5):
+
+1. **The visiting agent.** A third render head — content-negotiated
+   alongside page and fragment — hands any outside agent the same truth
+   the pixels get: what this screen is for (orientation), what state it
+   shows, which actions it affords, with typed fields and constraints.
+   Working name: **IFR mode** — same aircraft, flown on instruments.
+2. **The resident agent.** An intelligence that ships WITH the app and
+   IS an interface to it: "switch to dark mode," "fill this form from
+   this document." Lives server-side where the state lives; consumes
+   the same projection as a first-party client; speaks human (text or
+   voice) to the user. Orientation flows outward — the app's own mind
+   telling the user where they are — which is the honest version of the
+   accessibility lane. Drafts consequential actions for the user to
+   confirm; performs reversible preferences directly (the authorship
+   principle as an action-policy gradient).
+
+Key economics: against a declared capability surface, intent-matching
+is constrained decoding into typed slots — a small-model problem, not
+a frontier-model problem. The projection is what makes the resident
+affordable.

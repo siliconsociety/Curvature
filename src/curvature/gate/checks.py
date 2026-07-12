@@ -142,6 +142,13 @@ def _decorator_verb(decorator: ast.expr) -> str | None:
     return None
 
 
+def _is_redirect_call(node: ast.expr) -> bool:
+    return isinstance(node, ast.Call) and (
+        (isinstance(node.func, ast.Name) and node.func.id == "redirect")
+        or (isinstance(node.func, ast.Attribute) and node.func.attr == "redirect")
+    )
+
+
 def check_mutating_routes(root: Path) -> list[Finding]:
     """ANOM-131: mutating routes redirect; they never render (C-201)."""
     findings = []
@@ -163,12 +170,16 @@ def check_mutating_routes(root: Path) -> list[Finding]:
                 n.value for n in ast.walk(node)
                 if isinstance(n, ast.Return) and n.value is not None
             ]
+            redirect_names = {
+                target.id
+                for stmt in ast.walk(node)
+                if isinstance(stmt, ast.Assign) and _is_redirect_call(stmt.value)
+                for target in stmt.targets
+                if isinstance(target, ast.Name)
+            }
             redirects = sum(
-                isinstance(r, ast.Call)
-                and (
-                    (isinstance(r.func, ast.Name) and r.func.id == "redirect")
-                    or (isinstance(r.func, ast.Attribute) and r.func.attr == "redirect")
-                )
+                _is_redirect_call(r)
+                or (isinstance(r, ast.Name) and r.id in redirect_names)
                 for r in returns
             )
             if redirects == 0 or redirects < len(returns):

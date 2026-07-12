@@ -1,0 +1,79 @@
+"""SQLite backend — stdlib, single file, no server, real transactions.
+The default door."""
+
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+
+from satellites.auth.store import SessionRecord, UserRecord
+
+SCHEMA = """
+CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions (
+    token_hash TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    expires_at REAL NOT NULL
+);
+"""
+
+
+class SqliteAuthStore:
+    def __init__(self, path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._path = str(path)
+        with self._connect() as db:
+            db.executescript(SCHEMA)
+
+    def _connect(self) -> sqlite3.Connection:
+        db = sqlite3.connect(self._path)
+        db.row_factory = sqlite3.Row
+        return db
+
+    def get_user_by_email(self, email: str) -> UserRecord | None:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT id, email, password_hash FROM users WHERE email = ?", (email,)
+            ).fetchone()
+        return UserRecord(**row) if row else None
+
+    def get_user_by_id(self, user_id: str) -> UserRecord | None:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT id, email, password_hash FROM users WHERE id = ?", (user_id,)
+            ).fetchone()
+        return UserRecord(**row) if row else None
+
+    def save_user(self, user: UserRecord) -> None:
+        with self._connect() as db:
+            db.execute(
+                "INSERT INTO users (id, email, password_hash) VALUES (?, ?, ?)",
+                (user.id, user.email, user.password_hash),
+            )
+
+    def get_session(self, token_hash: str) -> SessionRecord | None:
+        with self._connect() as db:
+            row = db.execute(
+                "SELECT token_hash, user_id, expires_at FROM sessions WHERE token_hash = ?",
+                (token_hash,),
+            ).fetchone()
+        return SessionRecord(**row) if row else None
+
+    def save_session(self, session: SessionRecord) -> None:
+        with self._connect() as db:
+            db.execute(
+                "INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)",
+                (session.token_hash, session.user_id, session.expires_at),
+            )
+
+    def delete_session(self, token_hash: str) -> None:
+        with self._connect() as db:
+            db.execute("DELETE FROM sessions WHERE token_hash = ?", (token_hash,))
+
+    def purge_expired(self, now: float) -> None:
+        with self._connect() as db:
+            db.execute("DELETE FROM sessions WHERE expires_at < ?", (now,))

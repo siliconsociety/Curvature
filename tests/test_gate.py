@@ -139,6 +139,17 @@ def test_post_route_that_redirects_passes(tmp_path):
     assert checks.check_mutating_routes(tmp_path) == []
 
 
+def test_post_route_returning_an_assigned_redirect_passes(tmp_path):
+    write(tmp_path, "routes.py", textwrap.dedent("""
+        @app.post("/login")
+        def login(request):
+            response = redirect("/")
+            start_session(response, store, user)
+            return response
+    """))
+    assert checks.check_mutating_routes(tmp_path) == []
+
+
 def test_json_endpoint_escape_hatch(tmp_path):
     write(tmp_path, "routes.py", textwrap.dedent("""
         @app.post("/api/tasks")

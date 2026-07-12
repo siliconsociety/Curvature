@@ -115,6 +115,19 @@ def command_new(root: Path, kind: str, path: str) -> int:
     return 0
 
 
+def command_pour(root: Path, name: str) -> int:
+    try:
+        created = scaffold.pour_satellite(root, name)
+    except (ValueError, FileExistsError) as error:
+        print(error)
+        return 1
+    for file in created:
+        print(f"poured {file.relative_to(root)}")
+    print(f"capture instructions: satellites/{name}/satellite.py carries them")
+    print("then run ./gate.sh — poured code answers to your gate now")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="curvature", description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -131,9 +144,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     new.add_argument("kind", choices=["app", "component"])
     new.add_argument("path", help="app name, or component path like app/components/gauge")
+    pour = sub.add_parser("pour", help="deliver a first-party satellite as owned code")
+    pour.add_argument("name", help="e.g. auth")
+    pour.add_argument("root", nargs="?", default=".")
     args = parser.parse_args(argv)
     if args.command == "new":
         return command_new(Path.cwd(), args.kind, args.path)
+    if args.command == "pour":
+        return command_pour(Path(args.root).resolve(), args.name)
     root = Path(args.root).resolve()
     if args.command == "check":
         return command_check(root)

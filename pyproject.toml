@@ -63,6 +63,9 @@ pythonpath = ["."]
 [tool.coverage.run]
 source = ["src/curvature"]
 branch = true
+# Pours are delivered code: tested by pouring them into an app and
+# running that app's suite, not by importing them here.
+omit = ["src/curvature/pours/*"]
 
 [tool.coverage.report]
 show_missing = true

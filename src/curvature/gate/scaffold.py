@@ -127,3 +127,54 @@ def new_component(root: Path, dotted_path: str) -> list[Path]:
     target.write_text(COMPONENT_TEMPLATE.format(**substitutions))
     test.write_text(TEST_TEMPLATE.format(**substitutions))
     return [target, test]
+
+POURS = Path(__file__).resolve().parent.parent / "pours"
+
+
+def available_pours() -> list[str]:
+    return sorted(p.name for p in POURS.iterdir() if p.is_dir())
+
+
+def pour_satellite(root: Path, name: str) -> list[Path]:
+    """Deliver a first-party satellite as code the manifold owns.
+
+    The tree lands in satellites/<name>/, its tests land in tests/, and
+    from that moment the app's own gate audits every line — poured code
+    is native code. Never overwrites; re-pouring is a deliberate delete
+    first."""
+    source = POURS / name
+    if not source.is_dir():
+        raise ValueError(
+            f"no satellite named {name!r} to pour; available: {available_pours()}"
+        )
+    destination = root / "satellites" / name
+    if destination.exists():
+        raise FileExistsError(f"{destination} already exists; pours never overwrite")
+
+    created: list[Path] = []
+    for path in sorted(source.rglob("*")):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(source)
+        if relative.parts[0] == "_tests":
+            target = root / "tests" / Path(*relative.parts[1:])
+        else:
+            target = destination / relative
+        if target.exists():
+            raise FileExistsError(f"{target} already exists; pours never overwrite")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(path.read_text())
+        created.append(target)
+
+    for package in (root / "satellites", destination):
+        marker = package / "__init__.py"
+        if not marker.exists():
+            marker.touch()
+            created.append(marker)
+    for sub in sorted(destination.rglob("*")):
+        if sub.is_dir():
+            marker = sub / "__init__.py"
+            if not marker.exists():
+                marker.touch()
+                created.append(marker)
+    return created

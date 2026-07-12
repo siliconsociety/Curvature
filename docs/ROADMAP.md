@@ -1,5 +1,12 @@
 # Roadmap
 
+**The living roadmap is an app now** — `./site.sh`, then /roadmap:
+three lanes, real forms, its data in git at `website/data/roadmap.json`
+(diffs are the changelog), its chart served to agents. This file is the
+founding archive; it no longer tracks state.
+
+---
+
 Held to the same rule as everything else here: an item earns code only
 when its contract can be stated. Order is intent, not promise — and a
 version number is a RELEASE (whatever is green when the button is

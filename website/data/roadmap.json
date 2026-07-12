@@ -1,0 +1,106 @@
+{
+  "items": [
+    {
+      "id": "founding",
+      "title": "0.1.0 — the founding",
+      "lane": "shipped",
+      "note": "Contract, runtime, gate, ratchet, scaffolds, Pit Board, AGENTS.md-first docs. Steerability lab #1 passed with zero JS."
+    },
+    {
+      "id": "constellation",
+      "title": "0.2.0 — the constellation",
+      "lane": "shipped",
+      "note": "Satellites (capture, manifests, mass), curvature pour, Auth skeleton with the revolving-door store, C-203 construction-grade."
+    },
+    {
+      "id": "chart-atlas",
+      "title": "Chart + atlas — the third render head",
+      "lane": "shipped",
+      "note": "Agents read coordinates, not pixels. The atlas is a screen whose chart is the atlas. ANOM-170: purposes are law."
+    },
+    {
+      "id": "concierge-v1",
+      "title": "Concierge v1 — drafts, never deeds",
+      "lane": "shipped",
+      "note": "The resident agent: intent becomes prefilled real forms the human fires. Zero mutating routes in its orbit, pinned by test."
+    },
+    {
+      "id": "website-manifold",
+      "title": "The website-manifold",
+      "lane": "pouring",
+      "note": "This very board: the living roadmap as a Curvature app, its data in git, its chart served to agents. The markdown becomes a pointer."
+    },
+    {
+      "id": "model-resolver",
+      "title": "Model-backed Resolver for the Concierge",
+      "lane": "queued",
+      "note": "Drops into the existing protocol; constrained slot-filling against a declared chart is a small-model job. Needs the owner's model config ruling."
+    },
+    {
+      "id": "agent-tokens",
+      "title": "Personal access tokens for visiting agents",
+      "lane": "queued",
+      "note": "Minted via a form, naturally. Completes borrowed authority: an enduser hands their agent credentials scoped to themselves."
+    },
+    {
+      "id": "auth-oidc-totp",
+      "title": "Auth: direct OIDC + TOTP",
+      "lane": "queued",
+      "note": "Social login is one standard, zero middlemen. SAML stays outside forever, brokered at the edge."
+    },
+    {
+      "id": "live-sse",
+      "title": "Live — server-pushed fragment swaps",
+      "lane": "queued",
+      "note": "Same id-swap protocol curvature.js already speaks, flowing downhill over SSE. Chat-class apps without a word of app JS."
+    },
+    {
+      "id": "event-horizons",
+      "title": "Event horizon doctrine (C-7xx)",
+      "lane": "queued",
+      "note": "The declared boundary where the gate's sight deliberately ends: budgeted, fenced, vendored 60fps enclaves."
+    },
+    {
+      "id": "mongo-satellite",
+      "title": "Mongo store satellite",
+      "lane": "queued",
+      "note": "A real server on purpose, first-class, never default."
+    },
+    {
+      "id": "gate-audits",
+      "title": "ANOM-150/151/160/161",
+      "lane": "queued",
+      "note": "Orphan CSS, registry patterns, third-party satellite audits, undeclared orbit contributions."
+    },
+    {
+      "id": "deploy-doc",
+      "title": "Deployment doc",
+      "lane": "queued",
+      "note": "The boring truth: uvicorn workers behind a proxy, one container. Published so nobody invents a k8s ritual for a monolith."
+    },
+    {
+      "id": "benchmarks",
+      "title": "Honest benchmarks",
+      "lane": "queued",
+      "note": "Render cost, cache behavior, requests-per-core against an equivalent SPA + JSON API. Published whatever they say."
+    },
+    {
+      "id": "offline-cache",
+      "title": "Offline: a cache, never a database",
+      "lane": "queued",
+      "note": "A pure-replay worker for reads; offline writes refused loudly and promised in the manifesto. The promise is worth more than the feature."
+    },
+    {
+      "id": "new-demo",
+      "title": "curvature new demo",
+      "lane": "queued",
+      "note": "Pit Board as a scaffold: only a pour delivers code."
+    },
+    {
+      "id": "design-system",
+      "title": "The design idea (owner's, sealed)",
+      "lane": "queued",
+      "note": "Requires semantic HTML, which the substrate already speaks. Tailwind remains heresy. Details live in the owner's head."
+    }
+  ]
+}

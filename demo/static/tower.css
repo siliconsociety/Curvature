@@ -1,0 +1,126 @@
+/* The timing tower. Monospace discipline; the board is dark by nature
+ * and only politely lighter on paper. */
+
+#pit-tower {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.tower-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0 1.25rem;
+}
+
+.emblem { border-radius: 12px; }
+
+.tower-head h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.18em;
+}
+
+.tower-sub { margin: 0.15rem 0 0; color: var(--ink-soft); font-size: 0.85rem; }
+
+.lane-mark {
+  margin: 1.4rem 0 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.lane-mark-track { color: var(--signal); border-bottom-color: var(--signal); }
+.lane-mark-shipped { color: var(--go); }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+
+.row {
+  display: grid;
+  grid-template-columns: 3.2rem 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.row-dim { opacity: 0.72; }
+
+.marker {
+  text-align: right;
+  color: var(--go);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.row-dim .marker { color: var(--ink-soft); }
+
+.pulse {
+  color: var(--signal);
+  animation: tower-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes tower-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.row-body h3 { margin: 0; font-size: 0.95rem; font-weight: 600; }
+
+.row-note {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-family: system-ui, sans-serif;
+}
+
+.paddles { display: flex; gap: 0.4rem; }
+
+.paddle-form { display: flex; }
+
+.paddle {
+  font: inherit;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color var(--pace), border-color var(--pace), background var(--pace);
+}
+
+.paddle:hover {
+  color: var(--signal-ink);
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.plan-form { display: flex; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+
+.plan-form input[type="text"] {
+  flex: 1;
+  min-width: 11rem;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.plan {
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -28,7 +28,7 @@
       "id": "website-manifold",
       "title": "The website-manifold",
       "lane": "shipped",
-      "note": "This very board: the living roadmap as a Curvature app, its data in git, its chart served to agents. The markdown becomes a pointer."
+      "note": "Recast by the owner: the board came home to the demo as the timing tower; the public site becomes its own repo \u2014 the stranger test."
     },
     {
       "id": "model-resolver",
@@ -75,7 +75,7 @@
     {
       "id": "deploy-doc",
       "title": "Deployment doc",
-      "lane": "queued",
+      "lane": "pouring",
       "note": "The boring truth: uvicorn workers behind a proxy, one container. Published so nobody invents a k8s ritual for a monolith."
     },
     {
@@ -101,6 +101,18 @@
       "title": "The design idea (owner's, sealed)",
       "lane": "queued",
       "note": "Requires semantic HTML, which the substrate already speaks. Tailwind remains heresy. Details live in the owner's head."
+    },
+    {
+      "id": "timing-tower",
+      "title": "Timing tower \u2014 the board wears its true clothes",
+      "lane": "shipped",
+      "note": "ON TRACK, SHIPPED with positions, STINT PLAN; paddle forms (OUT/FLAG/PIT); Nano Banana 2 emblem. Poured awake, with an idea in it."
+    },
+    {
+      "id": "site-repo",
+      "title": "curvature-site: the stranger test",
+      "lane": "pouring",
+      "note": "The public site as its own repo, poured by the published CLI, consuming Curvature like any outsider. Heroku-ready; the deploy button is the owner's."
     }
   ]
 }

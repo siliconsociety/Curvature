@@ -23,6 +23,8 @@ from curvature.atlas import atlas
 from curvature.live import live_stream
 from demo.components.pit_board import FILTERS, PitBoardProps, pit_board
 from demo.components.shell import shell
+from demo.components.tower import TowerProps, tower
+from demo.roadmap_store import LANES, RoadmapStore
 from demo.store import board
 
 app = FastAPI(title="Pit Board")
@@ -81,6 +83,46 @@ async def _board_events():
 @app.get("/live")
 async def live():
     return live_stream(_board_events())
+
+
+app.state.roadmap_store = RoadmapStore(Path(__file__).parent / "data" / "roadmap.json")
+
+
+@app.get("/roadmap")
+async def roadmap(request: Request):
+    lanes = request.app.state.roadmap_store.by_lane()
+    props = TowerProps(
+        on_track=tuple(lanes["pouring"]),
+        shipped=tuple(lanes["shipped"]),
+        queued=tuple(lanes["queued"]),
+    )
+    return respond(
+        request, tower(props), shell=shell,
+        purpose="The living roadmap as a timing tower: send a stint OUT, take the "
+                "FLAG, or PIT it back; git keeps the time.",
+    )
+
+
+@app.post("/roadmap/items")
+async def plan_item(
+    request: Request,
+    title: Annotated[str, Form()],
+    note: Annotated[str, Form()] = "",
+    lane: Annotated[str, Form()] = "queued",
+):
+    if lane not in LANES:
+        lane = "queued"
+    request.app.state.roadmap_store.add(title.strip(), note.strip(), lane)
+    return redirect("/roadmap")
+
+
+@app.post("/roadmap/items/{item_id}/move")
+async def move_item(
+    request: Request, item_id: str, direction: Annotated[str, Form()]
+):
+    if direction in {"advance", "back"}:
+        request.app.state.roadmap_store.move(item_id, direction)
+    return redirect("/roadmap")
 
 
 @app.get("/atlas")

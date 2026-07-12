@@ -1,9 +1,11 @@
 # Roadmap
 
-**The living roadmap is an app now** — `./site.sh`, then /roadmap:
-three lanes, real forms, its data in git at `website/data/roadmap.json`
-(diffs are the changelog), its chart served to agents. This file is the
-founding archive; it no longer tracks state.
+**The living roadmap is the demo's timing tower** — `./run.sh` was
+never poured here; use `uv run uvicorn demo.app:app --reload`, then
+/roadmap: ON TRACK, SHIPPED with positions, STINT PLAN, real paddle
+forms, its data in git at `demo/data/roadmap.json` (diffs are the
+changelog), its chart served to agents. This file is the founding
+archive; it no longer tracks state.
 
 ---
 

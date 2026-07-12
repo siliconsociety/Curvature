@@ -14,12 +14,19 @@ def shell(*fragments: Element) -> Element:
             h.meta(name="viewport", content="width=device-width, initial-scale=1"),
             h.title("Pit Board — a Curvature demo"),
             h.style_link("/static/manifold.css"),
+            h.style_link("/static/tower.css"),
             h.script(src="/static/lib/curvature.js"),
         ),
         h.body(
             h.header(
                 h.h1("Pit Board"),
                 h.p("Every lap counted. With JavaScript switched off, nothing changes."),
+                h.nav(
+                    h.a("Board", href="/"),
+                    h.a("Roadmap", href="/roadmap"),
+                    h.a("Atlas", href="/atlas"),
+                    class_="demo-nav",
+                ),
             ),
             h.main(*fragments),
             data_boost=True,

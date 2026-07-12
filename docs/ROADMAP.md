@@ -17,7 +17,22 @@ service disease and are refused. (The Valet remains the owner's alone.)
 1. **Satellite mechanics** — C-800 capture(), manifests, ANOM-160/161.
    Nothing activates until capture exists.
 2. **Auth satellite** — the proving case for capture, and the identity
-   both agent stories borrow.
+   both agent stories borrow. Position (2026-07-11): own design at the
+   flow and data layers, assembled standards at the crypto layer
+   (argon2, PyJWT/OIDC, TOTP) — invent nothing, rent nothing. Identity
+   is an explicit dependency at use sites (Depends(current_user)),
+   never middleware — C-804 makes auth better, not harder. Social
+   login = direct OIDC (Google/Microsoft/Apple/any issuer, one
+   client, zero JS). Enterprise SAML never enters the house: a broker
+   at the edge (WorkOS/Dex/authentik) translates to OIDC. Clerk-class
+   JS-widget vendors are ANOM-120 on arrival, by design. Users live in
+   the app's own store. Personal access tokens (minted via a form) are
+   how endusers hand borrowed authority to their visiting agents.
+   Passkeys deferred: navigator.credentials has no JS-off path —
+   baseline is password + TOTP (pure forms); passkeys later as a
+   declared enhancement. DISCOVERED CORE WORK — C-203: sessions demand
+   CSRF posture in the runtime itself (SameSite=Lax + Origin check on
+   writes), construction-grade, not satellite code.
 3. **IFR projection** — the third render head: format, discovery
    header, one authored purpose line per screen.
 4. **Concierge** — the capstone: IFR consumed first-party + satellite

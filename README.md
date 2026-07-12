@@ -94,7 +94,7 @@ PyPI ships the framework; the repo ships Pit Board, the demo:
 ```bash
 git clone https://github.com/siliconsociety/Curvature && cd Curvature
 uv sync && ./gate.sh
-uv run uvicorn demo.app:app --reload   # Pit Board
+uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1   # Pit Board
 ```
 
 Then turn JavaScript off and use it again. Nothing changes. That is the

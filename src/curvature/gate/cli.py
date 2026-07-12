@@ -13,7 +13,7 @@ import math
 import sys
 from pathlib import Path
 
-from curvature.gate import checks, scaffold
+from curvature.gate import bounds, checks, scaffold
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
 
@@ -23,15 +23,16 @@ ALL_CHECKS = "the full finding index (ANOM-110 .. ANOM-142); see SPEC.md"
 def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
     ratchet = load(root)
     findings = [
-        *checks.check_ceilings(root, ratchet),
+        *bounds.check_ceilings(root, ratchet),
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
         *checks.check_dom_sins(root),
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),
         *checks.check_purposes(root),
-        *checks.check_coverage(root, ratchet),
-        *checks.check_ratchet_integrity(root, ratchet),
+        *bounds.check_coverage(root, ratchet),
+        *bounds.check_ratchet_integrity(root, ratchet),
+        *bounds.check_version_currency(root),
     ]
     info = [
         f"raw() census: {checks.raw_census(root)} call sites (ANOM-122)",

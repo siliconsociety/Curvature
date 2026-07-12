@@ -126,6 +126,13 @@ Human edits to `ratchet.toml` that loosen any bound are anomalies.
 *Enforcement:* gate (ANOM-142: `curvature check` recomputes actuals; any bound
 looser than the recorded tightest-known state is refused).
 
+**C-403 · Versions move like ratchets.**
+Every publish tags `v{version}`; a tagged version with commits past it
+is stale and must be bumped before anything else lands. *Why:* the bump
+is the release step everyone forgets — so it is not remembered, it is
+checked. *Enforcement:* gate (ANOM-143: tag-for-current-version exists
+and HEAD has moved past it; silent where git or the tag is absent).
+
 ## 5. Fragments and the boost protocol
 
 **C-500 · Negotiation is one header.**
@@ -268,6 +275,7 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-140 | C-400 | file lines over ceiling |
 | ANOM-141 | C-401 | coverage below floor |
 | ANOM-142 | C-402 | ratchet bound looser than tightest-known |
+| ANOM-143 | C-403 | published version with commits past its tag |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 
 Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a

@@ -1,4 +1,5 @@
-"""The anomaly checks. One function per rule; each returns findings.
+"""The source checks: tokens and syntax trees. One function per rule.
+The bounds family (ceilings, floors, versions) lives in bounds.py.
 
 These are deliberately unclever. A check an agent cannot predict is a
 check an agent cannot steer by; boring, greppable rules are the product.
@@ -7,11 +8,9 @@ check an agent cannot steer by; boring, greppable rules are the product.
 from __future__ import annotations
 
 import ast
-import json
 from pathlib import Path
 
 from curvature.gate.findings import Finding, is_boost_layer, is_vendored, walk_source
-from curvature.gate.ratchet import Ratchet, loosened, previous_committed
 
 HTTP_TOKENS = ("fetch(", "XMLHttpRequest", "WebSocket(", "EventSource(")
 MUTATING_VERBS = frozenset({"post", "put", "delete", "patch"})
@@ -24,25 +23,6 @@ def _allowed(line: str) -> bool:
     and tests that exercise refusals need to spell the forbidden words;
     the pragma is counted (see cli info lines) so it cannot hide."""
     return ALLOW_PRAGMA in line
-
-
-def check_ceilings(root: Path, ratchet: Ratchet) -> list[Finding]:
-    """ANOM-140: no file outgrows its ceiling. Split while the split is cheap."""
-    findings = []
-    for path in walk_source(root, frozenset({".py", ".css", ".js"})):
-        if is_vendored(path):
-            continue
-        relpath = str(path.relative_to(root))
-        ceiling = ratchet.ceiling_for(path, relpath)
-        if ceiling is None:
-            continue
-        lines = len(path.read_text(errors="replace").splitlines())
-        if lines > ceiling:
-            findings.append(Finding(
-                "ANOM-140", relpath, None,
-                f"{lines} lines against a ceiling of {ceiling}; split it (C-400)",
-            ))
-    return findings
 
 
 def check_js_placement(root: Path) -> list[Finding]:
@@ -218,37 +198,6 @@ def check_purposes(root: Path) -> list[Finding]:
                     "one authored line of orientation",
                 ))
     return findings
-
-
-def check_coverage(root: Path, ratchet: Ratchet) -> list[Finding]:
-    """ANOM-141: the coverage floor holds (C-401)."""
-    if ratchet.coverage_floor <= 0:
-        return []
-    report = root / "coverage.json"
-    if not report.exists():
-        return [Finding(
-            "ANOM-141", "coverage.json", None,
-            f"floor is {ratchet.coverage_floor} but no coverage report exists; "
-            "run pytest --cov --cov-report=json first (C-401)",
-        )]
-    percent = json.loads(report.read_text())["totals"]["percent_covered"]
-    if percent < ratchet.coverage_floor:
-        return [Finding(
-            "ANOM-141", "coverage.json", None,
-            f"coverage {percent:.2f} is under the floor {ratchet.coverage_floor} (C-401)",
-        )]
-    return []
-
-
-def check_ratchet_integrity(root: Path, ratchet: Ratchet) -> list[Finding]:
-    """ANOM-142: nothing loosened since the last commit (C-402)."""
-    committed = previous_committed(root)
-    if committed is None:
-        return []
-    return [
-        Finding("ANOM-142", "ratchet.toml", None, f"{complaint} (C-402)")
-        for complaint in loosened(ratchet, committed)
-    ]
 
 
 def raw_census(root: Path) -> int:

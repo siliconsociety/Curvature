@@ -1,10 +1,8 @@
-import json
 import textwrap
 from pathlib import Path
 
 from curvature.gate import checks
 from curvature.gate.cli import command_check
-from curvature.gate.ratchet import Ratchet, load, loosened, save
 
 
 def write(root: Path, relpath: str, text: str) -> Path:
@@ -15,24 +13,6 @@ def write(root: Path, relpath: str, text: str) -> Path:
 
 
 # --- ANOM-140 ceilings ---------------------------------------------------------
-
-
-def test_file_over_ceiling_is_off_curvature(tmp_path):
-    write(tmp_path, "app.py", "\n".join(["x = 1"] * 10))
-    findings = checks.check_ceilings(tmp_path, Ratchet(ceilings={"py": 5}))
-    assert [f.rule for f in findings] == ["ANOM-140"]
-    assert "10 lines against a ceiling of 5" in findings[0].message
-
-
-def test_grandfathered_file_is_honored_at_its_pin(tmp_path):
-    write(tmp_path, "legacy.py", "\n".join(["x = 1"] * 10))
-    ratchet = Ratchet(ceilings={"py": 5}, exceptions={"legacy.py": 10})
-    assert checks.check_ceilings(tmp_path, ratchet) == []
-
-
-def test_vendored_files_have_no_ceiling(tmp_path):
-    write(tmp_path, "static/vendor/big.js", "\n".join(["//"] * 500))
-    assert checks.check_ceilings(tmp_path, Ratchet()) == []
 
 
 # --- ANOM-120 / ANOM-121 JavaScript ----------------------------------------------
@@ -172,69 +152,7 @@ def test_get_routes_are_not_mutating(tmp_path):
 # --- ANOM-141 coverage ------------------------------------------------------------
 
 
-def test_coverage_under_floor_is_off_curvature(tmp_path):
-    write(tmp_path, "coverage.json", json.dumps({"totals": {"percent_covered": 71.0}}))
-    findings = checks.check_coverage(tmp_path, Ratchet(coverage_floor=80.0))
-    assert [f.rule for f in findings] == ["ANOM-141"]
-
-
-def test_missing_report_with_a_floor_is_off_curvature(tmp_path):
-    findings = checks.check_coverage(tmp_path, Ratchet(coverage_floor=80.0))
-    assert [f.rule for f in findings] == ["ANOM-141"]
-
-
-def test_no_floor_means_no_coverage_check(tmp_path):
-    assert checks.check_coverage(tmp_path, Ratchet()) == []
-
-
 # --- ANOM-142 loosening -----------------------------------------------------------
-
-
-def test_every_loosening_is_named():
-    committed = Ratchet(
-        ceilings={"py": 300}, exceptions={"big.py": 500}, coverage_floor=80.0
-    )
-    current = Ratchet(
-        ceilings={"py": 400},
-        exceptions={"big.py": 600, "new.py": 999},
-        coverage_floor=70.0,
-    )
-    complaints = loosened(current, committed)
-    assert len(complaints) == 4
-
-
-def test_tightening_is_not_loosening():
-    committed = Ratchet(ceilings={"py": 300}, exceptions={"big.py": 500}, coverage_floor=80.0)
-    current = Ratchet(ceilings={"py": 250}, exceptions={"big.py": 400}, coverage_floor=90.0)
-    assert loosened(current, committed) == []
-
-
-# --- ratchet.toml round trip -----------------------------------------------------
-
-
-def test_ratchet_round_trip(tmp_path):
-    original = Ratchet(
-        ceilings={"py": 300, "css": 250, "js": 150},
-        exceptions={"src/big.py": 512},
-        coverage_floor=83.4,
-    )
-    save(tmp_path, original)
-    assert load(tmp_path) == original
-
-
-def test_the_ratchet_wears_its_floor(tmp_path):
-    import json
-
-    save(tmp_path, Ratchet(coverage_floor=97.4))
-    badge = json.loads((tmp_path / "floor-badge.json").read_text())
-    assert badge["schemaVersion"] == 1
-    assert badge["message"] == "97.4 · ratcheted"
-
-
-def test_missing_ratchet_file_yields_defaults(tmp_path):
-    ratchet = load(tmp_path)
-    assert ratchet.ceilings["py"] == 300
-    assert ratchet.coverage_floor == 0.0
 
 
 # --- the CLI surface --------------------------------------------------------------
@@ -281,3 +199,5 @@ def test_walk_source_skips_excluded_dirs(tmp_path):
     write(tmp_path, "real.py", "x = 1\n")
     names = [p.name for p in walk_source(tmp_path, frozenset({".py"}))]
     assert names == ["real.py"]
+
+

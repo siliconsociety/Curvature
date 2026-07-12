@@ -3,7 +3,27 @@
 Held to the same rule as everything else here: an item earns code only
 when its contract can be stated. Order is intent, not promise.
 
-## 0.2 — the space expands
+## The load-bearing principle, found 2026-07-11 (last light)
+
+**A cambered app requires no bespoke client.** IFR is self-describing:
+the projection carries its own documentation, discovery is a response
+header, identity is the user's ordinary session (borrowed authority via
+Auth). One generic IFR capability in any agent harness drives every
+Curvature app ever poured. Per-app enduser skills are the SDK-per-
+service disease and are refused. (The Valet remains the owner's alone.)
+
+## 0.2 — the space expands, in dependency order
+
+1. **Satellite mechanics** — C-800 capture(), manifests, ANOM-160/161.
+   Nothing activates until capture exists.
+2. **Auth satellite** — the proving case for capture, and the identity
+   both agent stories borrow.
+3. **IFR projection** — the third render head: format, discovery
+   header, one authored purpose line per screen.
+4. **Concierge** — the capstone: IFR consumed first-party + satellite
+   packaging + a small-model client + the confirm-vs-do policy.
+
+## 0.2 — also in the bay
 
 - **Event horizon doctrine (C-7xx).** The declared enclave for 60fps work:
   a fenced, vendored widget with a byte budget and a named owner,

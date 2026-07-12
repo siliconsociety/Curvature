@@ -48,36 +48,39 @@ def test_live_stream_renders_each_yield():
     assert "tock" in chunks[1]
 
 
-def test_the_demo_board_streams_its_state():
-    from demo.app import _board_events
-    from demo.store import board
+def test_the_tower_streams_its_state(tmp_path):
+    import shutil
+    from pathlib import Path
 
-    board.reset()
-    board.add("Live lap")
+    from demo.app import _tower_events
+    from demo.roadmap_store import RoadmapStore
+
+    seed = Path(__file__).parent.parent / "demo" / "data" / "roadmap.json"
+    working = tmp_path / "roadmap.json"
+    shutil.copy(seed, working)
+    store = RoadmapStore(working)
 
     async def first_event():
-        generator = _board_events()
+        generator = _tower_events(store)
         return await anext(generator)
 
     fragment = asyncio.run(first_event())
-    assert fragment.id == "pit-board"
+    assert fragment.id == "pit-tower"
     assert fragment.attrs.get("data_live") == "/live"
 
 
-def test_the_board_declares_its_stream():
-    from demo.components.pit_board import PitBoardProps, pit_board
+def test_store_version_tracks_the_file(tmp_path):
+    import shutil
+    import time
+    from pathlib import Path
 
-    fragment = pit_board(PitBoardProps(tasks=(), status="all", open_count=0, done_count=0))
-    assert 'data-live="/live"' in str(fragment)
+    from demo.roadmap_store import RoadmapStore
 
-
-def test_store_versions_bump_on_every_write():
-    from demo.store import PitBoard
-
-    board = PitBoard()
-    task = board.add("a")
-    board.toggle(task.id)
-    board.update_title(task.id, "b")
-    assert board.version == 3
-    board.reset()
-    assert board.version == 0
+    seed = Path(__file__).parent.parent / "demo" / "data" / "roadmap.json"
+    working = tmp_path / "roadmap.json"
+    shutil.copy(seed, working)
+    store = RoadmapStore(working)
+    before = store.version()
+    time.sleep(0.01)
+    store.add("bump", "", "queued")
+    assert store.version() != before

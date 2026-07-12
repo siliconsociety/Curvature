@@ -195,3 +195,21 @@ def test_anomaly_170_spares_tests_and_authored_screens(tmp_path):
         "def test_it():\n    respond(req, frag, shell=shell)\n"
     )
     assert check_purposes(tmp_path) == []
+
+
+def test_the_atlas_skips_parameterized_regions():
+    from fastapi import FastAPI
+
+    from curvature.atlas import atlas
+
+    plain = FastAPI()
+
+    @plain.get("/items/{item_id}")
+    async def item(item_id: str): ...  # curvature: json-endpoint (fixture)
+
+    @plain.get("/whole")
+    async def whole(): ...  # curvature: json-endpoint (fixture)
+
+    markup = str(atlas(plain))
+    assert 'href="/whole"' in markup
+    assert "{item_id}" not in markup

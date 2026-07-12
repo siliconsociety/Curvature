@@ -22,6 +22,14 @@
 
 .tower-sub { margin: 0.15rem 0 0; color: var(--ink-soft); font-size: 0.85rem; }
 
+.tower-legend {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
 .lane-mark {
   margin: 1.4rem 0 0.5rem;
   font-size: 0.78rem;

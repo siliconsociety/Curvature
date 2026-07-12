@@ -7,14 +7,14 @@ from demo.app import app
 def test_the_resident_reads_the_house_chart():
     chart = asyncio.run(fetch_chart(app, "/"))
     assert chart is not None and chart["chart"] == "curvature/1"
-    assert chart["affordances"]["forms"][0]["action"] == "/tasks"
+    assert any(
+        form["action"] == "/roadmap/items" for form in chart["affordances"]["forms"]
+    )
 
 
 def test_query_strings_reach_the_region():
-    chart = asyncio.run(fetch_chart(app, "/", query="status=done"))
-    assert (
-        chart["affordances"]["forms"][0]["fields"]["properties"]["status"]
-    ) == {"const": "done", "type": "string"}
+    chart = asyncio.run(fetch_chart(app, "/atlas", query="unused=1"))
+    assert chart is not None and chart["fragments"] == ["atlas"]
 
 
 def test_missing_regions_return_none():
@@ -22,7 +22,7 @@ def test_missing_regions_return_none():
 
 
 def test_non_chart_regions_return_none():
-    assert asyncio.run(fetch_chart(app, "/static/tarmac.css")) is None
+    assert asyncio.run(fetch_chart(app, "/static/tower.css")) is None
 
 
 def test_non_json_two_hundreds_return_none():

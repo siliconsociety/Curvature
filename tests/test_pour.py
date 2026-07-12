@@ -65,3 +65,10 @@ def test_cli_pour(tmp_path, capsys):
 def test_cli_pour_unknown_is_polite(tmp_path, capsys):
     assert main(["pour", "warp_drive", str(tmp_path)]) == 1
     assert "available" in capsys.readouterr().out
+
+
+def test_pour_refuses_when_a_test_file_already_exists(tmp_path):
+    (tmp_path / "tests").mkdir(parents=True)
+    (tmp_path / "tests" / "test_auth_satellite.py").write_text("# squatter\n")
+    with pytest.raises(FileExistsError, match="never overwrite"):
+        pour_satellite(tmp_path, "auth")

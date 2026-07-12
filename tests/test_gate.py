@@ -272,3 +272,12 @@ def test_component_props_via_attribute_annotation_passes(tmp_path):
     findings = checks.check_component_signatures(tmp_path)
     assert [f.rule for f in findings] == ["ANOM-110"]
     assert "helper()" in findings[0].message
+
+
+def test_walk_source_skips_excluded_dirs(tmp_path):
+    from curvature.gate.findings import walk_source
+
+    write(tmp_path, "__pycache__/ghost.py", "x = 1\n")
+    write(tmp_path, "real.py", "x = 1\n")
+    names = [p.name for p in walk_source(tmp_path, frozenset({".py"}))]
+    assert names == ["real.py"]

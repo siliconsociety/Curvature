@@ -33,10 +33,18 @@ class PaddleProps(Props):
     label: str
 
 
+PADDLE_HINTS = {
+    "OUT": "Send onto the track — start this work",
+    "FLAG": "Take the flag — mark it shipped",
+    "PIT": "Pull back one lane",
+}
+
+
 def _paddle(props: PaddleProps) -> Element:
     return h.form(
         h.input_(type="hidden", name="direction", value=props.direction),
         h.button(props.label, class_="paddle",
+                 title=PADDLE_HINTS.get(props.label, props.label),
                  aria_label=f"{props.label}: {props.item.title}"),
         action=f"/roadmap/items/{props.item.id}/move",
         method="post",
@@ -69,6 +77,8 @@ def tower(props: TowerProps) -> Element:
             h.div(
                 h.h2("ROADMAP"),
                 h.p("The crew's board. Git keeps the time.", class_="tower-sub"),
+                h.p("OUT → on track · FLAG → shipped · PIT → back one",
+                    class_="tower-legend"),
             ),
             class_="tower-head",
         ),
@@ -118,4 +128,5 @@ def tower(props: TowerProps) -> Element:
             class_="plan-form",
         ),
         id="pit-tower",
+        data_live="/live",
     )

@@ -1,16 +1,15 @@
-"""Pit Board — the canonical Curvature demo.
+"""Pit Board — the living roadmap, and the canonical Curvature demo.
 
-Live: the board streams itself. Open two windows; add a lap in one.
-
-Three routes, two of them writes. Every write is POST -> redirect -> GET.
-The whole app works with JavaScript switched off; curvature.js only makes it
-feel like it never left the page.
+One page. The tower streams itself: ship a card from anywhere — the
+app, a git pull, an editor — and every open browser updates. Real
+paddle forms move items; git keeps the time.
 
 Run it:  uv run uvicorn demo.app:app --reload
 """
 
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 from typing import Annotated
 
@@ -21,86 +20,38 @@ import curvature
 from curvature import redirect, respond
 from curvature.atlas import atlas
 from curvature.live import live_stream
-from demo.components.pit_board import FILTERS, PitBoardProps, pit_board
 from demo.components.shell import shell
 from demo.components.tower import TowerProps, tower
 from demo.roadmap_store import LANES, RoadmapStore
-from demo.store import board
 
 app = FastAPI(title="Pit Board")
 app.mount("/static/lib", StaticFiles(directory=Path(curvature.__file__).parent / "static"))
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"))
 
-
-def clean_status(status: str) -> str:
-    return status if status in FILTERS else "all"
-
-
-@app.get("/")
-async def index(request: Request, status: str = "all", editing_task_id: int | None = None):
-    status = clean_status(status)
-    props = PitBoardProps(
-        tasks=tuple(board.visible(status)),
-        status=status,
-        open_count=len(board.visible("open")),
-        done_count=len(board.visible("done")),
-        editing_task_id=editing_task_id,
-    )
-    return respond(
-        request, pit_board(props), shell=shell,
-        purpose="Robert's pit board: track laps, add them, mark them done, filter by status.",
-    )
-
-
-@app.get("/tasks/{task_id}/edit")
-async def edit_task(request: Request, task_id: int, status: str = "all"):
-    status = clean_status(status)
-    if task_id not in board.tasks:
-        return redirect(f"/?status={status}")
-    return await index(request, status=status, editing_task_id=task_id)
-
-
-def _board_fragment():
-    return pit_board(PitBoardProps(
-        tasks=tuple(board.visible("all")),
-        status="all",
-        open_count=len(board.visible("open")),
-        done_count=len(board.visible("done")),
-    ))
-
-
-async def _board_events():
-    import asyncio
-
-    seen = -1
-    while True:
-        if board.version != seen:
-            seen = board.version
-            yield _board_fragment()
-        await asyncio.sleep(0.4)
-
-
-@app.get("/live")
-async def live():
-    return live_stream(_board_events())
-
-
 app.state.roadmap_store = RoadmapStore(Path(__file__).parent / "data" / "roadmap.json")
 
 
-@app.get("/roadmap")
-async def roadmap(request: Request):
-    lanes = request.app.state.roadmap_store.by_lane()
-    props = TowerProps(
+def _tower_fragment(store: RoadmapStore):
+    lanes = store.by_lane()
+    return tower(TowerProps(
         on_track=tuple(lanes["pouring"]),
         shipped=tuple(lanes["shipped"]),
         queued=tuple(lanes["queued"]),
-    )
+    ))
+
+
+@app.get("/")
+async def board(request: Request):
     return respond(
-        request, tower(props), shell=shell,
+        request, _tower_fragment(request.app.state.roadmap_store), shell=shell,
         purpose="The living roadmap as a timing tower: send a stint OUT, take the "
                 "FLAG, or PIT it back; git keeps the time.",
     )
+
+
+@app.get("/roadmap")
+async def old_address():
+    return redirect("/")
 
 
 @app.post("/roadmap/items")
@@ -113,7 +64,7 @@ async def plan_item(
     if lane not in LANES:
         lane = "queued"
     request.app.state.roadmap_store.add(title.strip(), note.strip(), lane)
-    return redirect("/roadmap")
+    return redirect("/")
 
 
 @app.post("/roadmap/items/{item_id}/move")
@@ -122,7 +73,22 @@ async def move_item(
 ):
     if direction in {"advance", "back"}:
         request.app.state.roadmap_store.move(item_id, direction)
-    return redirect("/roadmap")
+    return redirect("/")
+
+
+async def _tower_events(store: RoadmapStore):
+    seen = -1
+    while True:
+        current = store.version()
+        if current != seen:
+            seen = current
+            yield _tower_fragment(store)
+        await asyncio.sleep(0.5)
+
+
+@app.get("/live")
+async def live(request: Request):
+    return live_stream(_tower_events(request.app.state.roadmap_store))
 
 
 @app.get("/atlas")
@@ -131,27 +97,3 @@ async def atlas_page(request: Request):
         request, atlas(app), shell=shell,
         purpose="Every readable region of Pit Board; agents fetch each region's chart.",
     )
-
-
-@app.post("/tasks")
-async def create_task(
-    title: Annotated[str, Form()], status: Annotated[str, Form()] = "all"
-):
-    board.add(title.strip())
-    return redirect(f"/?status={clean_status(status)}")
-
-
-@app.post("/tasks/{task_id}/toggle")
-async def toggle_task(task_id: int, status: Annotated[str, Form()] = "all"):
-    board.toggle(task_id)
-    return redirect(f"/?status={clean_status(status)}")
-
-
-@app.post("/tasks/{task_id}/edit")
-async def save_task_title(
-    task_id: int,
-    title: Annotated[str, Form()],
-    status: Annotated[str, Form()] = "all",
-):
-    board.update_title(task_id, title.strip())
-    return redirect(f"/?status={clean_status(status)}")

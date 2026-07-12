@@ -40,6 +40,11 @@ class RoadmapStore:
         tmp.write_text(json.dumps(payload, indent=2) + "\n")
         tmp.replace(self._path)
 
+    def version(self) -> int:
+        """The file's mtime is the version: writes from the app, from git
+        checkouts, or from an editor all count. Live watches this."""
+        return self._path.stat().st_mtime_ns
+
     def by_lane(self) -> dict[str, list[Item]]:
         lanes: dict[str, list[Item]] = {lane: [] for lane in LANES}
         for item in self._read():

@@ -20,7 +20,7 @@ def client(tmp_path):
 
 
 def test_the_tower_reads_like_a_pit_board(client):
-    text = client.get("/roadmap").text
+    text = client.get("/").text
     for mark in ("ON TRACK", "SHIPPED", "STINT PLAN"):
         assert mark in text
     assert "P1" in text                      # shipped items hold positions
@@ -28,7 +28,7 @@ def test_the_tower_reads_like_a_pit_board(client):
 
 
 def test_paddles_are_real_forms(client):
-    text = client.get("/roadmap").text
+    text = client.get("/").text
     for label in ("OUT", "PIT"):
         assert f">{label}</button>" in text
     assert 'method="post"' in text
@@ -41,7 +41,7 @@ def test_planning_a_stint_round_trips(client):
         follow_redirects=False,
     )
     assert response.status_code == 303
-    assert "Test the tower" in client.get("/roadmap").text
+    assert "Test the tower" in client.get("/").text
 
 
 def test_out_flag_and_pit_move_items(client):
@@ -70,8 +70,28 @@ def test_duplicate_titles_get_distinct_slugs(client):
     assert "twin" in ids and "twin-2" in ids
 
 
+def test_the_old_address_redirects_home(client):
+    response = client.get("/roadmap", follow_redirects=False)
+    assert response.status_code == 303
+
+
+def test_the_page_is_whole_without_js_and_fragment_when_boosted(client):
+    page = client.get("/")
+    assert page.text.startswith("<!doctype html>")
+    assert page.headers["vary"] == "Curvature-Boost, Curvature-Chart"
+    fragment = client.get("/", headers={"Curvature-Boost": "1"})
+    assert fragment.text.startswith('<section id="pit-tower"')
+
+
+def test_the_tower_declares_its_stream_and_legend(client):
+    text = client.get("/").text
+    assert 'data-live="/live"' in text
+    assert "OUT → on track" in text
+    assert 'title="Take the flag — mark it shipped"' in text
+
+
 def test_agents_read_the_tower_through_the_chart(client):
-    chart = client.get("/roadmap", headers={"Curvature-Chart": "1"}).json()
+    chart = client.get("/", headers={"Curvature-Chart": "1"}).json()
     assert "timing tower" in chart["purpose"]
     plan = next(
         f for f in chart["affordances"]["forms"] if f["action"] == "/roadmap/items"

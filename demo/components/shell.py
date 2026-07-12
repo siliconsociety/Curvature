@@ -20,13 +20,8 @@ def shell(*fragments: Element) -> Element:
         h.body(
             h.header(
                 h.h1("Pit Board"),
-                h.p("Every lap counted. With JavaScript switched off, nothing changes."),
-                h.nav(
-                    h.a("Board", href="/"),
-                    h.a("Roadmap", href="/roadmap"),
-                    h.a("Atlas", href="/atlas"),
-                    class_="demo-nav",
-                ),
+                h.p("Curvature's living roadmap. With JavaScript switched off, "
+                    "nothing changes — with it on, the board keeps itself."),
             ),
             h.main(*fragments),
             data_boost=True,

@@ -66,9 +66,9 @@ a frontier-model problem. The projection is what makes the resident
 affordable.
 
 The staffing chart (2026-07-11, late): **Concierge** is front of house —
-ships with the app, serves guests within their own authority. **Butler**
-is back of house — an owner-side agent skill, not a satellite; holds the
-master keys (gate, ratchet, satellites, publish antechamber) and enters
-through the service door. Guests may bring their own valets: visiting
-agents speaking IFR with borrowed guest authority. Three roles, one
-substrate, three trust boundaries.
+ships with the app, serves guests within their own authority. **Valet**
+is the owner's personal agent — a skill in the owner's harness, not a
+satellite; handed the master keys with valet mode locked on (gate,
+ratchet, ledger — the keys work, everything is recorded). Guests may
+bring their own staff: visiting agents speaking IFR with borrowed guest
+authority. Three roles, one substrate, three trust boundaries.

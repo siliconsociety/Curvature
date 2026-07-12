@@ -1,7 +1,24 @@
 # Roadmap
 
 Held to the same rule as everything else here: an item earns code only
-when its contract can be stated. Order is intent, not promise.
+when its contract can be stated. Order is intent, not promise — and a
+version number is a RELEASE (whatever is green when the button is
+pressed), never a container a feature is owed to. The ledger below says
+what shipped; the queue says what's next, in dependency order.
+
+## Shipped
+
+- **0.1.0** (2026-07-11): the founding — contract (SPEC C-1xx..6xx),
+  runtime (typed components, built markup, one-header fragments),
+  curvature.js, the gate with the one-way ratchet, `new app` /
+  `new component` scaffolds, Pit Board, AGENTS.md-first docs.
+  Steerability lab #1 passed (Luna, zero JS).
+- **0.2.0** (2026-07-12, unpublished — the button is the owner's):
+  satellites (capture, manifests, mass, C-800..804), `curvature pour`
+  with Auth as the first poured satellite (stdlib scrypt, hashed
+  session tokens, revolving-door store: sqlite/jsonfile behind a
+  seven-verb protocol), C-203 construction-grade, ANOM-131 follows
+  assigned redirects, httpx2, warning-free suite.
 
 ## The load-bearing principle, found 2026-07-11 (last light)
 
@@ -29,12 +46,13 @@ service disease and are refused. (The Valet remains the owner's alone.)
    mass; tighten-only = no negative mass); tokens file would rename
    (surface.css candidate). Proposed, awaiting the mouth test.
 
-## 0.2 — the space expands, in dependency order
+## The queue, in dependency order
 
-1. **Satellite mechanics** — C-800 capture(), manifests, ANOM-160/161.
-   Nothing activates until capture exists.
-2. **Auth satellite** — the proving case for capture, and the identity
-   both agent stories borrow. Position (2026-07-11): own design at the
+1. ~~Satellite mechanics~~ — SHIPPED 0.2.0 (ANOM-160/161 audits still
+   queued).
+2. ~~Auth skeleton~~ — SHIPPED 0.2.0. Still queued from the Auth
+   position: OIDC social login, TOTP, personal access tokens for
+   visiting agents, the Mongo store satellite. Position (2026-07-11): own design at the
    flow and data layers, assembled standards at the crypto layer
    (argon2, PyJWT/OIDC, TOTP) — invent nothing, rent nothing. Identity
    is an explicit dependency at use sites (Depends(current_user)),
@@ -50,12 +68,14 @@ service disease and are refused. (The Valet remains the owner's alone.)
    declared enhancement. DISCOVERED CORE WORK — C-203: sessions demand
    CSRF posture in the runtime itself (SameSite=Lax + Origin check on
    writes), construction-grade, not satellite code.
-3. **IFR projection** — the third render head: format, discovery
-   header, one authored purpose line per screen.
+3. **The chart** (name awaiting the owner's gavel: chart/atlas) — the
+   third render head: JSON Schema affordances, discovery header, one
+   authored purpose line per screen. THE current blocker; everything
+   agent-facing stacks on it.
 4. **Concierge** — the capstone: IFR consumed first-party + satellite
    packaging + a small-model client + the confirm-vs-do policy.
 
-## 0.2 — also in the bay
+## Also in the bay (no dependency ordering)
 
 - **Event horizon doctrine (C-7xx).** The declared enclave for 60fps work:
   a fenced, vendored widget with a byte budget and a named owner,
@@ -77,7 +97,7 @@ service disease and are refused. (The Valet remains the owner's alone.)
   reverse proxy, one container, fragment-cache headers. Publish it so
   nobody invents a k8s ritual for a monolith.
 
-## 0.3 — the proof
+## Further out
 
 - **Honest benchmarks.** Render cost, fragment cache hit behavior,
   requests-per-core against an equivalent SPA + JSON API. Publish the

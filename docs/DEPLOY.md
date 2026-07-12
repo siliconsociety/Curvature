@@ -19,7 +19,10 @@ web: uvicorn app.main:app --host 0.0.0.0 --port $PORT
 ```
 
 `.python-version` (poured by the scaffold) selects the runtime.
-`heroku create && git push heroku main`. Done.
+`heroku create && git push heroku main`. Done. Better: connect the
+GitHub repo with **auto-deploy → "wait for CI to pass"** — then Heroku
+only ever builds commits the public gate has blessed. Proven in
+production 2026-07-12, roughly 82 seconds after it would have helped.
 
 ## Any box with a proxy
 

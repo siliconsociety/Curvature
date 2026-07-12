@@ -111,8 +111,8 @@
     {
       "id": "site-repo",
       "title": "curvature-site: the stranger test",
-      "lane": "pouring",
-      "note": "LIVE at github.com/siliconsociety/curvature-site: poured by the published CLI, gate green against git-main, Procfile ready. Deploy button remains the owner's."
+      "lane": "shipped",
+      "note": "DEPLOYED: live on Heroku via GitHub auto-deploy gated on CI. Poured by the published CLI, fed from PyPI, built only from commits the public gate blessed. The stranger test, complete at every layer."
     },
     {
       "id": "public-gate",

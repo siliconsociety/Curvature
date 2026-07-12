@@ -84,10 +84,12 @@ def test_the_page_is_whole_without_js_and_fragment_when_boosted(client):
 
 
 def test_the_tower_declares_its_stream_and_legend(client):
+    app.state.roadmap_store.add("On track fixture", "", "pouring")
     text = client.get("/").text
     assert 'data-live="/live"' in text
     assert "OUT → on track" in text
     assert 'title="Take the flag — mark it shipped"' in text
+    assert 'title="Send onto the track — start this work"' in text
 
 
 def test_agents_read_the_tower_through_the_chart(client):

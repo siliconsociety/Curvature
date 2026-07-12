@@ -34,7 +34,7 @@
       "id": "model-resolver",
       "title": "Model-backed Resolver for the Concierge",
       "lane": "queued",
-      "note": "Drops into the existing protocol; constrained slot-filling against a declared chart is a small-model job. Needs the owner's model config ruling."
+      "note": "Owner's inference doctrine (2026-07-12): the ModelResolver takes a completion CALLABLE \u2014 keys never touch framework code; house-paid behind CurrentUser (open inference GETs are a cost-DoS faucet), keyword floor always free, BYOK possible but discouraged (secrets custody), BYOA is the pressure valve \u2014 harness chat off-app, sidecar chat on-app, both live today via chart + tokens + real forms; the in-DOM ask box is Concierge territory by law: the DOM belongs to the house, the harness to the user, the browser is where they meet. Curvature never meters, never phones home, never sits in the billing path."
     },
     {
       "id": "agent-tokens",

@@ -2,6 +2,7 @@
 
 *The right path is free fall.*
 
+[![gate](https://github.com/siliconsociety/Curvature/actions/workflows/gate.yml/badge.svg)](https://github.com/siliconsociety/Curvature/actions/workflows/gate.yml)
 [![PyPI](https://img.shields.io/pypi/v/curvature)](https://pypi.org/project/curvature/)
 [![Python](https://img.shields.io/pypi/pyversions/curvature)](https://pypi.org/project/curvature/)
 [![Coverage floor](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsiliconsociety%2FCurvature%2Fmain%2Ffloor-badge.json)](https://github.com/siliconsociety/Curvature/blob/main/ratchet.toml)

@@ -1,0 +1,17 @@
+# The same gate, running in public. Not a second definition of green —
+# the only one, witnessed.
+name: gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: ./gate.sh

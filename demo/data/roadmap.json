@@ -113,6 +113,12 @@
       "title": "curvature-site: the stranger test",
       "lane": "pouring",
       "note": "LIVE at github.com/siliconsociety/curvature-site: poured by the published CLI, gate green against git-main, Procfile ready. Deploy button remains the owner's."
+    },
+    {
+      "id": "public-gate",
+      "title": "The gate goes public \u2014 CI on both repos",
+      "lane": "shipped",
+      "note": "Same ./gate.sh, witnessed on GitHub. Its first run caught a real bug: CI runners have no git identity, so pour commits now carry the scaffold's own. The badge means what it says."
     }
   ]
 }

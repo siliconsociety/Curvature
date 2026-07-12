@@ -222,6 +222,15 @@ def test_ratchet_round_trip(tmp_path):
     assert load(tmp_path) == original
 
 
+def test_the_ratchet_wears_its_floor(tmp_path):
+    import json
+
+    save(tmp_path, Ratchet(coverage_floor=97.4))
+    badge = json.loads((tmp_path / "floor-badge.json").read_text())
+    assert badge["schemaVersion"] == 1
+    assert badge["message"] == "97.4 · ratcheted"
+
+
 def test_missing_ratchet_file_yields_defaults(tmp_path):
     ratchet = load(tmp_path)
     assert ratchet.ceilings["py"] == 300

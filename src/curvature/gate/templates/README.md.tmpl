@@ -11,4 +11,6 @@ uv run curvature new component app/components/<name>   # grow it
 Working with an agent? Point it at this directory — AGENTS.md is its
 onboarding, the gate is its reviewer. No uv? `python -m venv .venv &&
 . .venv/bin/activate && pip install -e . --group dev`, then swap `uv run`
-for direct commands. Then install uv anyway.
+for direct commands. Then install uv anyway:
+macOS/Linux `curl -LsSf https://astral.sh/uv/install.sh | sh`,
+Windows `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`.

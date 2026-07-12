@@ -2,6 +2,11 @@
 
 *The right path is free fall.*
 
+[![PyPI](https://img.shields.io/pypi/v/curvature)](https://pypi.org/project/curvature/)
+[![Python](https://img.shields.io/pypi/pyversions/curvature)](https://pypi.org/project/curvature/)
+[![Coverage floor](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsiliconsociety%2FCurvature%2Fmain%2Ffloor-badge.json)](https://github.com/siliconsociety/Curvature/blob/main/ratchet.toml)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 A web framework for code that agents maintain. Server-rendered Python,
 components as typed functions, real links and real forms, one small
 boost script for the single-page feel — and a gate that makes the
@@ -50,8 +55,19 @@ def lap(props: LapProps) -> Element:
 
 ## Start from nothing
 
+One prerequisite, one line ([uv](https://docs.astral.sh/uv/)):
+
 ```bash
-uvx curvature new app pitstop     # no install, no venv, no Python even — uv brings it
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Windows
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Then:
+
+```bash
+uvx curvature new app pitstop     # no venv, no Python even — uv brings it
 cd pitstop
 ./gate.sh                      # green before you write a line
 ./run.sh                       # http://127.0.0.1:8000

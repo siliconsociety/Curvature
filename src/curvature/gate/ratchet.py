@@ -58,6 +58,22 @@ def dump(ratchet: Ratchet) -> str:
 
 def save(root: Path, ratchet: Ratchet) -> None:
     (root / RATCHET_FILE).write_text(dump(ratchet))
+    _write_floor_badge(root, ratchet)
+
+
+def _write_floor_badge(root: Path, ratchet: Ratchet) -> None:
+    """The chip that can't lie: it reports the FLOOR, the number with no
+    reverse gear — not a point-in-time snapshot that decays the moment
+    nobody looks. shields.io endpoint schema."""
+    import json
+
+    badge = {
+        "schemaVersion": 1,
+        "label": "coverage floor",
+        "message": f"{ratchet.coverage_floor:g} · ratcheted",
+        "color": "2f9e44",
+    }
+    (root / "floor-badge.json").write_text(json.dumps(badge, indent=2) + "\n")
 
 
 def previous_committed(root: Path) -> Ratchet | None:

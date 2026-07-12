@@ -8,6 +8,10 @@ module's problem.
 
 Live regions are display surfaces. Don't stream a form someone might
 be typing into.
+
+Dev note: an open stream is an open connection, and uvicorn's graceful
+shutdown waits for those — run dev servers with
+`--timeout-graceful-shutdown 1` or --reload will hang on every change.
 """
 
 from __future__ import annotations
@@ -38,12 +42,39 @@ def sse_event(*fragments: Element) -> str:
     return f"{lines}\n"
 
 
-def live_stream(events: AsyncIterator[tuple[Element, ...] | Element]) -> StreamingResponse:
-    """Wrap an async generator of Elements into an SSE response."""
+def live_stream(
+    events: AsyncIterator[tuple[Element, ...] | Element],
+    *,
+    heartbeat_seconds: float = 15.0,
+) -> StreamingResponse:
+    """Wrap an async generator of Elements into an SSE response.
+
+    Quiet streams emit a comment heartbeat so proxies don't reap idle
+    connections and dead clients are noticed at the next write."""
 
     async def body() -> AsyncIterator[str]:
-        async for event in events:
-            fragments = event if isinstance(event, tuple) else (event,)
-            yield sse_event(*fragments)
+        import asyncio
+
+        # The pending next-event is never cancelled on heartbeat — a
+        # timeout that cancels anext() kills the generator mid-await and
+        # the stream dies at its first quiet moment. asyncio.wait leaves
+        # the task pending; we just speak up while it thinks.
+        iterator = aiter(events)
+        pending = asyncio.ensure_future(anext(iterator))
+        try:
+            while True:
+                done, _ = await asyncio.wait({pending}, timeout=heartbeat_seconds)
+                if not done:
+                    yield ": keep-alive\n\n"
+                    continue
+                try:
+                    event = pending.result()
+                except StopAsyncIteration:
+                    return
+                fragments = event if isinstance(event, tuple) else (event,)
+                yield sse_event(*fragments)
+                pending = asyncio.ensure_future(anext(iterator))
+        finally:
+            pending.cancel()
 
     return StreamingResponse(body(), media_type="text/event-stream", headers=SSE_HEADERS)

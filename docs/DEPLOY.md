@@ -39,6 +39,14 @@ behind Caddy or nginx. Two notes the defaults get wrong:
   `X-Accel-Buffering: no`; if you strip headers at the proxy, don't
   strip that one.
 
+## The dev loop
+
+Live streams hold connections open, and uvicorn's graceful shutdown
+waits for open connections — so `--reload` without a bound hangs on
+every file change. Run dev servers with
+`--timeout-graceful-shutdown 1`. Production restarts are already
+bounded (SIGTERM then SIGKILL); this is a laptop concern.
+
 ## What there isn't
 
 No container orchestration requirement, no sidecar, no bundler stage,

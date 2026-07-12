@@ -84,3 +84,34 @@ def test_store_version_tracks_the_file(tmp_path):
     time.sleep(0.01)
     store.add("bump", "", "queued")
     assert store.version() != before
+
+
+def test_quiet_streams_heartbeat_and_resume():
+    async def event_silence_event():
+        yield h.div("x", id="only")
+        await asyncio.sleep(0.05)
+        yield h.div("y", id="again")
+
+    async def drain():
+        response = live_stream(event_silence_event(), heartbeat_seconds=0.01)
+        return [chunk async for chunk in response.body_iterator]
+
+    chunks = asyncio.run(drain())
+    assert "only" in chunks[0]
+    assert ": keep-alive\n\n" in chunks[1:-1]  # silence was kept alive
+    assert "again" in chunks[-1]                 # and the loop resumed past it
+
+
+def test_events_flow_through_the_heartbeat_loop():
+    async def two_events():
+        yield h.div("a", id="one")
+        yield (h.div("b", id="one"), h.div("c", id="two"))
+
+    async def drain():
+        response = live_stream(two_events(), heartbeat_seconds=5)
+        return [chunk async for chunk in response.body_iterator]
+
+    chunks = asyncio.run(drain())
+    assert len(chunks) == 2
+    assert 'data: <div id="one">a</div>' in chunks[0]
+    assert "two" in chunks[1]

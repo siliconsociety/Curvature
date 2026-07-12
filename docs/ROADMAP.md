@@ -1,7 +1,8 @@
 # Roadmap
 
 **The living roadmap IS Pit Board** — one page:
-`uv run uvicorn demo.app:app --reload`, then `/`. The timing tower
+`uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1`,
+then `/`. The timing tower
 streams itself (Live), its data in git at `demo/data/roadmap.json`
 (diffs are the changelog), its chart served to agents. This file is
 the founding archive; it no longer tracks state.

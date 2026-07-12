@@ -4,7 +4,9 @@ One page. The tower streams itself: ship a card from anywhere — the
 app, a git pull, an editor — and every open browser updates. Real
 paddle forms move items; git keeps the time.
 
-Run it:  uv run uvicorn demo.app:app --reload
+Run it:  uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1
+(the flag matters: Live holds connections open, and graceful shutdown
+waits for them — without it, every reload hangs)
 """
 
 from __future__ import annotations

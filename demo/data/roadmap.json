@@ -5,7 +5,7 @@
       "pit_id": "P15",
       "title": "Public site: new splash + living roadmap",
       "lane": "shipped",
-      "note": "Launched the editorial splash and a read-only, Chart-readable /roadmap backed by the repository Pit Board. The deployed site keeps a last-known-good seed, refreshes through Live, and exposes no public mutation controls."
+      "note": "Launched the editorial splash and a read-only, Chart-readable /roadmap backed by the repository Pit Board. The deployed site keeps a last-known-good seed, exposes no public mutation controls, and bounds GitHub edge staleness to one minute before Live swaps the fragment."
     },
     {
       "id": "public-live-playground",

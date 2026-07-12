@@ -1,6 +1,6 @@
 [project]
 name = "curvature"
-version = "0.2.2"
+version = "0.2.3"
 description = "A web framework for code that agents maintain. The right path is free fall."
 readme = "README.md"
 license = "MIT"

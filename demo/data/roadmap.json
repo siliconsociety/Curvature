@@ -63,8 +63,8 @@
     {
       "id": "mongo-satellite",
       "title": "Mongo store satellite",
-      "lane": "pouring",
-      "note": "A real server on purpose, first-class, never default."
+      "lane": "shipped",
+      "note": "The third door on the revolving door: MongoAuthStore rides the Auth pour, twelve verbs on pymongo, constructor takes a database object so tests stay hermetic against an in-repo fake \u2014 Today's FakeCollection tradition, honored in the framework it inspired."
     },
     {
       "id": "gate-audits",

@@ -53,7 +53,9 @@ class AuthStore(Protocol):
 
 def choose(data_dir: Path) -> AuthStore:
     """The door revolves here: swap the returned backend, nothing else
-    changes. Both backends share one file-shaped contract."""
+    changes. Three doors ship: sqlite (stdlib, default), jsonfile (toy
+    scale), and Mongo (a real server, on purpose — see store_mongo.py;
+    `uv add pymongo`, hand the constructor a database object)."""
     from satellites.auth.store_sqlite import SqliteAuthStore
 
     return SqliteAuthStore(data_dir / "auth.db")

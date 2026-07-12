@@ -119,6 +119,12 @@
       "title": "The gate goes public \u2014 CI on both repos",
       "lane": "shipped",
       "note": "Same ./gate.sh, witnessed on GitHub. Its first run caught a real bug: CI runners have no git identity, so pour commits now carry the scaffold's own. The badge means what it says."
+    },
+    {
+      "id": "v021-and-c403",
+      "title": "v0.2.1 \u2014 the bump becomes law (C-403)",
+      "lane": "shipped",
+      "note": "First publish under the standing blessing. ANOM-143 makes stale versions a gate matter; its arrival broke the 300-line ceiling on the gate's own modules \u2014 the first ANOM-140 in history forced the bounds-family split while it was cheap."
     }
   ]
 }

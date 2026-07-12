@@ -10,16 +10,23 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 
+from curvature.chart import build_chart
 from curvature.errors import Anomaly
 from curvature.html import Element, render
 
 BOOST_HEADER = "curvature-boost"
+CHART_HEADER = "curvature-chart"
+VARY = "Curvature-Boost, Curvature-Chart"
 
 
 def is_boosted(request: Request) -> bool:
     return request.headers.get(BOOST_HEADER) == "1"
+
+
+def wants_chart(request: Request) -> bool:
+    return request.headers.get(CHART_HEADER) == "1"
 
 
 def respond(
@@ -27,13 +34,16 @@ def respond(
     *fragments: Element,
     shell: Callable[..., Element],
     status_code: int = 200,
-) -> HTMLResponse:
-    """Answer a view with fragments or the full page — same tree either way.
+    purpose: str | None = None,
+) -> HTMLResponse | JSONResponse:
+    """Answer a view with the page, the fragments, or the chart — one
+    tree, three heads (C-103, C-500, C-900).
 
     Every fragment root must carry an id (C-501): the boost layer swaps by
-    id, and an anonymous fragment would strand the client. The shell is a
-    callable receiving the fragments and returning the full document; it
-    runs only for unboosted requests.
+    id, and an anonymous fragment would strand the client. The shell runs
+    only for unboosted page requests. A Curvature-Chart: 1 request gets
+    the machine-legible projection of the same tree; HTML responses
+    advertise the chart's existence so visiting agents can discover it.
     """
     for fragment in fragments:
         if fragment.id is None:
@@ -41,7 +51,10 @@ def respond(
                 f"fragment root <{fragment.tag}> has no id (C-501): the boost "
                 "layer swaps subtrees by id; give the root a stable identity"
             )
-    headers = {"vary": "Curvature-Boost"}
+    if wants_chart(request):
+        chart = build_chart(fragments, url=str(request.url.path), purpose=purpose)
+        return JSONResponse(chart, status_code=status_code, headers={"vary": VARY})
+    headers = {"vary": VARY, "curvature-chart": "available"}
     if is_boosted(request):
         markup = "".join(render(fragment) for fragment in fragments)
         return HTMLResponse(markup, status_code=status_code, headers=headers)

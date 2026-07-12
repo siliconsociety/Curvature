@@ -209,6 +209,34 @@ Doctrine: satellites are how features audition for core. First
 constellation: Concierge (the resident agent), IFR (the agent
 projection), Auth, Admin, Live (SSE push), and rule-packs.
 
+## 8. The chart — LANDED 0.3-line, 2026-07-12
+
+**C-900 · Negotiation is one header, third head.**
+A request carrying `Curvature-Chart: 1` receives the chart: the
+machine-legible projection of the same screen — purpose, headings,
+fragment ids, and affordances (links; forms as JSON Schema). HTML
+responses advertise availability (`Curvature-Chart: available`) so
+visiting agents discover it on first contact. *Why:* agents are
+clients without eyes; a cambered app requires no bespoke client.
+*Enforcement:* construction (`respond()` is the only chart emitter).
+
+**C-901 · Charts are derived, never authored.**
+The chart is computed from the same Element tree the pixels come from.
+There is no chart template, no chart override, no second source of
+truth to drift. *Why:* C-103's law extended to the third head.
+*Enforcement:* construction (build_chart takes the fragments,
+nothing else).
+
+**C-902 · Purpose is the one authored line.**
+`respond(..., purpose=...)` carries the single human-written sentence
+of orientation a derivation cannot supply: what this screen is FOR.
+*Why:* the first job of the agent-facing surface is orientation.
+*Enforcement:* gate (ANOM-170, queued: chart-serving screens without
+purpose are anomalies).
+
+The **atlas** — the enumeration of every chart a manifold serves — is
+queued; the chart ships first.
+
 ## Anomaly finding index
 
 | ID     | Invariant | Check |

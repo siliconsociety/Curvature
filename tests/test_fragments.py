@@ -36,10 +36,10 @@ def test_multiple_fragments_render_in_order():
     assert response.body == b'<div id="one">a</div><div id="two">b</div>'
 
 
-def test_both_branches_vary_on_the_boost_header():
+def test_both_branches_vary_on_both_negotiators():
     for boosted in (True, False):
         response = respond(make_request(boosted=boosted), h.div(id="p"), shell=shell)
-        assert response.headers["vary"] == "Curvature-Boost"
+        assert response.headers["vary"] == "Curvature-Boost, Curvature-Chart"
 
 
 def test_fragment_without_id_is_refused():

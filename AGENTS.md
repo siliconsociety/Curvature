@@ -115,4 +115,6 @@ discovery is not.
 | ratchet | a bound that moves one way (ceilings fall, floors rise) |
 | grandfather | pinning an over-ceiling file at its high-water mark |
 | Manifold | the design tokens; the poured surface |
+| chart | the machine-legible projection of a screen (agents read charts, not pixels) |
+| atlas | every chart a manifold serves (queued) |
 | the geometry holds | `curvature check` exit 0 |

@@ -40,7 +40,10 @@ async def index(request: Request, status: str = "all", editing_task_id: int | No
         done_count=len(board.visible("done")),
         editing_task_id=editing_task_id,
     )
-    return respond(request, pit_board(props), shell=shell)
+    return respond(
+        request, pit_board(props), shell=shell,
+        purpose="Robert's pit board: track laps, add them, mark them done, filter by status.",
+    )
 
 
 @app.get("/tasks/{task_id}/edit")

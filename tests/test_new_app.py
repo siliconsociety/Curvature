@@ -30,6 +30,12 @@ def test_title_derived_from_name(poured):
     assert 'title="Pit Stop"' in (poured / "app/main.py").read_text()
 
 
+def test_poured_readme_explains_the_update_boundary(poured):
+    readme = (poured / "README.md").read_text()
+    assert "uv lock --upgrade-package curvature" in readme
+    assert "upgrades never overwrite" in readme
+
+
 def test_scripts_are_executable(poured):
     for script in ("gate.sh", "run.sh"):
         assert (poured / script).stat().st_mode & 0o111

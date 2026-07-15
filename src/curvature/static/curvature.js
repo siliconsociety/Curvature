@@ -39,17 +39,40 @@
     startLive();
   };
 
-  // Live (C-502): the boost swap flowing downhill. One EventSource per
-  // stream URL, however many swaps arrive; missing targets are skipped,
-  // never navigated — an enhancement stream must not hijack the page.
-  const liveStreams = new Set();
+  // Live (C-502): each stream belongs to the current root that declares it.
+  // Clean terminal events retire that root; a later replacement starts fresh.
+  const liveStreams = new Map();
+  const endedLive = new WeakSet();
+
+  const stopLive = (stream, source, terminal) => {
+    const active = liveStreams.get(stream);
+    if (!active || active.source !== source) return;
+    source.close();
+    liveStreams.delete(stream);
+    if (!terminal) return;
+    for (const el of document.querySelectorAll("[data-live]")) {
+      if (el.dataset.live === stream) endedLive.add(el);
+    }
+  };
+
   const startLive = () => {
+    const owners = new Map();
     for (const el of document.querySelectorAll("[data-live]")) {
       const stream = el.dataset.live;
-      if (!stream || liveStreams.has(stream)) continue;
-      liveStreams.add(stream);
+      if (!stream || endedLive.has(el) || owners.has(stream)) continue;
+      owners.set(stream, el);
+    }
+    for (const [stream, active] of liveStreams) {
+      const owner = owners.get(stream);
+      if (owner) active.owner = owner;
+      else stopLive(stream, active.source, false);
+    }
+    for (const [stream, owner] of owners) {
+      if (liveStreams.has(stream)) continue;
       const source = new EventSource(stream);
+      liveStreams.set(stream, { owner, source });
       source.onmessage = (event) => swap(event.data, location.href, false, true);
+      source.addEventListener("curvature-end", () => stopLive(stream, source, true));
     }
   };
 

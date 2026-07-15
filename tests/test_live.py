@@ -6,7 +6,7 @@ import pytest
 
 from curvature import Anomaly
 from curvature import html as h
-from curvature.live import live_stream, sse_event
+from curvature.live import TERMINAL_SIGNAL, live_stream, sse_event
 
 
 def test_an_event_is_data_lines_and_a_blank():
@@ -46,6 +46,18 @@ def test_live_stream_renders_each_yield():
     chunks = asyncio.run(collect())
     assert 'data: <div id="tick">first</div>' in chunks[0]
     assert "tock" in chunks[1]
+    assert chunks[-1] == TERMINAL_SIGNAL
+
+
+def test_clean_completion_sends_the_terminal_signal():
+    async def no_events():
+        if False:
+            yield h.div(id="never")
+
+    async def collect():
+        return [chunk async for chunk in live_stream(no_events()).body_iterator]
+
+    assert asyncio.run(collect()) == [TERMINAL_SIGNAL]
 
 
 def test_the_tower_streams_its_state(tmp_path):
@@ -99,7 +111,8 @@ def test_quiet_streams_heartbeat_and_resume():
     chunks = asyncio.run(drain())
     assert "only" in chunks[0]
     assert ": keep-alive\n\n" in chunks[1:-1]  # silence was kept alive
-    assert "again" in chunks[-1]                 # and the loop resumed past it
+    assert "again" in chunks[-2]                 # and the loop resumed past it
+    assert chunks[-1] == TERMINAL_SIGNAL
 
 
 def test_events_flow_through_the_heartbeat_loop():
@@ -112,6 +125,7 @@ def test_events_flow_through_the_heartbeat_loop():
         return [chunk async for chunk in response.body_iterator]
 
     chunks = asyncio.run(drain())
-    assert len(chunks) == 2
+    assert len(chunks) == 3
     assert 'data: <div id="one">a</div>' in chunks[0]
     assert "two" in chunks[1]
+    assert chunks[2] == TERMINAL_SIGNAL

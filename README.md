@@ -102,6 +102,25 @@ Then turn JavaScript off and use it again. Links, forms, redirects, and
 refreshes still work; only enhancement (fragment swaps and live push)
 disappears. That is the boundary.
 
+## Updating an app
+
+Curvature has two ownership classes. The installed package owns the runtime,
+including `curvature.js`, Live, response helpers, and the gate. Update that
+runtime deliberately, review the lockfile, and run the app's gate:
+
+```bash
+uv lock --upgrade-package curvature
+uv sync
+./gate.sh
+```
+
+The app owns everything the scaffold or a satellite pour copied into its
+repository. Package upgrades never overwrite those files. When a release
+requires an app-source migration, its upgrade note names the files and the
+owner applies the diff like any other code change. See
+[docs/UPGRADING.md](docs/UPGRADING.md) for the complete contract and
+release-specific notes.
+
 ## Status
 
 Alpha. The contract, runtime, gate, demo, browser-level boost tests, and a

@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "live-stream-ownership",
+      "pit_id": "P17",
+      "title": "Live owns and retires its streams",
+      "lane": "shipped",
+      "note": "Resolved issue #1 from the first consumer: EventSource follows rendered ownership, clean completion stops reconnection, detach and return behavior is proven in Chrome, and existing poured apps now have an explicit runtime-update contract."
+    },
+    {
       "id": "site-visual-identity",
       "pit_id": "P16",
       "title": "Public site: a sharper identity",

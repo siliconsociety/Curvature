@@ -176,8 +176,16 @@ decorates. Live regions are display surfaces; don't stream a form
 someone might be typing into. JS-off degradation is already honest:
 reads render whole, refresh is the fallback. *Why:* chat-class
 liveness without a word of app JS or a gram of client state.
-*Enforcement:* construction (sse_event refuses anonymous fragments) +
-the boost layer (EventSource lives only in curvature.js, C-301).
+The source belongs to its current `data-live` root: replacing that root
+with the same id and stream transfers ownership, while removing it or
+changing its stream closes and unregisters the source. Clean generator
+completion sends `event: curvature-end`; the boost layer closes the source
+and retires that root so EventSource does not reconnect. A later render of
+the live root is a new owner and opens exactly one fresh source. Failures and
+interrupted connections retain native EventSource retry behavior.
+*Enforcement:* construction (sse_event refuses anonymous fragments and
+live_stream emits the terminal event) + browser coverage of ownership,
+cleanup, terminal completion, return, and duplicate prevention.
 
 ## 6. Project shape
 

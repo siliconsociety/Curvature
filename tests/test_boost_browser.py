@@ -12,6 +12,8 @@ from urllib.parse import parse_qs, urlparse
 import pytest
 from playwright.sync_api import Browser, expect, sync_playwright
 
+from curvature.live import TERMINAL_SIGNAL
+
 BOOST = Path(__file__).parent.parent / "src/curvature/static/curvature.js"
 
 
@@ -39,11 +41,19 @@ def _home() -> str:
     )
 
 
+def _live_home() -> str:
+    return _page(
+        '<section id="status" data-live="/stream">live '
+        '<a id="away" href="/live-away">Away</a></section>'
+    )
+
+
 class BoostProbe(BaseHTTPRequestHandler):
     last_query: dict[str, list[str]] = {}
     last_write = ""
     last_write_was_boosted = False
     broken_requests: list[bool] = []
+    terminal_requests = 0
 
     def log_message(self, _format, *_args):
         pass
@@ -64,6 +74,23 @@ class BoostProbe(BaseHTTPRequestHandler):
             self._send(BOOST.read_text(), content_type="text/javascript")
         elif parsed.path == "/":
             self._send(_home())
+        elif parsed.path == "/live-home":
+            self._send(_live_home())
+        elif parsed.path == "/live-away":
+            fragment = (
+                '<section id="status">away '
+                '<a id="return" href="/live-return">Return</a></section>'
+            )
+            self._send(fragment if boosted else _page(fragment))
+        elif parsed.path == "/live-return":
+            fragment = '<section id="status" data-live="/stream">returned</section>'
+            self._send(fragment if boosted else _page(fragment))
+        elif parsed.path == "/terminal-home":
+            self._send(_page('<section id="status" data-live="/terminal-stream">waiting</section>'))
+        elif parsed.path == "/terminal-stream":
+            type(self).terminal_requests += 1
+            event = 'data: <section id="status" data-live="/terminal-stream">complete</section>\n\n'
+            self._send(f"retry: 25\n\n{event}{TERMINAL_SIGNAL}", content_type="text/event-stream")
         elif parsed.path == "/search":
             type(self).last_query = parse_qs(parsed.query)
             fragment = '<section id="panel">searched</section>'
@@ -160,3 +187,85 @@ def test_newer_navigation_wins_response_races(page, live_url):
     page.wait_for_url(f"{live_url}/fast")
     page.wait_for_timeout(300)
     expect(page.locator("#panel")).to_have_text("fast")
+
+
+LIVE_SOURCE_PROBE = """(() => {
+  window.liveSources = [];
+  window.EventSource = class {
+    constructor(url) {
+      this.url = url;
+      this.closed = false;
+      this.listeners = {};
+      window.liveSources.push(this);
+    }
+    addEventListener(name, listener) { this.listeners[name] = listener; }
+    close() { this.closed = true; }
+    message(markup) { this.onmessage({data: markup}); }
+    finish() { this.listeners["curvature-end"]({data: "complete"}); }
+  };
+})()"""
+
+
+def live_source_state(page):
+    return page.evaluate("liveSources.map(source => ({url: source.url, closed: source.closed}))")
+
+
+def test_live_swaps_transfer_ownership_without_duplicates(page, live_url):
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-home")
+
+    page.evaluate("""() => {
+      liveSources[0].message('<section id="status" data-live="/stream">one</section>');
+      liveSources[0].message('<section id="status" data-live="/stream">two</section>');
+    }""")
+
+    assert live_source_state(page) == [{"url": "/stream", "closed": False}]
+    expect(page.locator("#status")).to_have_text("two")
+
+
+def test_detached_live_owner_closes_and_returning_starts_fresh(page, live_url):
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-home")
+    page.locator("#away").click()
+    page.wait_for_url(f"{live_url}/live-away")
+    assert live_source_state(page) == [{"url": "/stream", "closed": True}]
+
+    page.locator("#return").click()
+    page.wait_for_url(f"{live_url}/live-return")
+    assert live_source_state(page) == [
+        {"url": "/stream", "closed": True},
+        {"url": "/stream", "closed": False},
+    ]
+
+
+def test_changed_live_url_closes_the_old_source(page, live_url):
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-home")
+    page.evaluate(
+        "liveSources[0].message('<section id=\"status\" data-live=\"/other\">changed</section>')"
+    )
+    assert live_source_state(page) == [
+        {"url": "/stream", "closed": True},
+        {"url": "/other", "closed": False},
+    ]
+
+
+def test_terminal_event_closes_without_native_reconnection(page, live_url):
+    BoostProbe.terminal_requests = 0
+    page.goto(f"{live_url}/terminal-home")
+    expect(page.locator("#status")).to_have_text("complete")
+    page.wait_for_timeout(250)
+    assert BoostProbe.terminal_requests == 1
+
+
+def test_return_after_terminal_event_starts_fresh(page, live_url):
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-home")
+    page.evaluate("liveSources[0].finish()")
+    assert live_source_state(page) == [{"url": "/stream", "closed": True}]
+
+    page.locator("#away").click()
+    page.locator("#return").click()
+    page.wait_for_url(f"{live_url}/live-return")
+    assert live_source_state(page)[-1] == {"url": "/stream", "closed": False}
+    assert len(live_source_state(page)) == 2

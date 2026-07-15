@@ -27,6 +27,8 @@ SSE_HEADERS = {
     "cache-control": "no-store",
     "x-accel-buffering": "no",  # nginx: do not buffer the stream
 }
+TERMINAL_EVENT = "curvature-end"
+TERMINAL_SIGNAL = f"event: {TERMINAL_EVENT}\ndata: complete\n\n"
 
 
 def sse_event(*fragments: Element) -> str:
@@ -50,7 +52,10 @@ def live_stream(
     """Wrap an async generator of Elements into an SSE response.
 
     Quiet streams emit a comment heartbeat so proxies don't reap idle
-    connections and dead clients are noticed at the next write."""
+    connections and dead clients are noticed at the next write. Clean
+    generator completion emits the framework terminal event so browsers
+    close instead of reconnecting; failures still receive native EventSource
+    retry behavior."""
 
     async def body() -> AsyncIterator[str]:
         import asyncio
@@ -70,6 +75,7 @@ def live_stream(
                 try:
                     event = pending.result()
                 except StopAsyncIteration:
+                    yield TERMINAL_SIGNAL
                     return
                 fragments = event if isinstance(event, tuple) else (event,)
                 yield sse_event(*fragments)

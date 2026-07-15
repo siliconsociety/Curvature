@@ -14,3 +14,21 @@ onboarding, the gate is its reviewer. No uv? `python -m venv .venv &&
 for direct commands. Then install uv anyway:
 macOS/Linux `curl -LsSf https://astral.sh/uv/install.sh | sh`,
 Windows `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`.
+
+## Updating Curvature
+
+The lockfile pins the framework runtime. Upgrade it deliberately, then prove
+the app against the new runtime:
+
+```bash
+uv lock --upgrade-package curvature
+uv sync
+./gate.sh
+```
+
+That updates package-owned code, including `curvature.js`; the versioned asset
+URL makes browsers load the new boost layer. This repo owns every file copied
+here by the app scaffold or a satellite pour, so upgrades never overwrite
+those files. Apply any source migration named in Curvature's
+[upgrade notes](https://github.com/siliconsociety/Curvature/blob/main/docs/UPGRADING.md)
+as an ordinary reviewed change.

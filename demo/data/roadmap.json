@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "ci-node24",
+      "pit_id": "P21",
+      "title": "Public gate runs on Node 24 actions",
+      "lane": "shipped",
+      "note": "Moved checkout and uv setup to their current Node 24 action generations after the 0.3.0 release exposed GitHub's Node 20 deprecation annotation. Opened 0.3.1 in the same commit, as C-403 requires for all work after a release tag."
+    },
+    {
       "id": "hollow-branch-pruning",
       "pit_id": "P20",
       "title": "Spiral prunes hollow branches",

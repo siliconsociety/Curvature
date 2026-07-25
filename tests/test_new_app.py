@@ -18,6 +18,7 @@ def test_pours_every_file(poured):
         assert (poured / relpath).exists(), relpath
     assert (poured / "ratchet.toml").exists()
     assert (poured / ".python-version").read_text().strip() == "3.14"
+    assert (poured / "satellites/__init__.py").exists()
 
 
 def test_no_placeholder_residue(poured):

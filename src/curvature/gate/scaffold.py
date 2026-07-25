@@ -84,8 +84,10 @@ def new_app(parent: Path, name: str) -> Path:
         destination.write_text(text)
     for script in ("gate.sh", "run.sh"):
         (target / script).chmod(0o755)
-    for package in ("app", "app/components"):
-        (target / package / "__init__.py").touch()
+    for package in ("app", "app/components", "satellites"):
+        marker = target / package / "__init__.py"
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.touch()
     (target / ".python-version").write_text("3.14\n")
     save(target, Ratchet())
 

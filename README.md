@@ -57,10 +57,11 @@ def lap(props: LapProps) -> Element:
   render, one header of difference.
 - **The ratchet only tightens.** Base file ceilings fall, the coverage floor
   rises, and `curvature ratchet` is the only hand on the mechanism. Larger
-  projects may opt into [Spiral](docs/SPIRAL.md): Fibonacci mass stages let
-  cohesive files grow sublinearly while every directory keeps a fixed branch
-  span. The 10,000-line dumping ground and the 160-file trunk remain
-  anomalies.
+  projects may opt into
+  [Spiral](https://github.com/siliconsociety/Curvature/blob/main/docs/SPIRAL.md):
+  Fibonacci mass stages let cohesive files grow sublinearly while every
+  directory keeps a fixed branch span. The 10,000-line dumping ground and the
+  160-file trunk remain anomalies.
 
 ## Start from nothing
 

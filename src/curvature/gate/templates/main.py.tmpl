@@ -6,11 +6,10 @@ Run it: ./run.sh
 
 from pathlib import Path
 
-from fastapi import FastAPI, Request
-from fastapi.staticfiles import StaticFiles
-
 import curvature
 from curvature import respond
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 
 from app.components.shell import shell
 from app.components.welcome import WelcomeProps, welcome

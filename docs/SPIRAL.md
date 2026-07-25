@@ -29,6 +29,131 @@ ordinary ratcheted ceilings. The next `curvature check` reports every file
 that no longer fits. Spiral records no high-water marks and creates no
 grandfather exceptions.
 
+## Adoption workflows
+
+### New Curvature project
+
+Pour the application and enter it:
+
+```bash
+uvx --from "curvature==0.2.6" curvature new app my_app
+cd my_app
+```
+
+Add the Spiral table to `pyproject.toml`:
+
+```toml
+[tool.curvature.spiral]
+enabled = true
+roots = ["app"]
+```
+
+Establish the dependency lock and prove the new tree:
+
+```bash
+uv sync
+./gate.sh
+```
+
+The initial file ceilings remain Python 300, CSS 250, and JavaScript 150.
+The branch span of 13 guides the project from its first growth.
+
+### Existing Curved project
+
+Update the package-owned gate, synchronize the environment, and prove the
+unchanged application first:
+
+```bash
+uv lock --upgrade-package curvature
+uv sync
+./gate.sh
+```
+
+Add the Spiral table to `pyproject.toml`, naming each independent source tree:
+
+```toml
+[tool.curvature.spiral]
+enabled = true
+roots = ["app"]
+```
+
+Application and test trees can advance independently:
+
+```toml
+[tool.curvature.spiral]
+enabled = true
+roots = ["app", "tests"]
+```
+
+Run the complete gate again:
+
+```bash
+./gate.sh
+```
+
+ANOM-152 identifies directories ready to branch. Make those semantic moves,
+rerun the gate, and commit `pyproject.toml`, the upgraded lockfile, and the
+resulting structural changes together.
+
+### Existing project adopting Curvature
+
+Add Curvature as an application dependency when using its runtime:
+
+```bash
+uv add "curvature[fastapi]>=0.2.6,<0.3"
+```
+
+For a gate-first adoption, add it to the development group:
+
+```bash
+uv add --dev "curvature>=0.2.6,<0.3"
+```
+
+Add the Spiral table with the project's source package:
+
+```toml
+[tool.curvature.spiral]
+enabled = true
+roots = ["src/your_package"]
+```
+
+Run the Curvature gate to produce the migration inventory:
+
+```bash
+uv run curvature check
+```
+
+This path adopts Curvature's complete gate contract. Resolve its anomalies,
+then run the project's coverage-producing test command followed by:
+
+```bash
+uv run curvature check
+uv run curvature ratchet
+```
+
+Keep `uv run curvature check` in the project's ordinary gate or CI workflow.
+Commit the dependency lock, `pyproject.toml`, the managed `ratchet.toml` and
+floor badge, gate integration, and structural changes together.
+
+### Disabling Spiral
+
+Keep the source-tree declaration and set:
+
+```toml
+[tool.curvature.spiral]
+enabled = false
+roots = ["app"]
+```
+
+Then run:
+
+```bash
+./gate.sh
+```
+
+The ordinary ceilings apply immediately. ANOM-140 identifies files to bring
+back under those ceilings on the normal maintenance path.
+
 ## Mass
 
 Spiral measures source, not files. For each non-vendored governed file:

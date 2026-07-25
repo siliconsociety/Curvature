@@ -32,6 +32,16 @@ def test_main_check_reports_coverage_info(tmp_path, capsys):
     assert "coverage: 91.3 against a floor of 85.0" in capsys.readouterr().out
 
 
+def test_main_check_reports_spiral_scale(tmp_path, capsys):
+    write(
+        tmp_path / "pyproject.toml",
+        "[tool.curvature.spiral]\nroots = ['app']\n",
+    )
+    write(tmp_path / "app/model.py", "x = 1\n" * 300)
+    assert main(["check", str(tmp_path)]) == 0
+    assert "Spiral app: mass 1.0, scale 1" in capsys.readouterr().out
+
+
 def test_main_ratchet_raises_the_floor_and_tightens_pins(tmp_path, capsys):
     write(tmp_path / "app.py", "x = 1\n")
     write(tmp_path / "legacy.py", "\n".join(["x = 1"] * 8))

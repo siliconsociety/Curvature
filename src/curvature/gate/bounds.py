@@ -12,16 +12,23 @@ from pathlib import Path
 
 from curvature.gate.findings import Finding, is_vendored, walk_source
 from curvature.gate.ratchet import Ratchet, historical_tightest, loosened
+from curvature.gate.spiral import Spiral
 
 
-def check_ceilings(root: Path, ratchet: Ratchet) -> list[Finding]:
+def check_ceilings(
+    root: Path, ratchet: Ratchet, spiral: Spiral | None = None
+) -> list[Finding]:
     """ANOM-140: no file outgrows its ceiling. Split while the split is cheap."""
     findings = []
     for path in walk_source(root, frozenset({".py", ".css", ".js"})):
         if is_vendored(path):
             continue
         relpath = str(path.relative_to(root))
-        ceiling = ratchet.ceiling_for(path, relpath)
+        ceiling = (
+            spiral.ceiling_for(path, ratchet)
+            if spiral is not None
+            else ratchet.ceiling_for(path, relpath)
+        )
         if ceiling is None:
             continue
         lines = len(path.read_text(errors="replace").splitlines())

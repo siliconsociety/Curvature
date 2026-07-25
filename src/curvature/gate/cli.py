@@ -13,18 +13,21 @@ import math
 import sys
 from pathlib import Path
 
-from curvature.gate import bounds, checks, scaffold
+from curvature.gate import bounds, checks, scaffold, spiral
 from curvature.gate.css import check_orphan_css
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
 
-ALL_CHECKS = "the full finding index (ANOM-110 .. ANOM-142); see SPEC.md"
+ALL_CHECKS = "the full finding index; see SPEC.md"
 
 
 def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
     ratchet = load(root)
+    spiral_protocol, spiral_config_findings = spiral.load(root)
     findings = [
-        *bounds.check_ceilings(root, ratchet),
+        *spiral_config_findings,
+        *bounds.check_ceilings(root, ratchet, spiral_protocol),
+        *(spiral_protocol.branch_findings() if spiral_protocol else []),
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
         *checks.check_dom_sins(root),
@@ -42,6 +45,8 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         f"raw() census: {checks.raw_census(root)} call sites (ANOM-122)",
         f"curvature-allow census: {checks.pragma_census(root)} pragmas",
     ]
+    if spiral_protocol:
+        info.extend(spiral_protocol.info(ratchet))
     report = root / "coverage.json"
     if report.exists():
         percent = json.loads(report.read_text())["totals"]["percent_covered"]

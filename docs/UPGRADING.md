@@ -54,6 +54,16 @@ For each Curvature release:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
+## 0.2.6
+
+Spiral is an optional gate protocol; existing applications retain their
+ordinary ratcheted ceilings and need no migration. To adopt it, add
+`[tool.curvature.spiral]` with the application's independent source roots as
+described in [SPIRAL.md](SPIRAL.md), update the Curvature lock, and run the
+complete gate. Adoption may immediately report ANOM-152 for crowded
+directories. Disabling Spiral immediately restores ordinary ceilings and may
+report ANOM-140 for files that grew while it was active.
+
 ## 0.2.5
 
 Live streams now close when their declaring root disappears or changes stream,

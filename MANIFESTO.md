@@ -96,11 +96,13 @@ is no second language for the sediment to hide in.
 page renders the fragment. Boosted and unboosted requests differ by one
 header, never by one template.
 
-**6. Ratchets only tighten.** Coverage floors rise. File ceilings fall.
-The numbers live in a file the tooling owns, and the tooling turns the
-mechanism one way. The day a file nears its ceiling, the gate forces the
-split *while the split is still cheap*. Structure decays wherever the gate
-is silent, so the gate is not silent.
+**6. Ratchets only tighten; healthy trees may Spiral.** Coverage floors rise.
+Base file ceilings fall. The numbers live in a file the tooling owns, and the
+tooling turns the mechanism one way. A project may opt into Fibonacci growth:
+cohesive files earn room slowly, while local branch span stays fixed forever.
+The day a file or directory outruns its geometry, the gate forces structure
+*while structure is still cheap*. Structure decays wherever the gate is
+silent, so the gate is not silent.
 
 **7. Documentation is written for the maintainer.** The maintainer is an
 agent. AGENTS.md is the canonical documentation; the README is a courtesy

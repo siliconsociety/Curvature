@@ -55,10 +55,12 @@ def lap(props: LapProps) -> Element:
   GET forms into fragment swaps. Mutating forms stay native, so a lost
   connection can never turn a POST into the wrong GET. Same route, same
   render, one header of difference.
-- **The ratchet only tightens.** File ceilings fall, the coverage floor
-  rises, and `curvature ratchet` is the only hand on the mechanism. The
-  10,000-line file is never written because week two's gate refuses the
-  sediment while the split is still cheap.
+- **The ratchet only tightens.** Base file ceilings fall, the coverage floor
+  rises, and `curvature ratchet` is the only hand on the mechanism. Larger
+  projects may opt into [Spiral](docs/SPIRAL.md): Fibonacci mass stages let
+  cohesive files grow sublinearly while every directory keeps a fixed branch
+  span. The 10,000-line dumping ground and the 160-file trunk remain
+  anomalies.
 
 ## Start from nothing
 

@@ -125,7 +125,9 @@ current size and may only shrink. *Why:* the 10,000-line file is never
 written; it accretes. The ceiling forces the split while the split is
 cheap. *Enforcement:* ratchet (ANOM-140) — `curvature check` fails any file
 over its bound; `curvature ratchet` lowers bounds to current actuals and
-never raises them.
+never raises them. The optional Spiral protocol (C-602) derives a larger
+effective ceiling for files on healthy branches without changing the
+ratcheted base or creating a grandfather exception.
 
 **C-401 · Coverage floor.**
 The pytest coverage percentage has a floor in `ratchet.toml`. It rises.
@@ -203,6 +205,17 @@ import-time side effects. *Why:* an agent (or a human at 2 a.m.) must be
 able to answer "who calls this?" with grep.
 *Enforcement:* gate (ANOM-151, landed: `__init_subclass__` and
 `metaclass=` are findings — the manifold refuses invisible machinery).
+
+**C-602 · Spiral growth is massive and locally bounded.**
+Projects may opt source trees into Spiral in `pyproject.toml`. Each tree's
+mass is the sum of its governed source lines normalized by the default
+per-language ceiling. The greatest crossed Fibonacci threshold is its scale;
+from scale 13, healthy file ceilings grow by `sqrt(scale / 13)` while every
+directory retains a fixed span of 13 meaningful children. Crowded directories
+keep their ordinary file ceilings until they branch. *Why:* mature projects
+need more room without teaching the trunk to accept unlimited leaves.
+*Enforcement:* gate (ANOM-140 applies the effective ceiling; ANOM-152 reports
+invalid Spiral configuration and directories over the branch span).
 
 ## 7. Satellites
 
@@ -300,6 +313,7 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-143 | C-403 | published version with commits past its tag |
 | ANOM-150 | C-600 | orphan CSS class selector |
 | ANOM-151 | C-601 | registration magic (__init_subclass__, metaclass) |
+| ANOM-152 | C-602 | invalid Spiral configuration or directory over branch span |
 | ANOM-161 | C-802 | satellite manifest disagrees with its directory |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 

@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "spiral-project-growth",
+      "pit_id": "P18",
+      "title": "Spiral: stable growth for large projects",
+      "lane": "shipped",
+      "note": "Landed the optional Spiral protocol: independent source-tree mass crosses Fibonacci scales, healthy file ceilings grow by the square root of scale, and ANOM-152 keeps every directory's branch span at 13. OCR Lab reads as scale 34 with 485-line healthy Python leaves and three real branch anomalies."
+    },
+    {
       "id": "live-stream-ownership",
       "pit_id": "P17",
       "title": "Live owns and retires its streams",

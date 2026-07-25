@@ -51,8 +51,9 @@ def lap_counter(props: LapCounterProps) -> Element:
 
 Rules the gate will hold you to: the first parameter is a Props subclass
 (ANOM-110); text is escaped unless you write `raw()`, and every `raw()` is
-counted out loud; the file stays under its line ceiling (ANOM-140) — when
-you approach it, split the component, never widen the ceiling.
+counted out loud; the file stays under its line ceiling (ANOM-140). Split an
+overloaded component. When the optional Spiral protocol is active, a healthy
+branch may earn a larger computed ceiling; never widen the ratchet by hand.
 
 ## How to add a route
 
@@ -124,6 +125,7 @@ discovery is not.
 | shell | the combinator that pours the document around fragments |
 | ratchet | a bound that moves one way (ceilings fall, floors rise) |
 | grandfather | pinning an over-ceiling file at its high-water mark |
+| Spiral | optional Fibonacci growth: larger healthy leaves, permanently bounded branches |
 | Manifold | the design tokens; the poured surface |
 | live | server-pushed fragment swaps over SSE; declared with data-live |
 | chart | the machine-legible projection of a screen (agents read charts, not pixels) |

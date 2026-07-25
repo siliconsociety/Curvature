@@ -72,10 +72,12 @@ def check_ratchet_integrity(root: Path, ratchet: Ratchet) -> list[Finding]:
 
 
 def check_version_currency(root: Path) -> list[Finding]:
-    """ANOM-143: the version moves like a ratchet (C-403). publish.sh
-    tags every release; if the tag for pyproject's current version
-    exists and HEAD has moved past it, someone forgot the bump — the
-    thing the kids always forget, now unforgettable."""
+    """ANOM-143: the version moves like a ratchet (C-403).
+
+    If the tag for pyproject's current version exists and HEAD has moved past
+    it, someone forgot the bump — the thing the kids always forget, now
+    unforgettable.
+    """
     import subprocess
     import tomllib
 
@@ -97,7 +99,7 @@ def check_version_currency(root: Path) -> list[Finding]:
     except (OSError, subprocess.TimeoutExpired):
         return []
     if tag_commit.returncode != 0 or head_commit.returncode != 0:
-        return []  # no such tag (unpublished version) or no git: nothing to hold
+        return []  # no such tag or no git: nothing to hold
     if tag_commit.stdout.strip() != head_commit.stdout.strip():
         return [Finding(
             "ANOM-143", "pyproject.toml", None,

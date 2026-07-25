@@ -12,7 +12,7 @@ from demo.roadmap_store import RoadmapStore
 
 @pytest.fixture
 def client(tmp_path):
-    seed = Path(__file__).parent.parent / "demo" / "data" / "roadmap.json"
+    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
     working = tmp_path / "roadmap.json"
     shutil.copy(seed, working)
     app.state.roadmap_store = RoadmapStore(working)
@@ -38,9 +38,9 @@ def test_every_lane_is_recent_first(client):
     assert [item.id for item in lanes["queued"]] == [
         "public-live-playground", "live-production-hardening",
     ]
-    assert lanes["shipped"][0].id == "spiral-project-growth"
+    assert lanes["shipped"][0].id == "hollow-branch-pruning"
     assert lanes["shipped"][-1].id == "founding"
-    assert lanes["shipped"][0].pit_id == "P18"
+    assert lanes["shipped"][0].pit_id == "P20"
     assert lanes["shipped"][-1].pit_id == "P1"
     pit_numbers = [int((item.pit_id or "").removeprefix("P")) for item in lanes["shipped"]]
     assert pit_numbers == list(range(len(pit_numbers), 0, -1))

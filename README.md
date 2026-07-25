@@ -8,6 +8,46 @@
 [![Coverage floor](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsiliconsociety%2FCurvature%2Fmain%2Ffloor-badge.json)](https://github.com/siliconsociety/Curvature/blob/main/ratchet.toml)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
+## Spiral is project spacetime
+
+Spiral is on by default. Every directory is a local body: its substantial
+source files occupy surface, and the surface-to-volume law determines how
+much room a healthy leaf has to grow.
+
+For a sphere of radius \(r\),
+
+$$
+A(r)=4\pi r^2,\qquad
+V(r)=\frac{4}{3}\pi r^3,\qquad
+\frac{V(r)}{A(r)}=\frac{r}{3}.
+$$
+
+Curvature normalizes each direct source file \(f\) by its language's base
+ceiling \(B_{\tau(f)}\), then measures the occupied surface of directory
+\(D\):
+
+$$
+m_f=\frac{\operatorname{lines}(f)}{B_{\tau(f)}},\qquad
+A_D=\sum_{f\in\operatorname{direct}(D)}\min(1,m_f),\qquad
+R_D=\max(1,\sqrt{A_D}).
+$$
+
+The effective ceiling is the ratcheted base multiplied by that local radius:
+
+$$
+C_f=\operatorname{round}(B_fR_D).
+$$
+
+A lone Python leaf therefore begins at 300 lines and cannot buy room by
+becoming oversized. Two substantial neighboring leaves have radius
+\(\sqrt2\) and a 424-line Python ceiling; three have 520, five have 671, and
+eight have 849. Child directories form their own bodies, so distant project
+mass cannot inflate a local file. At thirteen meaningful neighbors the
+twelve-neighbor coordination bound fires and the directory must branch. The
+gate also prunes hollow branches that retain only cache archaeology or missing
+tracked leaves. The derivation and adoption controls live in
+[The Spiral law](docs/SPIRAL.md).
+
 A web framework for code that agents maintain. Live, dynamic web apps
 in pure Python — single-page feel, pages that update themselves in
 real time, zero JavaScript app code — and a gate that makes the
@@ -55,13 +95,11 @@ def lap(props: LapProps) -> Element:
   GET forms into fragment swaps. Mutating forms stay native, so a lost
   connection can never turn a POST into the wrong GET. Same route, same
   render, one header of difference.
-- **The ratchet only tightens.** Base file ceilings fall, the coverage floor
-  rises, and `curvature ratchet` is the only hand on the mechanism. Larger
-  projects may opt into
-  [Spiral](https://github.com/siliconsociety/Curvature/blob/main/docs/SPIRAL.md):
-  Fibonacci mass stages let cohesive files grow sublinearly while every
-  directory keeps a fixed branch span. The 10,000-line dumping ground and the
-  160-file trunk remain anomalies.
+- **The ratchet only tightens; healthy trees Spiral.** Base file ceilings
+  fall, the coverage floor rises, and `curvature ratchet` is the only hand on
+  the mechanism. Local occupied surface lets related leaves grow by radius,
+  while a twelve-neighbor coordination bound keeps branches navigable. The
+  10,000-line dumping ground and the 160-file trunk remain anomalies.
 
 ## Start from nothing
 

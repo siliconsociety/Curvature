@@ -9,8 +9,10 @@ import urllib.parse
 import uuid
 from typing import Annotated
 
-from app.components.shell import shell
 from fastapi import APIRouter, Form, Request
+
+from app.components.shell import shell
+from curvature import redirect, respond
 from satellites.auth.components.auth_forms import (
     LoginFormProps,
     RegisterFormProps,
@@ -34,8 +36,6 @@ from satellites.auth.sessions import (
     start_session,
 )
 from satellites.auth.store import ChallengeRecord, DuplicateUserError, TokenRecord, UserRecord
-
-from curvature import redirect, respond
 
 router = APIRouter()
 REVEAL_SECONDS = 120

@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from curvature.fragments import CHART_HEADER
+from curvature.core.fragments import CHART_HEADER
 
 
 async def fetch_chart(app: Any, path: str, query: str = "") -> dict[str, Any] | None:

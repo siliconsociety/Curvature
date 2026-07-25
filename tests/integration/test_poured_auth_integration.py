@@ -34,6 +34,15 @@ def test_poured_auth_suite_is_green_and_warning_free(tmp_path):
     environment["PYTHONPATH"] = os.pathsep.join(
         [str(root), environment.get("PYTHONPATH", "")]
     )
+    lint = subprocess.run(
+        [sys.executable, "-m", "ruff", "check", "app", "satellites", "tests"],
+        cwd=root,
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert lint.returncode == 0, lint.stdout + lint.stderr
     result = subprocess.run(
         [
             sys.executable,

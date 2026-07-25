@@ -1,4 +1,4 @@
-"""Spiral: Fibonacci growth without unbounded local branching (C-602)."""
+"""Spiral: local surface-and-volume growth with bounded branching (C-602)."""
 
 from __future__ import annotations
 
@@ -10,10 +10,16 @@ from pathlib import Path
 from curvature.gate.findings import Finding, is_vendored, walk_source
 from curvature.gate.ratchet import DEFAULT_CEILINGS, Ratchet
 
-BRANCH_TARGET = 8
-BRANCH_LIMIT = 13
-GROWTH_ORIGIN = 13
+BRANCH_LIMIT = 12
 SOURCE_SUFFIXES = frozenset(f".{suffix}" for suffix in DEFAULT_CEILINGS)
+
+
+@dataclass(frozen=True)
+class SpiralBody:
+    path: Path
+    mass: float
+    area: float
+    radius: float
 
 
 @dataclass(frozen=True)
@@ -21,8 +27,7 @@ class SpiralTree:
     path: Path
     relpath: str
     mass: float
-    scale: int
-    growth: float
+    bodies: dict[Path, SpiralBody]
     fanout: dict[Path, int]
 
 
@@ -44,7 +49,8 @@ class Spiral:
             return base
         if tree.fanout.get(path.parent, 0) > BRANCH_LIMIT:
             return base
-        return scaled_ceiling(base, tree.growth)
+        body = tree.bodies.get(path.parent)
+        return base if body is None else scaled_ceiling(base, body.radius)
 
     def branch_findings(self) -> list[Finding]:
         findings = []
@@ -57,48 +63,42 @@ class Spiral:
                     "ANOM-152",
                     relpath,
                     None,
-                    f"{children} meaningful children against Spiral's branch span of "
-                    f"{BRANCH_LIMIT}; branch by responsibility toward "
-                    f"{BRANCH_TARGET} + {BRANCH_LIMIT - BRANCH_TARGET} (C-602)",
+                    f"{children} meaningful children against Spiral's "
+                    f"{BRANCH_LIMIT}-neighbor coordination bound; branch by "
+                    "responsibility (C-602)",
                 ))
         return findings
 
-    def info(self, ratchet: Ratchet) -> list[str]:
+    def info(self) -> list[str]:
         lines = []
         for tree in self.trees:
-            ceilings = ", ".join(
-                f".{suffix} {scaled_ceiling(ceiling, tree.growth)}"
-                for suffix, ceiling in sorted(ratchet.ceilings.items())
-            )
+            widest = max((body.radius for body in tree.bodies.values()), default=1.0)
             lines.append(
-                f"Spiral {tree.relpath}: mass {tree.mass:.1f}, scale {tree.scale}, "
-                f"healthy-leaf ceilings {ceilings}"
+                f"Spiral {tree.relpath}: mass {tree.mass:.1f}, "
+                f"{len(tree.bodies)} local bodies, widest radius {widest:.2f}, "
+                f"coordination bound {BRANCH_LIMIT}"
             )
         return lines
 
 
-def fibonacci_scale(mass: float) -> int:
-    """The greatest distinct Fibonacci threshold not exceeding mass."""
-    previous, current = 1, 2
-    scale = 0
-    while previous <= mass:
-        scale = previous
-        previous, current = current, previous + current
-    return scale
+def normalized_mass(path: Path, lines: int) -> float:
+    return lines / DEFAULT_CEILINGS[path.suffix.lstrip(".")]
 
 
-def growth_for(scale: int) -> float:
-    if scale < GROWTH_ORIGIN:
-        return 1.0
-    return math.sqrt(scale / GROWTH_ORIGIN)
+def occupied_surface(masses: list[float]) -> float:
+    return sum(min(1.0, mass) for mass in masses)
 
 
-def scaled_ceiling(base: int, growth: float) -> int:
-    return round(base * growth)
+def radius_for(area: float) -> float:
+    return max(1.0, math.sqrt(area))
+
+
+def scaled_ceiling(base: int, radius: float) -> int:
+    return round(base * radius)
 
 
 def load(root: Path) -> tuple[Spiral | None, list[Finding]]:
-    """Load an optional [tool.curvature.spiral] protocol from pyproject.toml."""
+    """Load the default-on Spiral protocol and any explicit boundaries."""
     root = root.resolve()
     pyproject = root / "pyproject.toml"
     if not pyproject.exists():
@@ -113,9 +113,7 @@ def load(root: Path) -> tuple[Spiral | None, list[Finding]]:
     curvature = tool.get("curvature", {})
     if not isinstance(curvature, dict):
         return None, [_config_finding("configuration must be a table")]
-    table = curvature.get("spiral")
-    if table is None:
-        return None, []
+    table = curvature.get("spiral", {})
     if not isinstance(table, dict):
         return None, [_config_finding("configuration must be a table")]
     unknown = sorted(set(table) - {"enabled", "roots"})
@@ -126,7 +124,7 @@ def load(root: Path) -> tuple[Spiral | None, list[Finding]]:
         return None, [_config_finding("enabled must be true or false")]
     if not enabled:
         return None, []
-    configured_roots = table.get("roots", ["app"])
+    configured_roots = table.get("roots", ["."])
     if (
         not isinstance(configured_roots, list)
         or not configured_roots
@@ -186,13 +184,20 @@ def _analyze(project_root: Path, tree_root: Path) -> SpiralTree:
             if path.is_relative_to(directory)
         }
         fanout[directory] = len(children)
-    mass = sum(
-        count / DEFAULT_CEILINGS[path.suffix.lstrip(".")]
-        for path, count in lines.items()
-    )
-    scale = fibonacci_scale(mass)
+
+    masses = {path: normalized_mass(path, count) for path, count in lines.items()}
+    bodies = {}
+    for directory in {path.parent for path in meaningful}:
+        local_masses = [mass for path, mass in masses.items() if path.parent == directory and mass]
+        area = occupied_surface(local_masses)
+        bodies[directory] = SpiralBody(
+            path=directory,
+            mass=sum(local_masses),
+            area=area,
+            radius=radius_for(area),
+        )
     relpath = str(tree_root.relative_to(project_root)) or "."
-    return SpiralTree(tree_root, relpath, mass, scale, growth_for(scale), fanout)
+    return SpiralTree(tree_root, relpath, sum(masses.values()), bodies, fanout)
 
 
 def _config_finding(message: str) -> Finding:

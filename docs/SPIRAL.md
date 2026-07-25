@@ -1,169 +1,40 @@
-# Spiral
+# The Spiral law
 
-Spiral is Curvature's optional protocol for projects whose total growth has
-outgrown one fixed file ceiling. It lets cohesive files grow slowly while
-keeping every directory locally navigable.
+Spiral is Curvature's default project-growth protocol. It gives related source
+files progressively more room without letting one oversized file, a distant
+subsystem, or an overcrowded directory manufacture capacity.
 
-Enable it per source tree in `pyproject.toml`:
+No configuration is required. A project with `pyproject.toml` is one Spiral
+tree rooted at `.` unless it declares different boundaries or opts out.
 
-```toml
-[tool.curvature.spiral]
-enabled = true
-roots = ["app"]
-```
+## The geometry
 
-Multiple roots are independent:
+The inspiration is the relationship between the surface and volume of a
+sphere:
 
-```toml
-[tool.curvature.spiral]
-roots = ["src/example", "tests"]
-```
+$$
+A(r)=4\pi r^2
+$$
 
-The `src/example` tree cannot buy room with test code, and the test tree
-cannot buy room with application code. Roots must exist, stay inside the
-project, and not overlap. The table's presence enables Spiral unless
-`enabled = false` is explicit.
+$$
+V(r)=\frac{4}{3}\pi r^3
+$$
 
-Removing the table or setting `enabled = false` immediately restores the
-ordinary ratcheted ceilings. The next `curvature check` reports every file
-that no longer fits. Spiral records no high-water marks and creates no
-grandfather exceptions.
+$$
+\frac{V(r)}{A(r)}=\frac{r}{3}
+$$
 
-## Adoption workflows
+Volume capacity per unit surface grows linearly with radius. Curvature applies
+that relationship locally and absorbs the constant \(1/3\) into a unit
+calibration: one occupied surface unit has radius one and keeps the base
+ceiling. For every non-vendored governed source file \(f\), its normalized mass
+is
 
-### New Curvature project
+$$
+m_f=\frac{\operatorname{lines}(f)}{B_{\tau(f)}} ,
+$$
 
-Pour the application and enter it:
-
-```bash
-uvx --from "curvature==0.2.6" curvature new app my_app
-cd my_app
-```
-
-Add the Spiral table to `pyproject.toml`:
-
-```toml
-[tool.curvature.spiral]
-enabled = true
-roots = ["app"]
-```
-
-Establish the dependency lock and prove the new tree:
-
-```bash
-uv sync
-./gate.sh
-```
-
-The initial file ceilings remain Python 300, CSS 250, and JavaScript 150.
-The branch span of 13 guides the project from its first growth.
-
-### Existing Curved project
-
-Update the package-owned gate, synchronize the environment, and prove the
-unchanged application first:
-
-```bash
-uv lock --upgrade-package curvature
-uv sync
-./gate.sh
-```
-
-Add the Spiral table to `pyproject.toml`, naming each independent source tree:
-
-```toml
-[tool.curvature.spiral]
-enabled = true
-roots = ["app"]
-```
-
-Application and test trees can advance independently:
-
-```toml
-[tool.curvature.spiral]
-enabled = true
-roots = ["app", "tests"]
-```
-
-Run the complete gate again:
-
-```bash
-./gate.sh
-```
-
-ANOM-152 identifies directories ready to branch. Make those semantic moves,
-rerun the gate, and commit `pyproject.toml`, the upgraded lockfile, and the
-resulting structural changes together.
-
-### Existing project adopting Curvature
-
-Add Curvature as an application dependency when using its runtime:
-
-```bash
-uv add "curvature[fastapi]>=0.2.6,<0.3"
-```
-
-For a gate-first adoption, add it to the development group:
-
-```bash
-uv add --dev "curvature>=0.2.6,<0.3"
-```
-
-Add the Spiral table with the project's source package:
-
-```toml
-[tool.curvature.spiral]
-enabled = true
-roots = ["src/your_package"]
-```
-
-Run the Curvature gate to produce the migration inventory:
-
-```bash
-uv run curvature check
-```
-
-This path adopts Curvature's complete gate contract. Resolve its anomalies,
-then run the project's coverage-producing test command followed by:
-
-```bash
-uv run curvature check
-uv run curvature ratchet
-```
-
-Keep `uv run curvature check` in the project's ordinary gate or CI workflow.
-Commit the dependency lock, `pyproject.toml`, the managed `ratchet.toml` and
-floor badge, gate integration, and structural changes together.
-
-### Disabling Spiral
-
-Keep the source-tree declaration and set:
-
-```toml
-[tool.curvature.spiral]
-enabled = false
-roots = ["app"]
-```
-
-Then run:
-
-```bash
-./gate.sh
-```
-
-The ordinary ceilings apply immediately. ANOM-140 identifies files to bring
-back under those ceilings on the normal maintenance path.
-
-## Mass
-
-Spiral measures source, not files. For each non-vendored governed file:
-
-```text
-file mass = physical lines / default ceiling for its suffix
-tree mass = sum of file mass
-```
-
-The default ceilings define one unit:
+where \(B_{\tau(f)}\) is the stable default unit for its suffix:
 
 | Source | One mass unit |
 |---|---:|
@@ -171,67 +42,169 @@ The default ceilings define one unit:
 | CSS | 250 lines |
 | JavaScript | 150 lines |
 
-Twenty 15-line Python files and one 300-line Python file therefore have the
-same mass. Their shape is different, which the branch law measures
-separately. Empty files, excluded directories, and `static/vendor/` do not
-contribute.
+The occupied surface of directory \(D\) is
 
-The tree's **Spiral scale** is the greatest Fibonacci threshold not exceeding
-its mass:
+$$
+A_D=\sum_{f\in\operatorname{direct}(D)}\min(1,m_f).
+$$
 
-```text
-scale(M) = max { F ∈ 1, 2, 3, 5, 8, 13, 21, 34, ... | F ≤ M }
-```
+Each file contributes in proportion to its size until it occupies one full
+unit. The clamp is load-bearing: a 600-line Python file still occupies one
+unit and cannot buy permission for its own excess. A tiny helper contributes
+only a tiny fraction, so splitting off stubs is not a capacity exploit.
 
-Discrete thresholds keep ordinary edits from continuously moving the limit.
+The normalized radius is
 
-## Leaf growth
+$$
+R_D=\max(1,\sqrt{A_D}),
+$$
 
-A tree stays at its ordinary ceilings through scale 13. Beyond that:
+and a healthy file's effective ceiling is
 
-```text
-growth(scale) = √(scale / 13)
-healthy leaf ceiling = round(ratcheted ceiling × growth)
-```
+$$
+C_f=\operatorname{round}(B_fR_D),
+$$
 
-For the default Python ceiling:
+where \(B_f\) is the project's ratcheted base ceiling for that language.
+Grandfather exceptions remain exact pins and are never multiplied.
 
-| Spiral scale | Python ceiling |
-|---:|---:|
-| 13 | 300 |
-| 21 | 381 |
-| 34 | 485 |
-| 55 | 617 |
-| 89 | 785 |
-| 144 | 998 |
-| 233 | 1,270 |
+For the default Python base:
 
-The sequence has no final cap. When project mass advances by approximately
-the golden ratio, local file capacity advances by its square root. The other
-square root of growth must be carried by the tree's structure.
+| Occupied local surface | Radius | Python ceiling |
+|---:|---:|---:|
+| 1 | 1.000 | 300 |
+| 2 | 1.414 | 424 |
+| 3 | 1.732 | 520 |
+| 5 | 2.236 | 671 |
+| 8 | 2.828 | 849 |
+| 12 | 3.464 | 1,039 |
 
-Grandfather exceptions remain exact pins; Spiral does not multiply them.
+The law has no artificial growth stages and no global reservoir. Direct source
+files are leaves on one local surface. Child directories are branches into new
+local bodies with their own surface and radius. Code elsewhere in the project
+cannot buy room here.
 
-## Branch growth
+## The coordination bound
 
-A directory may have at most 13 meaningful direct children. Eight is the
-comfortable target; when a branch crosses 13, `8 + 5` is the suggested
-partition, not a required naming scheme.
+A directory may have at most twelve meaningful direct children. Twelve is the
+three-dimensional kissing number: at most twelve equal spheres can touch one
+equal central sphere without overlap. Curvature uses that natural coordination
+limit as the point where a flat collection must reveal another level of
+structure.
 
 A meaningful child is either:
 
 - a non-empty governed source file directly in the directory; or
 - a direct child directory containing non-empty governed source.
 
-The branch span never rises with total project mass. Total capacity grows
-without bound through recursive branching, not through ever larger sibling
-lists.
+Empty markers, excluded caches, and vendored source do not count. ANOM-152
+reports the thirteenth child. Files directly inside a crowded directory retain
+their ordinary ratcheted ceiling until the directory branches.
 
-ANOM-152 reports crowded directories. Files whose immediate directory is
-crowded retain the ordinary ratcheted ceiling until that directory branches.
-A one-file component directory is healthy and receives the tree's full
-scaled ceiling.
+The inverse also matters: a branch with no leaves is structural debris.
+ANOM-153 reports a source directory left with only cache archaeology or missing
+tracked files. Its remedy is singular: prune the hollow directory.
 
-Spiral does not move files, infer architecture, recombine prior splits, or
-grandfather the files it permits to grow. It supplies the gradient; the
-maintainer still names the branches.
+Spiral measures shape; it does not move or recombine code. Turning it on never
+joins previously separated files. Turning it off reapplies the ordinary
+ceilings, and the next gate reports files that need attention on the ordinary
+maintenance path.
+
+## Adoption workflows
+
+### New Curvature project
+
+Pour the application and prove its initial geometry:
+
+```bash
+uvx --from "curvature==0.3.0" curvature new app my_app
+cd my_app
+uv sync
+./gate.sh
+```
+
+Spiral is already active over the whole project. Add configuration only if the
+project has independent source domains.
+
+### Existing Curved project
+
+Update the package-owned runtime and gate, then run the application's complete
+proof:
+
+```bash
+uv lock --upgrade-package curvature
+uv sync
+./gate.sh
+```
+
+Spiral becomes active when the new gate reads the existing `pyproject.toml`.
+ANOM-152 identifies flat directories ready to branch; ANOM-140 identifies
+leaves beyond their local radius. Make those semantic changes as normal
+reviewed edits and rerun the gate.
+
+For unusual repositories, independent roots keep unrelated domains separate:
+
+```toml
+[tool.curvature.spiral]
+roots = ["src/example", "tests"]
+```
+
+Roots must exist, stay inside the project, and not overlap.
+
+### Existing project adopting Curvature
+
+Add Curvature as an application dependency when using its runtime:
+
+```bash
+uv add "curvature[fastapi]>=0.3,<0.4"
+```
+
+For gate-only adoption, add it to the development group:
+
+```bash
+uv add --dev "curvature>=0.3,<0.4"
+```
+
+Run the gate to produce the migration inventory:
+
+```bash
+uv run curvature check
+```
+
+Resolve its anomalies, run the project's coverage-producing test command, then
+run:
+
+```bash
+uv run curvature check
+uv run curvature ratchet
+```
+
+Keep `uv run curvature check` in the project's ordinary gate or CI workflow.
+
+## Explicit controls
+
+The default whole-project body is equivalent to:
+
+```toml
+[tool.curvature.spiral]
+enabled = true
+roots = ["."]
+```
+
+To separate unrelated source domains:
+
+```toml
+[tool.curvature.spiral]
+roots = ["src/example", "tests"]
+```
+
+To switch Spiral off:
+
+```toml
+[tool.curvature.spiral]
+enabled = false
+```
+
+Run the complete gate after either change. Switching boundaries or disabling
+Spiral changes only computed ceilings; it creates no history, hidden state, or
+automatic source rewrite.

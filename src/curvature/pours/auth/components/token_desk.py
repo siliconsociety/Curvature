@@ -3,10 +3,9 @@ agents. The token is shown exactly once, then only its hash exists."""
 
 from __future__ import annotations
 
-from satellites.auth.store import TokenRecord
-
 from curvature import Element, Props
 from curvature import html as h
+from satellites.auth.store import TokenRecord
 
 
 class TokenDeskProps(Props):

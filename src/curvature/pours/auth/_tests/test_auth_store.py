@@ -3,6 +3,7 @@
 from concurrent.futures import ThreadPoolExecutor
 
 import pytest
+
 from satellites.auth.store import (
     ChallengeRecord,
     DuplicateUserError,

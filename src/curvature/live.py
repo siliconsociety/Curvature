@@ -20,7 +20,7 @@ from collections.abc import AsyncIterator
 
 from starlette.responses import StreamingResponse
 
-from curvature.errors import Anomaly
+from curvature.core.errors import Anomaly
 from curvature.html import Element, render
 
 SSE_HEADERS = {

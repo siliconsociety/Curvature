@@ -13,7 +13,7 @@ import math
 import sys
 from pathlib import Path
 
-from curvature.gate import bounds, checks, scaffold, spiral
+from curvature.gate import bounds, checks, scaffold, shape, spiral
 from curvature.gate.css import check_orphan_css
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
@@ -28,6 +28,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *spiral_config_findings,
         *bounds.check_ceilings(root, ratchet, spiral_protocol),
         *(spiral_protocol.branch_findings() if spiral_protocol else []),
+        *shape.check_hollow_branches(root),
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
         *checks.check_dom_sins(root),
@@ -46,7 +47,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         f"curvature-allow census: {checks.pragma_census(root)} pragmas",
     ]
     if spiral_protocol:
-        info.extend(spiral_protocol.info(ratchet))
+        info.extend(spiral_protocol.info())
     report = root / "coverage.json"
     if report.exists():
         percent = json.loads(report.read_text())["totals"]["percent_covered"]

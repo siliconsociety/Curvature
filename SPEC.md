@@ -125,8 +125,8 @@ current size and may only shrink. *Why:* the 10,000-line file is never
 written; it accretes. The ceiling forces the split while the split is
 cheap. *Enforcement:* ratchet (ANOM-140) — `curvature check` fails any file
 over its bound; `curvature ratchet` lowers bounds to current actuals and
-never raises them. The optional Spiral protocol (C-602) derives a larger
-effective ceiling for files on healthy branches without changing the
+never raises them. The default Spiral protocol (C-602) derives a larger
+effective ceiling from a file's healthy local body without changing the
 ratcheted base or creating a grandfather exception.
 
 **C-401 · Coverage floor.**
@@ -141,11 +141,11 @@ Human edits to `ratchet.toml` that loosen any bound are anomalies.
 looser than the recorded tightest-known state is refused).
 
 **C-403 · Versions move like ratchets.**
-Every publish tags `v{version}`; a tagged version with commits past it
-is stale and must be bumped before anything else lands. *Why:* the bump
-is the release step everyone forgets — so it is not remembered, it is
-checked. *Enforcement:* gate (ANOM-143: tag-for-current-version exists
-and HEAD has moved past it; silent where git or the tag is absent).
+Every released version has a `v{version}` tag; a tagged version with commits
+past it is stale and must be bumped before anything else lands. *Why:* the bump
+is the release step everyone forgets — so it is not remembered, it is checked.
+*Enforcement:* gate (ANOM-143: tag-for-current-version exists and HEAD has
+moved past it; silent where git or the tag is absent).
 
 ## 5. Fragments and the boost protocol
 
@@ -206,16 +206,35 @@ able to answer "who calls this?" with grep.
 *Enforcement:* gate (ANOM-151, landed: `__init_subclass__` and
 `metaclass=` are findings — the manifold refuses invisible machinery).
 
-**C-602 · Spiral growth is massive and locally bounded.**
-Projects may opt source trees into Spiral in `pyproject.toml`. Each tree's
-mass is the sum of its governed source lines normalized by the default
-per-language ceiling. The greatest crossed Fibonacci threshold is its scale;
-from scale 13, healthy file ceilings grow by `sqrt(scale / 13)` while every
-directory retains a fixed span of 13 meaningful children. Crowded directories
-keep their ordinary file ceilings until they branch. *Why:* mature projects
-need more room without teaching the trunk to accept unlimited leaves.
-*Enforcement:* gate (ANOM-140 applies the effective ceiling; ANOM-152 reports
-invalid Spiral configuration and directories over the branch span).
+**C-602 · Spiral growth follows local surface and volume.**
+Spiral is on by default for projects with `pyproject.toml`. For each direct
+source file, normalized mass is its physical lines divided by the stable
+default ceiling for its suffix. A directory's occupied surface is
+`A = Σ min(1, mass)` over those direct leaves, its normalized radius is
+`R = max(1, √A)`, and each healthy leaf receives
+`round(ratcheted base × R)`. Child directories form independent local bodies;
+distant project mass cannot inflate a leaf, and a leaf's contribution is
+clamped so it cannot buy its own excess. Every directory has a
+twelve-meaningful-child coordination bound. Crowded directories keep their
+ordinary file ceilings until they branch. Explicit non-overlapping roots may
+separate unrelated domains; `enabled = false` opts out without creating
+history or exceptions. *Why:* volume capacity per surface grows with the
+radius of a sphere, while the three-dimensional kissing number supplies a
+natural local coordination limit. Mature projects gain room without teaching
+the trunk to accept unlimited leaves. *Enforcement:* gate (ANOM-140 applies
+the effective ceiling; ANOM-152 reports invalid Spiral configuration and
+directories over the coordination bound).
+
+**C-603 · Hollow branches are pruned.**
+A source directory with no meaningful files is an anomaly when the workspace
+retains evidence that code occupied it: orphaned Python cache artifacts or
+paths tracked at `HEAD` that are now absent. An empty directory without such
+evidence may be an intentional runtime boundary; an empty package marker is a
+real file. *Why:* dead branches preserve a false map of the project and make
+agents search responsibilities that no longer exist. Evidence identifies the
+debris; the gate directs one action. *Enforcement:* gate (ANOM-153 reports the
+highest hollow branch beneath a live ancestor; its sole remedy is to prune that
+directory).
 
 ## 7. Satellites
 
@@ -310,17 +329,18 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-140 | C-400 | file lines over ceiling |
 | ANOM-141 | C-401 | coverage below floor |
 | ANOM-142 | C-402 | ratchet bound looser than tightest-known |
-| ANOM-143 | C-403 | published version with commits past its tag |
+| ANOM-143 | C-403 | tagged version with commits past its tag |
 | ANOM-150 | C-600 | orphan CSS class selector |
 | ANOM-151 | C-601 | registration magic (__init_subclass__, metaclass) |
 | ANOM-152 | C-602 | invalid Spiral configuration or directory over branch span |
+| ANOM-153 | C-603 | hollow source branch retaining evidence of removed leaves |
 | ANOM-161 | C-802 | satellite manifest disagrees with its directory |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 
 Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a
 `curvature-allow` pragma with a reason. Enforcement code and tests that
 exercise refusals must spell the forbidden words; the pragma keeps them
-buildable while staying greppable — and `curvature check` publishes the
+buildable while staying greppable — and `curvature check` reports the
 pragma census on every run, so the escape hatch can never go quietly.
 
 A curved repo is one where `curvature check` exits 0 and has *teeth it

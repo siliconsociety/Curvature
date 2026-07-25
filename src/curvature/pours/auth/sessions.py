@@ -8,9 +8,10 @@ from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request
+from starlette.responses import Response
+
 from satellites.auth.security import hash_token, new_session_token
 from satellites.auth.store import AuthStore, SessionRecord, UserRecord
-from starlette.responses import Response
 
 SESSION_COOKIE = "curvature_session"
 WRITE_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})

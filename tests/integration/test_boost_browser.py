@@ -14,7 +14,7 @@ from playwright.sync_api import Browser, expect, sync_playwright
 
 from curvature.live import TERMINAL_SIGNAL
 
-BOOST = Path(__file__).parent.parent / "src/curvature/static/curvature.js"
+BOOST = Path(__file__).parents[2] / "src/curvature/static/curvature.js"
 
 
 def _page(fragment: str) -> str:

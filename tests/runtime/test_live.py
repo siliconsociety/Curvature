@@ -67,7 +67,7 @@ def test_the_tower_streams_its_state(tmp_path):
     from demo.app import _tower_events
     from demo.roadmap_store import RoadmapStore
 
-    seed = Path(__file__).parent.parent / "demo" / "data" / "roadmap.json"
+    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
     working = tmp_path / "roadmap.json"
     shutil.copy(seed, working)
     store = RoadmapStore(working)
@@ -88,7 +88,7 @@ def test_store_version_tracks_the_file(tmp_path):
 
     from demo.roadmap_store import RoadmapStore
 
-    seed = Path(__file__).parent.parent / "demo" / "data" / "roadmap.json"
+    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
     working = tmp_path / "roadmap.json"
     shutil.copy(seed, working)
     store = RoadmapStore(working)

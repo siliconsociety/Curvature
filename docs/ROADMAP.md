@@ -4,7 +4,7 @@ The living roadmap is the Pit Board at `/`, backed by
 `demo/data/roadmap.json` and exposed through Curvature's own Chart. This file
 records the decisions that would otherwise be easy to misremember.
 
-## Current direction (2026-07-12)
+## Current direction (2026-07-25)
 
 - Curvature is an alpha contract and runtime being hardened for production;
   a live demo is evidence of deployability, not proof of readiness.
@@ -23,14 +23,18 @@ records the decisions that would otherwise be easy to misremember.
   contract.
 - Satellite manifests now declare only what capture enforces: identity,
   router, and components. Assets, mass, and rule-pack claims were removed.
-- The Valet is an owner-side Codex skill, not framework runtime or a resident
-  satellite. Publishing and deployment remain explicit owner actions.
+- Spiral is the default project geometry in 0.3.0. Direct leaves occupy local
+  surface, healthy capacity grows by radius, and twelve meaningful neighbors
+  force a semantic branch.
+- Repository instructions, the gate, and checked-in verification scripts are
+  the complete agent control plane. Consumer agents need no framework-specific
+  skill for ordinary edits.
 
 ## Next evidence
 
 - Green gates on Python 3.12, 3.13, and 3.14.
-- Build the wheel, install it into a clean stranger environment, scaffold an
-  app, pour Auth, and run the resulting app's gate.
+- Run `scripts/verify-package.sh` to build both artifacts, install them into
+  clean environments, scaffold a stranger app, pour Auth, and run its gate.
 - Keep the public site on the latest released framework and verify its HTML,
   Chart, security headers, and health endpoint against the live deployment.
 - Publish performance and operational measurements only when reproducible.

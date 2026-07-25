@@ -11,7 +11,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from curvature.errors import Anomaly
+from curvature.core.errors import Anomaly
 
 
 class Satellite(BaseModel):

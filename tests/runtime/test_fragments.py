@@ -1,9 +1,11 @@
+import importlib
+
 import pytest
 from starlette.requests import Request
 
 from curvature import Anomaly, respond
 from curvature import html as h
-from curvature.fragments import redirect
+from curvature.core.fragments import redirect
 
 
 def make_request(*, boosted: bool) -> Request:
@@ -13,6 +15,10 @@ def make_request(*, boosted: bool) -> Request:
 
 def shell(*fragments):
     return h.html(h.body(h.main(*fragments)))
+
+
+def test_legacy_fragments_module_path_remains_compatible():
+    assert importlib.import_module("curvature.fragments").redirect is redirect
 
 
 def test_boosted_request_gets_fragments_only():

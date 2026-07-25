@@ -37,6 +37,11 @@ def test_poured_readme_explains_the_update_boundary(poured):
     assert "upgrades never overwrite" in readme
 
 
+def test_poured_config_knows_its_first_party_import_roots(poured):
+    config = (poured / "pyproject.toml").read_text()
+    assert 'known-first-party = ["app", "satellites"]' in config
+
+
 def test_scripts_are_executable(poured):
     for script in ("gate.sh", "run.sh"):
         assert (poured / script).stat().st_mode & 0o111

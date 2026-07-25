@@ -1,6 +1,6 @@
 [project]
 name = "curvature"
-version = "0.2.6"
+version = "0.3.0"
 description = "A web framework for code that agents maintain. The right path is free fall."
 readme = "README.md"
 license = "MIT"
@@ -63,6 +63,9 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["app", "satellites"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
@@ -79,7 +82,7 @@ typeCheckingMode = "standard"
 source = ["src/curvature"]
 branch = true
 # The badge is core-runtime coverage. Poured Auth is executed separately
-# from a fresh stranger app by tests/test_poured_auth_integration.py.
+# from a fresh stranger app by tests/integration/test_poured_auth_integration.py.
 omit = ["src/curvature/pours/*"]
 
 [tool.coverage.report]

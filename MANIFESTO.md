@@ -98,11 +98,13 @@ header, never by one template.
 
 **6. Ratchets only tighten; healthy trees may Spiral.** Coverage floors rise.
 Base file ceilings fall. The numbers live in a file the tooling owns, and the
-tooling turns the mechanism one way. A project may opt into Fibonacci growth:
-cohesive files earn room slowly, while local branch span stays fixed forever.
+tooling turns the mechanism one way. Spiral is the default geometry: direct
+leaves occupy a directory's surface, healthy capacity grows with its radius,
+and twelve meaningful neighbors are the coordination bound. An oversized leaf
+cannot manufacture its own room, and distant mass cannot swell a local body.
 The day a file or directory outruns its geometry, the gate forces structure
-*while structure is still cheap*. Structure decays wherever the gate is
-silent, so the gate is not silent.
+*while structure is still cheap*. Structure decays wherever the gate is silent,
+so the gate is not silent.
 
 **7. Documentation is written for the maintainer.** The maintainer is an
 agent. AGENTS.md is the canonical documentation; the README is a courtesy

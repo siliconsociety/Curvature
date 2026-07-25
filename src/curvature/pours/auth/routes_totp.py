@@ -7,8 +7,10 @@ import json
 import time
 from typing import Annotated
 
-from app.components.shell import shell
 from fastapi import APIRouter, Form, Request
+
+from app.components.shell import shell
+from curvature import redirect, respond
 from satellites.auth.components.totp_desk import (
     TotpChallengeProps,
     TotpSetupProps,
@@ -29,8 +31,6 @@ from satellites.auth.sessions import (
     start_session,
 )
 from satellites.auth.store import ChallengeRecord
-
-from curvature import redirect, respond
 
 router = APIRouter()
 

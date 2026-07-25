@@ -7,8 +7,9 @@ import re
 import time
 
 import pytest
-from app.main import app
 from fastapi.testclient import TestClient
+
+from app.main import app
 from satellites.auth.security import totp_code
 from satellites.auth.sessions import SESSION_COOKIE, AuthConfig
 
@@ -142,6 +143,7 @@ def test_default_oidc_verifier_checks_the_published_key_and_nonce():
     import jwt
     from cryptography.hazmat.primitives.asymmetric import rsa
     from jwt.algorithms import RSAAlgorithm
+
     from satellites.auth.oidc import OIDCProvider, verify_id_token
 
     provider = OIDCProvider(

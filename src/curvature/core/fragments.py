@@ -13,7 +13,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from curvature.chart import build_chart
-from curvature.errors import Anomaly
+from curvature.core.errors import Anomaly
 from curvature.html import Element, render
 
 BOOST_HEADER = "curvature-boost"

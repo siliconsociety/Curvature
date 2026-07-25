@@ -40,29 +40,33 @@ A release that needs copied source to change must carry a migration note with:
 Owners apply that migration as a normal reviewed change. Re-pouring over local
 source is not an upgrade mechanism because it would erase application edits.
 
-## Release flow
+## Update flow
 
-For each Curvature release:
+For each tagged Curvature version:
 
-1. Curvature publishes the runtime and a release-specific note below.
-2. A consumer updates only Curvature in its lockfile.
-3. The consumer applies any named source migration.
-4. The consumer runs its complete gate and exercises affected browser or
+1. A consumer updates only Curvature in its lockfile.
+2. The consumer applies any named source migration.
+3. The consumer runs its complete gate and exercises affected browser or
    deployment surfaces.
-5. The consumer commits the lockfile and migrations, then deploys explicitly.
+4. The consumer commits the lockfile and migrations, then deploys explicitly.
 
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
-## 0.2.6
+## 0.3.0
 
-Spiral is an optional gate protocol; existing applications retain their
-ordinary ratcheted ceilings and need no migration. To adopt it, add
-`[tool.curvature.spiral]` with the application's independent source roots as
-described in [SPIRAL.md](SPIRAL.md), update the Curvature lock, and run the
-complete gate. Adoption may immediately report ANOM-152 for crowded
-directories. Disabling Spiral immediately restores ordinary ceilings and may
-report ANOM-140 for files that grew while it was active.
+Spiral is now the default gate geometry. Updating an existing application may
+immediately report ANOM-152 for directories with more than twelve meaningful
+children or ANOM-140 for leaves beyond their local surface-derived ceiling.
+These are application-owned structural migrations: branch crowded directories
+by responsibility and split genuinely isolated oversized leaves.
+
+No configuration is required for the default whole-project body. Repositories
+with independent domains may declare non-overlapping `roots`; projects may set
+`enabled = false` to retain ordinary ratcheted ceilings. Switching Spiral off
+immediately reapplies those ceilings and reports every mismatch at the next
+gate. See [SPIRAL.md](SPIRAL.md) for the equations and all three adoption
+workflows.
 
 ## 0.2.5
 

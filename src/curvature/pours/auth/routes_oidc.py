@@ -8,6 +8,8 @@ import time
 import uuid
 
 from fastapi import APIRouter, Request
+
+from curvature import redirect
 from satellites.auth.oidc import (
     authorization_url,
     exchange_code,
@@ -18,8 +20,6 @@ from satellites.auth.routes_totp import stash_pending
 from satellites.auth.security import hash_token, new_session_token
 from satellites.auth.sessions import auth_config, rate_limit, start_session
 from satellites.auth.store import ChallengeRecord, DuplicateUserError, UserRecord
-
-from curvature import redirect
 
 router = APIRouter()
 STATE_SECONDS = 600

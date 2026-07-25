@@ -26,11 +26,11 @@ dependency wherever you want it:
 from __future__ import annotations
 
 from fastapi import APIRouter
+
+from curvature.satellites import Satellite
 from satellites.auth.routes import router as base_router
 from satellites.auth.routes_oidc import router as oidc_router
 from satellites.auth.routes_totp import router as totp_router
-
-from curvature.satellites import Satellite
 
 router = APIRouter()
 router.include_router(base_router)

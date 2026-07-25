@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from html import escape
 from types import MappingProxyType
 
-from curvature.errors import Anomaly
+from curvature.core.errors import Anomaly
 
 type AttrValue = str | int | float | bool | None
 type Child = "Element | Raw | str | int | float | None | Iterable[Child]"

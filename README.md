@@ -169,6 +169,4 @@ fresh-pour Auth integration suite are real and self-hosting. Production
 readiness is earned by the gate and deployment checks, not asserted by the
 version label. The spec is versioned and arguable; argue by issue.
 
-MIT. Built by Robert Sharp, with Claude Fable 5 on its last day on the
-subscription — read the manifesto and you'll see why that detail
-belongs in a README.
+MIT.

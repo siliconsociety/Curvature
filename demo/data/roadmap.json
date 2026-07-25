@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "readme-footer-032",
+      "pit_id": "P22",
+      "title": "0.3.2 — README footer stays current",
+      "lane": "shipped",
+      "note": "Removed the dated model-subscription attribution from the README footer and shipped the correction as 0.3.2."
+    },
+    {
       "id": "ci-node24",
       "pit_id": "P21",
       "title": "Public gate runs on Node 24 actions",

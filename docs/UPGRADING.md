@@ -61,6 +61,43 @@ pour started by a parent repository hook, IDE, or automation process from
 redirecting scaffold Git commands into that parent. The repair changes only the
 package-owned scaffold command; existing application source needs no migration.
 
+New applications also receive the field-report doctrine in their app-owned
+`AGENTS.md`. Existing applications should adopt the same canonical block:
+
+```markdown
+## Field reports
+
+When app work reveals a gap owned by Curvature — the app is reimplementing
+framework responsibility or compensating for a missing check — identify it to
+the operator and offer to file an upstream Curvature issue. Filing requires the
+operator's nod. That authorization permits the upstream issue; it creates no
+issue, attribution policy, or process artifact in this consumer repository. Do
+not silently ship the workaround. A good report names the consumer context and
+mechanism, gives a minimal reproduction, includes measurements where relevant,
+records the temporary workaround and verification performed, and states desired
+behavior as checkable invariants.
+
+Only upstream Curvature field reports and their substantive discussion carry
+model attribution under this contract. Issues, pull requests, commits, and
+ordinary artifacts in this consumer repository are explicitly excluded. When
+making that attribution, use the specific model identity plus its role when
+known. Never guess: read identity from the harness or configuration, ask the
+operator, or use `Unidentified model (role) — operator, please amend` as the
+honest fallback. Model identity is a qualification-ledger key, not complete
+provenance; the report's context, mechanism, reproduction, measurements,
+workaround, and verification remain the causal record.
+```
+
+Adopt it as an application-owned migration:
+
+1. Copy the block into the application's app-owned `AGENTS.md`.
+2. Preserve its upstream-only attribution boundary.
+3. Run the application's `./gate.sh`.
+4. Commit the contract change as an application-owned migration.
+
+Package upgrades never overwrite an existing application's app-owned
+`AGENTS.md`.
+
 ## 0.4.0
 
 Current Starlette test clients use `httpx2`. New Curvature applications no

@@ -38,6 +38,24 @@ def test_poured_readme_explains_the_update_boundary(poured):
     assert "upgrades never overwrite" in readme
 
 
+def test_poured_agents_carries_upstream_field_report_doctrine(poured):
+    contract = " ".join((poured / "AGENTS.md").read_text().split())
+    assert "offer to file an upstream Curvature issue" in contract
+    assert "Filing requires the operator's nod" in contract
+    assert "creates no issue, attribution policy, or process artifact" in contract
+    assert "minimal reproduction" in contract
+    assert "desired behavior as checkable invariants" in contract
+    assert "Only upstream Curvature field reports" in contract
+    assert (
+        "ordinary artifacts in this consumer repository are explicitly excluded"
+        in contract
+    )
+    assert "specific model identity plus its role" in contract
+    assert "Never guess" in contract
+    assert "Unidentified model (role) — operator, please amend" in contract
+    assert "qualification-ledger key, not complete provenance" in contract
+
+
 def test_poured_config_knows_its_first_party_import_roots(poured):
     config = (poured / "pyproject.toml").read_text()
     assert 'known-first-party = ["app", "satellites"]' in config

@@ -29,6 +29,7 @@ def _home() -> str:
         '<a id="same-name" href="#legacy%20target">Named target</a>'
         '<a id="cross-id" href="/fragment-redirect#target%20id">Cross-page ID</a>'
         '<a id="cross-name" href="/fragment-redirect#legacy%20target">Cross-page name</a>'
+        '<a id="cross-bad" href="/fragment-redirect#bad%ZZ">Malformed fragment</a>'
         '<a id="plain" href="/plain">Plain boost</a>'
         '<div style="height: 1200px"></div>'
         '<h2 id="target id">decoded ID</h2>'
@@ -45,6 +46,8 @@ def _fragment_page() -> str:
         '<h2 id="target id">cross-page target</h2>'
         '<div style="height: 1200px"></div>'
         '<a name="legacy target">cross-page named target</a>'
+        '<div style="height: 1200px"></div>'
+        '<h2 id="bad%ZZ">malformed fragment target</h2>'
         "</section>"
     )
 
@@ -132,6 +135,7 @@ def test_same_page_fragments_and_history_stay_native(page, fragment_url):
     [
         ("cross-id", "target%20id", "#target\\ id"),
         ("cross-name", "legacy%20target", 'a[name="legacy target"]'),
+        ("cross-bad", "bad%ZZ", '[id="bad%ZZ"]'),
     ],
 )
 def test_cross_page_fragment_survives_boosted_redirect(

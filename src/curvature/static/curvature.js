@@ -7,8 +7,8 @@
   const fallback = (url) => location.assign(url);
   const scrollToFragment = (url) => {
     if (!url.hash) return;
-    let id;
-    try { id = decodeURIComponent(url.hash.slice(1)); } catch { return; }
+    let id = url.hash.slice(1);
+    try { id = decodeURIComponent(id); } catch {}
     const target = document.getElementById(id) || document.querySelector(`a[name="${CSS.escape(id)}"]`);
     if (target) target.scrollIntoView();
     else if (id.toLowerCase() === "top") scrollTo(0, 0);

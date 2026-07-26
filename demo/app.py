@@ -1,7 +1,7 @@
-"""Pit Board — the living roadmap, and the canonical Curvature demo.
+"""Pit Board — an illustrative release-history Curvature demo.
 
-One page. The tower streams itself: change a card through git or an
-editor and every open browser updates. Git keeps the time.
+One page. The tower streams itself: change its file-backed demonstration
+data and every open browser updates.
 
 Run it:  uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1
 (the flag matters: Live holds connections open, and graceful shutdown
@@ -44,8 +44,8 @@ def _tower_fragment(store: RoadmapStore):
 async def board(request: Request):
     return respond(
         request, _tower_fragment(request.app.state.roadmap_store), shell=shell,
-        purpose="The living Curvature roadmap: current work, what comes next, "
-                "and recently shipped changes, reflected live from git.",
+        purpose="An illustrative Curvature release-history board, reflected "
+                "live from file-backed demonstration data.",
     )
 
 

@@ -1,7 +1,4 @@
-"""The living roadmap's store: a JSON file checked into the repo. Single
-writer, whole-file rewrites — the honest tier, chosen on purpose: git
-is the audit trail, diffs are the changelog, and the markdown this
-replaces never had transactions either."""
+"""The Pit Board demo store: file-backed state with whole-file rewrites."""
 
 from __future__ import annotations
 

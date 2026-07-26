@@ -89,8 +89,8 @@ def lap(props: LapProps) -> Element:
   it with httpx — which executes no JS — so the degraded path is the
   tested path, permanently.
 - **Pages keep themselves current.** Live (SSE) pushes updates into
-  every open browser — the demo's roadmap redraws when anyone ships a
-  card — with zero app JavaScript.
+  every open browser — the demo board redraws whenever its file-backed
+  data changes — with zero app JavaScript.
 - **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
   GET forms into fragment swaps. Mutating forms stay native, so a lost
   connection can never turn a POST into the wrong GET. Native submitter
@@ -138,7 +138,8 @@ the directory and ask for a feature — the repo is the prompt.
 
 ## The demo
 
-PyPI ships the framework; the repo ships Pit Board, the demo:
+PyPI ships the framework; the repo ships Pit Board, an illustrative
+release-history demo rather than a second project ledger:
 
 ```bash
 git clone https://github.com/siliconsociety/Curvature && cd Curvature

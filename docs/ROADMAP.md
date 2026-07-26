@@ -1,8 +1,11 @@
-# Roadmap archive
+# Project direction and release archive
 
-The living roadmap is the Pit Board at `/`, backed by
-`demo/data/roadmap.json` and exposed through Curvature's own Chart. This file
-records the decisions that would otherwise be easy to misremember.
+GitHub issues hold intake and technical discussion, open pull requests show
+active work, and merged pull requests plus releases record what shipped.
+Pit Board at `/` is an illustrative release-history demo backed by
+`demo/data/roadmap.json` and exposed through Curvature's own Chart. It is not a
+second project ledger. This file records longer-lived decisions that would
+otherwise be easy to misremember.
 
 ## Current direction (2026-07-25)
 

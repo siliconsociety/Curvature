@@ -16,7 +16,7 @@ BOOST = Path(__file__).parents[2] / "src/curvature/static/curvature.js"
 
 def _page(fragment: str) -> str:
     return (
-        "<!doctype html><html><head>"
+        '<!doctype html><html><head><meta charset="utf-8">'
         '<script src="/curvature.js" defer></script></head>'
         f'<body data-boost><main>{fragment}</main></body></html>'
     )
@@ -30,6 +30,8 @@ def _home() -> str:
         '<a id="cross-id" href="/fragment-redirect#target%20id">Cross-page ID</a>'
         '<a id="cross-name" href="/fragment-redirect#legacy%20target">Cross-page name</a>'
         '<a id="cross-bad" href="/fragment-redirect#bad%ZZ">Malformed fragment</a>'
+        '<a id="cross-mixed" href="/fragment-redirect#mixed%20value%ZZ">Mixed fragment</a>'
+        '<a id="cross-utf8" href="/fragment-redirect#invalid%FFutf8">Invalid UTF-8</a>'
         '<a id="plain" href="/plain">Plain boost</a>'
         '<div style="height: 1200px"></div>'
         '<h2 id="target id">decoded ID</h2>'
@@ -48,6 +50,10 @@ def _fragment_page() -> str:
         '<a name="legacy target">cross-page named target</a>'
         '<div style="height: 1200px"></div>'
         '<h2 id="bad%ZZ">malformed fragment target</h2>'
+        '<div style="height: 1200px"></div>'
+        '<h2 id="mixed value%ZZ">mixed fragment target</h2>'
+        '<div style="height: 1200px"></div>'
+        '<h2 id="invalid�utf8">invalid UTF-8 target</h2>'
         "</section>"
     )
 
@@ -136,6 +142,8 @@ def test_same_page_fragments_and_history_stay_native(page, fragment_url):
         ("cross-id", "target%20id", "#target\\ id"),
         ("cross-name", "legacy%20target", 'a[name="legacy target"]'),
         ("cross-bad", "bad%ZZ", '[id="bad%ZZ"]'),
+        ("cross-mixed", "mixed%20value%ZZ", '[id="mixed value%ZZ"]'),
+        ("cross-utf8", "invalid%FFutf8", '[id="invalid�utf8"]'),
     ],
 )
 def test_cross_page_fragment_survives_boosted_redirect(

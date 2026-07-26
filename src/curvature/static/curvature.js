@@ -7,8 +7,8 @@
   const fallback = (url) => location.assign(url);
   const scrollToFragment = (url) => {
     if (!url.hash) return;
-    let id = url.hash.slice(1);
-    try { id = decodeURIComponent(id); } catch {}
+    // Form decoding is forgiving UTF-8; protect query separators that fragments keep literal.
+    const id = new URLSearchParams("x=" + url.hash.slice(1).replace(/[+&]/g, encodeURIComponent)).get("x");
     const target = document.getElementById(id) || document.querySelector(`a[name="${CSS.escape(id)}"]`);
     if (target) target.scrollIntoView();
     else if (id.toLowerCase() === "top") scrollTo(0, 0);

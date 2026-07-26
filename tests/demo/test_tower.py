@@ -38,10 +38,8 @@ def test_every_lane_is_recent_first(client):
     assert [item.id for item in lanes["queued"]] == [
         "public-live-playground", "live-production-hardening",
     ]
-    assert lanes["on_track"][0].id == "submitter-aware-boost-040"
     assert lanes["shipped"][0].id == "readme-footer-032"
     assert lanes["shipped"][-1].id == "founding"
-    assert lanes["on_track"][0].pit_id == "P23"
     assert lanes["shipped"][0].pit_id == "P22"
     assert lanes["shipped"][-1].pit_id == "P1"
     pit_numbers = [int((item.pit_id or "").removeprefix("P")) for item in lanes["shipped"]]

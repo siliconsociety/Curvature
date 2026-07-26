@@ -95,8 +95,10 @@ def lap(props: LapProps) -> Element:
   GET forms into fragment swaps. Mutating forms stay native, so a lost
   connection can never turn a POST into the wrong GET. Native submitter
   overrides remain native semantics, and enhanced submissions expose
-  `aria-busy` and `data-curvature-pending` while intent is in flight. Same
-  route, same render, one header of difference.
+  `aria-busy` and `data-curvature-pending` while intent is in flight.
+  Same-page fragment links and their history stay browser-native; cross-page
+  boosts preserve and scroll to their fragment after swapping. Same route,
+  same render, one header of difference.
 - **The ratchet only tightens; healthy trees Spiral.** Base file ceilings
   fall, the coverage floor rises, and `curvature ratchet` is the only hand on
   the mechanism. Local occupied surface lets related leaves grow by radius,

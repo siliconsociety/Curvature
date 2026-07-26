@@ -53,6 +53,15 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
+## 0.4.2
+
+The boost layer now leaves same-page fragment navigation and its history
+traversal to the browser. Cross-page boosted navigation preserves fragments
+through redirects and scrolls to the resolved target after swapping. This is a
+package-only runtime correction: update Curvature in the application lockfile,
+sync the environment, exercise affected links in a real browser, and deploy.
+No application-owned source migration is required.
+
 ## 0.4.1
 
 `curvature new app` now removes repository-local Git environment variables

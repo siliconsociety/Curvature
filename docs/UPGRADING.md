@@ -62,25 +62,41 @@ redirecting scaffold Git commands into that parent. The repair changes only the
 package-owned scaffold command; existing application source needs no migration.
 
 New applications also receive the field-report doctrine in their app-owned
-`AGENTS.md`. Existing applications should adopt that clause deliberately:
-instruct agents to identify framework-owned gaps to the operator and offer an
-upstream Curvature issue, file only with the operator's nod, and never create a
-corresponding issue, attribution policy, or process artifact in the consumer
-repository. A report should carry its context, mechanism, minimal reproduction,
-measurements where relevant, temporary workaround, desired behavior as
-checkable invariants, and verification.
+`AGENTS.md`. Existing applications should adopt the same canonical block:
 
-Scope attribution only to upstream Curvature field reports and substantive
-discussion, never consumer-repository issues, pull requests, commits, or
-ordinary artifacts. Use the specific model identity plus role when known; read
-it from the harness or configuration or ask the operator, and never guess. When
-identity remains unavailable, use an honest unidentified-model fallback for the
-operator to amend. Model identity is a qualification-ledger key, not complete
-provenance, so it does not replace the report body.
+```markdown
+## Field reports
 
-This is an application-owned contract migration: package upgrades never
-overwrite an existing application's `AGENTS.md`. Review and add the clause
-locally, then run `./gate.sh`.
+When app work reveals a gap owned by Curvature — the app is reimplementing
+framework responsibility or compensating for a missing check — identify it to
+the operator and offer to file an upstream Curvature issue. Filing requires the
+operator's nod. That authorization permits the upstream issue; it creates no
+issue, attribution policy, or process artifact in this consumer repository. Do
+not silently ship the workaround. A good report names the consumer context and
+mechanism, gives a minimal reproduction, includes measurements where relevant,
+records the temporary workaround and verification performed, and states desired
+behavior as checkable invariants.
+
+Only upstream Curvature field reports and their substantive discussion carry
+model attribution under this contract. Issues, pull requests, commits, and
+ordinary artifacts in this consumer repository are explicitly excluded. When
+making that attribution, use the specific model identity plus its role when
+known. Never guess: read identity from the harness or configuration, ask the
+operator, or use `Unidentified model (role) — operator, please amend` as the
+honest fallback. Model identity is a qualification-ledger key, not complete
+provenance; the report's context, mechanism, reproduction, measurements,
+workaround, and verification remain the causal record.
+```
+
+Adopt it as an application-owned migration:
+
+1. Copy the block into the application's app-owned `AGENTS.md`.
+2. Preserve its upstream-only attribution boundary.
+3. Run the application's `./gate.sh`.
+4. Commit the contract change as an application-owned migration.
+
+Package upgrades never overwrite an existing application's app-owned
+`AGENTS.md`.
 
 ## 0.4.0
 

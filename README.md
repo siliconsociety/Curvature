@@ -93,13 +93,20 @@ def lap(props: LapProps) -> Element:
   card — with zero app JavaScript.
 - **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
   GET forms into fragment swaps. Mutating forms stay native, so a lost
-  connection can never turn a POST into the wrong GET. Same route, same
-  render, one header of difference.
+  connection can never turn a POST into the wrong GET. Native submitter
+  overrides remain native semantics, and enhanced submissions expose
+  `aria-busy` and `data-curvature-pending` while intent is in flight. Same
+  route, same render, one header of difference.
 - **The ratchet only tightens; healthy trees Spiral.** Base file ceilings
   fall, the coverage floor rises, and `curvature ratchet` is the only hand on
   the mechanism. Local occupied surface lets related leaves grow by radius,
   while a twelve-neighbor coordination bound keeps branches navigable. The
   10,000-line dumping ground and the 160-file trunk remain anomalies.
+
+Drafting belongs to native controls: text, selection, and open details stay in
+the browser while the operator edits. Server-derived or persisted state earns
+a round trip and an identified fragment replacement. Pending attributes bridge
+those two moments without pretending the server has already accepted anything.
 
 ## Start from nothing
 

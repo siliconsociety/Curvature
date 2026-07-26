@@ -61,6 +61,28 @@ This repository is the agent control plane. AGENTS.md and `./gate.sh` are
 sufficient for ordinary work; do not invoke a framework-specific agent skill
 for each edit.
 
+## Field reports
+
+When app work reveals a gap owned by Curvature — the app is reimplementing
+framework responsibility or compensating for a missing check — identify it to
+the operator and offer to file an upstream Curvature issue. Filing requires the
+operator's nod. That authorization permits the upstream issue; it creates no
+issue, attribution policy, or process artifact in this consumer repository. Do
+not silently ship the workaround. A good report names the consumer context and
+mechanism, gives a minimal reproduction, includes measurements where relevant,
+records the temporary workaround and verification performed, and states desired
+behavior as checkable invariants.
+
+Only upstream Curvature field reports and their substantive discussion carry
+model attribution under this contract. Issues, pull requests, commits, and
+ordinary artifacts in this consumer repository are explicitly excluded. When
+making that attribution, use the specific model identity plus its role when
+known. Never guess: read identity from the harness or configuration, ask the
+operator, or use `Unidentified model (role) — operator, please amend` as the
+honest fallback. Model identity is a qualification-ledger key, not complete
+provenance; the report's context, mechanism, reproduction, measurements,
+workaround, and verification remain the causal record.
+
 ## When you finish
 
 Run ./gate.sh. If green and coverage rose, run `uv run curvature ratchet`

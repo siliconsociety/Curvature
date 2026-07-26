@@ -61,6 +61,27 @@ pour started by a parent repository hook, IDE, or automation process from
 redirecting scaffold Git commands into that parent. The repair changes only the
 package-owned scaffold command; existing application source needs no migration.
 
+New applications also receive the field-report doctrine in their app-owned
+`AGENTS.md`. Existing applications should adopt that clause deliberately:
+instruct agents to identify framework-owned gaps to the operator and offer an
+upstream Curvature issue, file only with the operator's nod, and never create a
+corresponding issue, attribution policy, or process artifact in the consumer
+repository. A report should carry its context, mechanism, minimal reproduction,
+measurements where relevant, temporary workaround, desired behavior as
+checkable invariants, and verification.
+
+Scope attribution only to upstream Curvature field reports and substantive
+discussion, never consumer-repository issues, pull requests, commits, or
+ordinary artifacts. Use the specific model identity plus role when known; read
+it from the harness or configuration or ask the operator, and never guess. When
+identity remains unavailable, use an honest unidentified-model fallback for the
+operator to amend. Model identity is a qualification-ledger key, not complete
+provenance, so it does not replace the report body.
+
+This is an application-owned contract migration: package upgrades never
+overwrite an existing application's `AGENTS.md`. Review and add the clause
+locally, then run `./gate.sh`.
+
 ## 0.4.0
 
 Current Starlette test clients use `httpx2`. New Curvature applications no

@@ -110,8 +110,30 @@ framework-specific agent skill.
 
 Issues hold intake and durable technical discussion. An open pull request is
 active work; a merged pull request and its release are shipped work. When a
-field report starts the work, post the maintainer position on its issue before
-implementation so agreement, disagreement, and scope remain visible.
+field report starts the work, post the maintainer technical position on its
+issue before implementation. Record agreement, disagreement, scope corrections,
+and unresolved questions so the reasoning remains visible.
+
+## Field reports
+
+When work on a Curvature consumer reveals a framework-owned gap, identify it to
+the operator and offer to file an upstream Curvature issue. Filing requires the
+operator's nod. That authorization permits the upstream issue; it creates no
+issue, attribution policy, or process artifact in the consumer repository. A
+good report names the consumer context and mechanism, gives a minimal
+reproduction, includes measurements where relevant, records the temporary
+workaround and verification performed, and states desired behavior as checkable
+invariants.
+
+Only upstream Curvature field reports and their substantive discussion carry
+model attribution under this contract. Consumer-repository issues, pull
+requests, commits, and ordinary artifacts are explicitly excluded. When
+making that attribution, use the specific model identity plus its role when
+known. Never guess: read identity from the harness or configuration, ask the
+operator, or use `Unidentified model (role) — operator, please amend` as the
+honest fallback. Model identity is a qualification-ledger key, not complete
+provenance; the report's context, mechanism, reproduction, measurements,
+workaround, and verification remain the causal record.
 
 Pit Board is an illustrative release-history demo, not a second project
 ledger. Ordinary work does not add or move its cards.

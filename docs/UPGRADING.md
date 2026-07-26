@@ -53,6 +53,14 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
+## 0.4.0
+
+Current Starlette test clients use `httpx2`. New Curvature applications no
+longer include the deprecated `httpx` fallback in their development
+dependencies. Existing applications may remove that unused fallback with
+`uv remove --dev httpx`, regenerate their lock, and run `./gate.sh`. Keep
+`httpx` only if application code deliberately adopted it for other HTTP work.
+
 ## 0.3.0
 
 Spiral is now the default gate geometry. Updating an existing application may

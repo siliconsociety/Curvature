@@ -1,6 +1,7 @@
 import ast
 import subprocess
 import sys
+import tomllib
 
 import pytest
 
@@ -40,6 +41,13 @@ def test_poured_readme_explains_the_update_boundary(poured):
 def test_poured_config_knows_its_first_party_import_roots(poured):
     config = (poured / "pyproject.toml").read_text()
     assert 'known-first-party = ["app", "satellites"]' in config
+
+
+def test_poured_config_uses_starlettes_current_test_client(poured):
+    config = tomllib.loads((poured / "pyproject.toml").read_text())
+    dependencies = config["dependency-groups"]["dev"]
+    assert "httpx2" in dependencies
+    assert "httpx" not in dependencies
 
 
 def test_scripts_are_executable(poured):

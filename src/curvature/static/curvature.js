@@ -1,21 +1,11 @@
-/* curvature.js — the boost layer. The only script (C-300).
- *
- * It intercepts working links and GET forms inside a [data-boost]
- * scope, refetches with the Curvature-Boost header, and swaps the returned
- * subtrees by id. Every path out of here on trouble is the same: real
- * navigation to a real URL. The app never needs this file; it only
- * enjoys it.
- */
+/* curvature.js — the sole script (C-300): working navigation, enhanced. */
 (() => {
   "use strict";
 
   const HEADER = { "Curvature-Boost": "1" };
   let navigation;
-
   const sameOrigin = (url) => url.origin === location.origin;
-
   const fallback = (url) => location.assign(url);
-
   const swap = (markup, url, push, soft) => {
     const template = document.createElement("template");
     template.innerHTML = markup;
@@ -26,21 +16,24 @@
         if (!root.id || !document.getElementById(root.id)) return fallback(url);
       }
     }
+    const active = document.activeElement;
+    const focusId = active?.id && roots.some((root) => {
+      const target = root.id && document.getElementById(root.id);
+      return target?.contains(active);
+    }) ? active.id : "";
     for (const root of roots) {
       const target = root.id && document.getElementById(root.id);
       if (target) target.replaceWith(root);
     }
     if (soft) return startLive();
-    for (const root of roots) {
-      const auto = root.querySelector("[autofocus]");
-      if (auto) { auto.focus(); break; }
-    }
+    const auto = roots.map((root) => root.querySelector("[autofocus]")).find(Boolean);
+    if (auto) auto.focus();
+    else if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
     if (push) history.pushState({ curvature: true }, "", url);
     startLive();
   };
 
-  // Live (C-502): each stream belongs to the current root that declares it.
-  // Clean terminal events retire that root; a later replacement starts fresh.
+  // Live (C-502): streams belong to their declaring roots.
   const liveStreams = new Map();
   const endedLive = new WeakSet();
 
@@ -76,25 +69,42 @@
     }
   };
 
-  const boostedFetch = async (url, options, push) => {
-    if (navigation) navigation.abort();
-    navigation = new AbortController();
-    let response;
+  const setPending = (owner, active) => {
+    if (!owner) return;
+    const [form, submitter] = owner;
+    form.toggleAttribute("data-curvature-pending", active);
+    form.setAttribute("aria-busy", active ? "true" : "false");
+    submitter?.toggleAttribute("data-curvature-pending", active);
+  };
+
+  const boostedFetch = async (url, options, push, owner) => {
+    if (navigation) {
+      navigation.controller.abort();
+      setPending(navigation.owner, false);
+    }
+    const current = { controller: new AbortController(), owner };
+    navigation = current;
+    setPending(owner, true);
     try {
-      response = await fetch(url, {
+      const response = await fetch(url, {
         ...options,
         headers: HEADER,
         credentials: "same-origin",
         redirect: "follow",
-        signal: navigation.signal,
+        signal: current.controller.signal,
       });
+      const type = response.headers.get("content-type") || "";
+      if (!response.ok || !type.includes("text/html")) return fallback(response.url || url);
+      swap(await response.text(), response.url, push);
     } catch (error) {
       if (error.name === "AbortError") return;
       return fallback(url);
+    } finally {
+      if (navigation === current) {
+        setPending(owner, false);
+        navigation = undefined;
+      }
     }
-    const type = response.headers.get("content-type") || "";
-    if (!response.ok || !type.includes("text/html")) return fallback(response.url || url);
-    swap(await response.text(), response.url, push);
   };
 
   const boostScope = (node) => node.closest("[data-boost]");
@@ -116,15 +126,20 @@
     if (event.defaultPrevented) return;
     const form = event.target;
     if (!boostScope(form)) return;
-    const url = new URL(form.action, location.href);
+    const submitter = event.submitter;
+    const effective = (attribute, name) => (
+      submitter?.hasAttribute(attribute) ? submitter[`form${name}`] : form[name.toLowerCase()]
+    );
+    const url = new URL(effective("formaction", "Action"), location.href);
     if (!sameOrigin(url)) return;
-    const method = (form.method || "get").toUpperCase();
-    // Mutations stay native. A failed enhanced POST cannot be retried without
-    // risking a duplicate write, so interception would make the baseline less safe.
+    const method = (effective("formmethod", "Method") || "get").toUpperCase();
+    const target = effective("formtarget", "Target");
+    if (target && target !== "_self") return;
+    // Mutations stay native: enhancement never risks replaying a write.
     if (method !== "GET") return;
     event.preventDefault();
-    url.search = new URLSearchParams(new FormData(form, event.submitter)).toString();
-    boostedFetch(url, { method: "GET" }, true);
+    url.search = new URLSearchParams(new FormData(form, submitter || undefined)).toString();
+    boostedFetch(url, { method: "GET" }, true, [form, submitter]);
   });
 
   addEventListener("popstate", () => {

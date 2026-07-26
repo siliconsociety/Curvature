@@ -1,6 +1,6 @@
 # The Curvature Spec
 
-Version 0.2 — 2026-07-12. Protocol of record for the runtime, the gate,
+Version 0.4 — 2026-07-26. Protocol of record for the runtime, the gate,
 and every codebase that claims to be curved.
 
 The rule of this document: **an invariant that names no enforcement is a
@@ -166,7 +166,10 @@ the response. Anything else — a fragment without an id, an id not on the
 page — triggers full navigation to the same URL. *Why:* the failure mode
 of enhancement must be the working baseline, never a broken screen.
 *Enforcement:* construction (`respond()` raises on id-less fragment
-roots) + curvature.js (fallback navigation on any mismatch).
+roots) + curvature.js (fallback navigation on any mismatch). During an
+identified swap, response `autofocus` wins; otherwise a focused element
+inside a replaced root is restored only when the replacement contains
+the same focusable `id`, without deliberately moving the viewport.
 
 **C-502 · Live is the boost swap flowing downhill.**
 A `data-live="<stream>"` attribute opens one EventSource per stream URL;
@@ -188,6 +191,28 @@ interrupted connections retain native EventSource retry behavior.
 *Enforcement:* construction (sse_event refuses anonymous fragments and
 live_stream emits the terminal event) + browser coverage of ownership,
 cleanup, terminal completion, return, and duplicate prevention.
+
+**C-503 · A boosted form keeps native submitter semantics.**
+For an explicitly declared submitter override, `formaction`, `formmethod`,
+and `formtarget` replace the owning form's corresponding values. An absent
+attribute and a null submitter fall back to the form. Curvature enhances only
+same-origin GET submissions targeting the current browsing context; every
+other submission remains native. The successful submitter is included in the
+query. *Why:* enhancement must not reinterpret working HTML, and application
+code must not need a second form interceptor to recover browser semantics.
+*Enforcement:* browser coverage of submitter overrides, form fallback,
+off-target and mutating submissions, null-submitter submission, and the
+no-JavaScript path.
+
+**C-504 · Pending means intent in flight.**
+An enhanced form submission synchronously marks its form with `aria-busy` and
+marks both form and submitter with `data-curvature-pending`. The navigation
+that created those marks owns them: success, failure, or abort clears them,
+and an older completion cannot clear a newer navigation's state. Pending is
+an annotation of operator intent, never optimistic system truth. *Why:* slow
+work needs immediate acknowledgement without inventing client state or a
+correction path. *Enforcement:* browser coverage of success, HTTP fallback,
+network failure, and superseded navigation.
 
 ## 6. Project shape
 

@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "id": "submitter-aware-boost-040",
+      "pit_id": "P23",
+      "title": "0.4.0 — native forms reveal intent in flight",
+      "lane": "on_track",
+      "note": "Addresses issue #2 from OCR Lab. Boosted GET forms honor explicit submitter action, method, and target overrides; expose race-safe pending state; preserve matching focused controls without moving the viewport; and retain native behavior with JavaScript off."
+    },
+    {
       "id": "readme-footer-032",
       "pit_id": "P22",
       "title": "0.3.2 — README footer stays current",

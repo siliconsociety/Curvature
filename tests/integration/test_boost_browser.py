@@ -10,7 +10,7 @@ from threading import Thread
 from urllib.parse import parse_qs, urlparse
 
 import pytest
-from playwright.sync_api import Browser, expect, sync_playwright
+from playwright.sync_api import expect
 
 from curvature.live import TERMINAL_SIGNAL
 
@@ -131,22 +131,6 @@ def live_url():
     server.shutdown()
     thread.join(timeout=2)
     server.server_close()
-
-
-@pytest.fixture(scope="module")
-def chrome():
-    with sync_playwright() as playwright:
-        instance = playwright.chromium.launch(channel="chrome", headless=True)
-        yield instance
-        instance.close()
-
-
-@pytest.fixture
-def page(chrome: Browser):
-    context = chrome.new_context()
-    current = context.new_page()
-    yield current
-    context.close()
 
 
 def test_links_and_get_forms_swap_fragments(page, live_url):

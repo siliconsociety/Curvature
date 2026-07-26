@@ -10,6 +10,7 @@ human or an agent means pointing them at the directory.
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -63,6 +64,25 @@ def _class_name(name: str) -> str:
     return "".join(part.capitalize() for part in name.split("_"))
 
 
+def _scaffold_git_env() -> dict[str, str]:
+    inherited = os.environ.copy()
+    discovery_env = {
+        name: value for name, value in inherited.items() if not name.startswith("GIT_")
+    }
+    local_vars = subprocess.run(
+        ["git", "rev-parse", "--local-env-vars"],
+        capture_output=True,
+        env=discovery_env,
+        text=True,
+        timeout=15,
+    )
+    if local_vars.returncode != 0:
+        return discovery_env
+    for name in local_vars.stdout.splitlines():
+        inherited.pop(name, None)
+    return inherited
+
+
 def new_app(parent: Path, name: str) -> Path:
     """Pour a complete curved app: code, tests, gate, ratchet, AGENTS.md.
     Green from birth; refuses to overwrite; git-initialized when git is
@@ -91,6 +111,7 @@ def new_app(parent: Path, name: str) -> Path:
     (target / ".python-version").write_text("3.14\n")
     save(target, Ratchet())
 
+    git_env = _scaffold_git_env()
     for command in (
         ["git", "init", "--quiet"],
         ["git", "add", "-A"],
@@ -100,7 +121,9 @@ def new_app(parent: Path, name: str) -> Path:
         ["git", "-c", "user.name=curvature", "-c", "user.email=pour@curvature.local",
          "commit", "--quiet", "-m", "Poured by curvature new app"],
     ):
-        done = subprocess.run(command, cwd=target, capture_output=True, timeout=15)
+        done = subprocess.run(
+            command, cwd=target, capture_output=True, env=git_env, timeout=15
+        )
         if done.returncode != 0:
             break
     return target

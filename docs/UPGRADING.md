@@ -53,6 +53,14 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
+## 0.4.1
+
+`curvature new app` now removes repository-local Git environment variables
+before initializing and committing the generated application. This prevents a
+pour started by a parent repository hook, IDE, or automation process from
+redirecting scaffold Git commands into that parent. The repair changes only the
+package-owned scaffold command; existing application source needs no migration.
+
 ## 0.4.0
 
 Current Starlette test clients use `httpx2`. New Curvature applications no

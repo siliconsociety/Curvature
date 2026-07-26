@@ -26,9 +26,10 @@ uv sync
 ./gate.sh
 ```
 
-That updates package-owned code, including `curvature.js`; the versioned asset
-URL makes browsers load the new boost layer. This repo owns every file copied
-here by the app scaffold or a satellite pour, so upgrades never overwrite
-those files. Apply any source migration named in Curvature's
+That updates package-owned code, including the closed `curvature.js` and
+`live.js` client layer; the versioned stable entrypoint propagates its asset
+version to the Live branch. This repo owns every file copied here by the app
+scaffold or a satellite pour, so upgrades never overwrite those files. Apply
+any source migration named in Curvature's
 [upgrade notes](https://github.com/siliconsociety/Curvature/blob/main/docs/UPGRADING.md)
 as an ordinary reviewed change.

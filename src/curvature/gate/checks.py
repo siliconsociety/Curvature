@@ -8,51 +8,116 @@ check an agent cannot steer by; boring, greppable rules are the product.
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
-from curvature.gate.findings import Finding, is_boost_layer, is_vendored, walk_source
+from curvature.gate.findings import (
+    CLIENT_ENTRIES,
+    CLIENT_NETWORK_AUTHORITY,
+    Finding,
+    framework_client_directory,
+    is_framework_client,
+    walk_source,
+)
 from curvature.gate.routes import check_mutating_routes as check_mutating_routes
 
-HTTP_TOKENS = ("fetch(", "XMLHttpRequest", "WebSocket(", "EventSource(")
+NETWORK_PRIMITIVES = ("fetch", "XMLHttpRequest", "WebSocket", "EventSource")
+_PRIMITIVES = "|".join(NETWORK_PRIMITIVES)
+_GLOBAL = r"(?:(?:window|globalThis)\s*\.\s*)?"
+NETWORK_CALLS = {
+    primitive: re.compile(
+        rf"(?<![\w$.]){_GLOBAL}{primitive}\s*\(",
+    )
+    for primitive in NETWORK_PRIMITIVES
+}
+NETWORK_ALIAS = re.compile(
+    rf"\b(?:const|let|var)\s+"
+    rf"(?P<alias>[A-Za-z_$][\w$]*)\s*=\s*"
+    rf"{_GLOBAL}(?P<primitive>{_PRIMITIVES})\s*"
+    rf"(?:;|(?=//|[\r\n]|$))",
+)
 ALLOW_PRAGMA = "curvature-allow"
+ALLOW_WITH_REASON = re.compile(r"curvature-allow:\s*\S")
 
 
 def _allowed(line: str) -> bool:
     """Token checks honor an explicit, greppable pragma. Enforcement code
     and tests that exercise refusals need to spell the forbidden words;
     the pragma is counted (see cli info lines) so it cannot hide."""
-    return ALLOW_PRAGMA in line
+    return bool(ALLOW_WITH_REASON.search(line))
+
+
+def _network_uses(source: str) -> list[tuple[int, str]]:
+    """Recognize direct global calls and simple file-local aliases.
+
+    This stays a predictable textual check, not a partial JavaScript parser.
+    """
+    uses: set[tuple[int, str]] = set()
+    aliases = {
+        match.group("alias"): match.group("primitive")
+        for match in NETWORK_ALIAS.finditer(source)
+    }
+    patterns = {
+        **NETWORK_CALLS,
+        **{
+            f"alias:{alias}": re.compile(rf"(?<![\w$.]){re.escape(alias)}\s*\(")
+            for alias in aliases
+        },
+    }
+    for name, pattern in patterns.items():
+        primitive = aliases[name.removeprefix("alias:")] if name.startswith("alias:") else name
+        for match in pattern.finditer(source):
+            line = source.count("\n", 0, match.start()) + 1
+            uses.add((line, primitive))
+    return sorted(uses)
 
 
 def check_js_placement(root: Path) -> list[Finding]:
-    """ANOM-120: the only first-party script is the boost layer (C-300)."""
+    """ANOM-120: only the closed package-owned client set is chartered (C-300)."""
     findings = []
     for path in walk_source(root, frozenset({".js"})):
-        if is_vendored(path) or is_boost_layer(path):
+        # static/vendor remains meaningful to CSS and bounds policy, but cannot
+        # grant client authority under C-300.
+        if is_framework_client(path, root):
             continue
         findings.append(Finding(
             "ANOM-120", str(path.relative_to(root)), None,
-            "first-party JavaScript outside the boost layer (C-300); "
-            "move the behavior server-side or into native HTML",
+            "consumer, counterfeit, or unchartered JavaScript (C-300); "
+            "application behavior belongs server-side or in native HTML",
         ))
+    if directory := framework_client_directory(root):
+        actual = {
+            path.name for path in directory.glob("*.js")
+            if path.is_file()
+        }
+        for missing in sorted(CLIENT_ENTRIES - actual):
+            findings.append(Finding(
+                "ANOM-120", str((directory / missing).relative_to(root)), None,
+                f"chartered framework client entry {missing!r} is missing (C-300)",
+            ))
     return findings
 
 
 def check_js_http(root: Path) -> list[Finding]:
-    """ANOM-121: JavaScript never speaks HTTP on its own (C-301)."""
+    """ANOM-121: each client entry gets only its chartered protocol (C-301)."""
     findings = []
     for path in walk_source(root, frozenset({".js"})):
-        if is_vendored(path) or is_boost_layer(path):
-            continue
-        for number, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
+        authority = (
+            CLIENT_NETWORK_AUTHORITY[path.name]
+            if is_framework_client(path, root)
+            else frozenset()
+        )
+        source = path.read_text(errors="replace")
+        lines = source.splitlines()
+        for number, primitive in _network_uses(source):
+            line = lines[number - 1]
             if _allowed(line):
                 continue
-            for token in HTTP_TOKENS:
-                if token in line:
-                    findings.append(Finding(
-                        "ANOM-121", str(path.relative_to(root)), number,
-                        f"{token.rstrip('(')} outside the boost layer (C-301)",
-                    ))
+            if primitive not in authority:
+                findings.append(Finding(
+                    "ANOM-121", str(path.relative_to(root)), number,
+                    f"{primitive} exceeds this script's network charter (C-301)",
+                ))
     return findings
 
 

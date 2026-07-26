@@ -89,27 +89,59 @@ Full stop. The unboosted path is not a fallback; it is the application.
 `httpx`, which executes no JavaScript. If it isn't reachable without JS,
 it isn't testable, and coverage (C-401) starves until it is.
 
-## 3. JavaScript
+## 3. Framework client layer
 
-**C-300 · One script.**
-The only first-party JavaScript in a curved project is the vendored,
-`curvature.js` boost layer at `curvature/static/curvature.js`. *Why:* every
-additional script is a new sediment bed. *Enforcement:* gate (ANOM-120: any
-other first-party `.js` file is an anomaly; explicitly vendored directories
-remain the application's review responsibility).
+**C-300 · Client authority is closed and chartered.**
+Application client code is zero. Curvature supplies a closed set of
+package-owned public entries, each with one declared role. The 0.4.3 set is:
 
-**C-301 · JavaScript never speaks HTTP on its own.**
-No `fetch`, `XMLHttpRequest`, `WebSocket`, or `EventSource` outside
-`curvature.js`. *Why:* a script that can call the server is app logic
-wearing an enhancement's jacket. *Enforcement:* gate (ANOM-121: token scan
-of all non-vendor JS and inline script bodies).
+- `curvature.js` — the stable consumer-facing include; owns fetch navigation,
+  fragment swapping, focus, pending state, and history.
+- `live.js` — loaded by the stable entrypoint; owns the lifecycle of
+  EventSource streams declared by Live roots.
+
+A new client capability is a spec amendment argued by issue, not an ordinary
+refactor. Private implementation leaves may split an existing capability
+without changing its authority, but are not part of the current two-entry
+package. *Why:* ownership and bounded authority prevent client sediment
+without making one filename structurally indivisible. *Enforcement:* gate
+(ANOM-120 rejects consumer, counterfeit, and unchartered scripts) plus package
+and scaffold proofs of the exact public set and stable include. Framework
+ownership means exact filesystem identity with the Curvature package executing
+the gate; a project name or lookalike path is not evidence. This is a bounded
+local identity check, not a claim of cryptographic provenance. `static/vendor`
+continues to mark third-party review policy for CSS and geometry, but grants no
+JavaScript client authority.
+
+**C-301 · Network authority follows the charter.**
+Permission is per capability, not per file format: `curvature.js` may use
+`fetch` for navigation; `live.js` may use `EventSource` for declared Live
+streams. Neither charter grants `XMLHttpRequest` or `WebSocket`, and one entry
+does not inherit the other's protocol. *Why:* enumeration is not a blanket
+license to speak every protocol. *Enforcement:* gate (ANOM-121 token-scans
+every script against the authority of its exact package-owned entry). The
+predictable textual scan recognizes direct and `window`/`globalThis` calls
+across ordinary whitespace plus simple `const`/`let`/`var` aliases. It is not
+a JavaScript parser; dynamic property access and arbitrary data flow remain
+outside its stated evidence.
+
+**C-304 · Obligations are medium-blind; evidence is medium-aware.**
+Every maintained artifact must have a declared role, evidence appropriate to
+its medium, and a bounded growth model whose units and topology are defined
+before enforcement. No language or format grants authority by itself.
+Architectural obligations may therefore be medium-blind; checks cannot pretend
+their evidence is. Python types, browser semantics, CSS selectors, and source
+line mass remain honestly different measurements. *Enforcement:* contract
+review plus each medium's named checks. General Markdown and figure geometry
+is not claimed here: its units and topology remain undefined.
 
 **C-303 · Offline replay is not a framework feature.**
 Curvature ships no service worker and caches no authenticated pages or
 one-time secrets in the browser. *Why:* a generic replay cache cannot know
 the authorization and invalidation rules of an application; pretending it
 can breaks the one-source-of-truth claim. *Enforcement:* the sanctioned
-script path in ANOM-120 names only `curvature.js`.
+public set in ANOM-120 contains only `curvature.js` and `live.js`, neither
+chartered for a service worker or replay cache.
 
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
@@ -349,8 +381,8 @@ from app routes; there is nothing to hand-maintain).
 | ID     | Invariant | Check |
 |--------|-----------|-------|
 | ANOM-110 | C-100 | component signature: first annotation name ends in `Props` |
-| ANOM-120 | C-300 | first-party `.js` outside the exact framework boost path |
-| ANOM-121 | C-301 | HTTP tokens in non-vendor JS or inline script |
+| ANOM-120 | C-300 | consumer, counterfeit, missing, or unchartered client script |
+| ANOM-121 | C-301 | network token outside an exact entry's protocol charter |
 | ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
 | ANOM-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
 | ANOM-131 | C-201 | mutating route returns non-redirect |

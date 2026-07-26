@@ -18,6 +18,32 @@ if [[ -z "$wheel" || -z "$source_archive" ]]; then
   exit 1
 fi
 
+uv run python - "$wheel" "$source_archive" <<'PY'
+import sys
+import tarfile
+import zipfile
+from pathlib import PurePosixPath
+
+expected = {"curvature.js", "live.js"}
+wheel, source_archive = sys.argv[1:]
+with zipfile.ZipFile(wheel) as archive:
+    wheel_entries = {
+        PurePosixPath(name).name
+        for name in archive.namelist()
+        if "/static/" in name and name.endswith(".js")
+    }
+with tarfile.open(source_archive) as archive:
+    source_entries = {
+        PurePosixPath(name).name
+        for name in archive.getnames()
+        if "/src/curvature/static/" in name and name.endswith(".js")
+    }
+if wheel_entries != expected or source_entries != expected:
+    raise SystemExit(
+        f"client entries differ: wheel={wheel_entries}, source={source_entries}"
+    )
+PY
+
 uv venv "$work/source-env"
 uv pip install --python "$work/source-env/bin/python" "$source_archive"
 "$work/source-env/bin/python" -c \
@@ -37,6 +63,23 @@ uv pip install --python "$work/wheel-env/bin/python" "${wheel}[fastapi,auth]"
   uv run curvature pour auth
   uv run python - <<'PY'
 from pathlib import Path
+from importlib.metadata import version
+
+import curvature
+
+client_entries = {
+    path.name
+    for path in (Path(curvature.__file__).parent / "static").glob("*.js")
+}
+if client_entries != {"curvature.js", "live.js"}:
+    raise SystemExit(f"installed client entries differ: {client_entries}")
+
+shell = Path("app/components/shell.py").read_text()
+stable_include = 'h.script(src=f"/static/lib/curvature.js?v={ASSETS}")'
+if stable_include not in shell or "live.js" in shell:
+    raise SystemExit("scaffold does not preserve the stable consumer entrypoint")
+if version("curvature") != "0.4.3":
+    raise SystemExit(f"unexpected package version: {version('curvature')}")
 
 main = Path("app/main.py")
 source = main.read_text()

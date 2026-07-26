@@ -12,12 +12,13 @@ import pytest
 from playwright.sync_api import Browser, expect
 
 BOOST = Path(__file__).parents[2] / "src/curvature/static/curvature.js"
+LIVE = Path(__file__).parents[2] / "src/curvature/static/live.js"
 
 
 def _page(fragment: str) -> str:
     return (
         '<!doctype html><html><head><meta charset="utf-8">'
-        '<script src="/curvature.js" defer></script></head>'
+        '<script src="/curvature.js?v=0.4.3" defer></script></head>'
         f'<body data-boost><main>{fragment}</main></body></html>'
     )
 
@@ -78,6 +79,9 @@ class FragmentProbe(BaseHTTPRequestHandler):
         boosted = self.headers.get("Curvature-Boost") == "1"
         if parsed.path == "/curvature.js":
             self._send(BOOST.read_text(), content_type="text/javascript")
+            return
+        if parsed.path == "/live.js":
+            self._send(LIVE.read_text(), content_type="text/javascript")
             return
         if parsed.path in {"/", "/fragment-redirect", "/fragment-page", "/plain"}:
             type(self).requests.append((parsed.path, boosted))

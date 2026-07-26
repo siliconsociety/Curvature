@@ -6,9 +6,9 @@ of code. An update must preserve that boundary.
 ## Package-owned runtime
 
 The installed `curvature` package owns imports from `curvature`, the framework
-gate, static runtime assets such as `curvature.js`, and the source templates
-used for future scaffolds and pours. Existing applications update this layer
-through their dependency lock:
+gate, the closed static runtime (`curvature.js` and `live.js`), and the source
+templates used for future scaffolds and pours. Existing applications update
+this layer through their dependency lock:
 
 ```bash
 uv lock --upgrade-package curvature
@@ -17,9 +17,10 @@ uv sync
 ```
 
 Commit the lockfile with any compatibility changes. Deploy from that lockfile.
-The default shell serves `curvature.js` from the installed package and keys its
-URL with the installed package version, so a runtime update also moves the
-browser asset without copying it into the application.
+The default shell continues to serve only `curvature.js` from the installed
+package and keys its URL with the installed package version. That stable
+entrypoint propagates the same query to `live.js`, so a runtime update moves
+both browser assets without copying either into the application.
 
 Applications that do not commit a lockfile should install an explicit
 Curvature version. An unconstrained install is not an update policy.
@@ -53,14 +54,26 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
-## 0.4.2
+## 0.4.3
 
-The boost layer now leaves same-page fragment navigation and its history
-traversal to the browser. Cross-page boosted navigation preserves fragments
-through redirects and scrolls to the resolved target after swapping. This is a
-package-only runtime correction: update Curvature in the application lockfile,
-sync the environment, exercise affected links in a real browser, and deploy.
-No application-owned source migration is required.
+The stable `/static/lib/curvature.js?v=<version>` include now loads the
+package-owned `live.js` branch with the same asset version. Navigation, swaps,
+focus, pending state, and history remain in the entrypoint; declared
+EventSource lifecycle lives in the branch. The boost layer also leaves
+same-page fragment navigation and its history traversal to the browser, while
+cross-page boosted navigation preserves fragments through redirects and
+scrolls to the resolved target after swapping.
+
+This is a package-only runtime update. Existing applications need no source or
+script-tag migration: update Curvature to 0.4.3 in the application lockfile,
+sync the environment, exercise boosted and Live paths in a real browser, run
+`./gate.sh`, and deploy.
+
+## 0.4.2 (internal only; never published)
+
+0.4.2 was a merged integration waypoint for the fragment-navigation
+correction. It is not a consumer upgrade target and must never be tagged or
+published; its package-owned correction ships publicly as part of 0.4.3.
 
 ## 0.4.1
 
@@ -87,14 +100,24 @@ records the temporary workaround and verification performed, and states desired
 behavior as checkable invariants.
 
 Only upstream Curvature field reports and their substantive discussion carry
-model attribution under this contract. Issues, pull requests, commits, and
-ordinary artifacts in this consumer repository are explicitly excluded. When
-making that attribution, use the specific model identity plus its role when
-known. Never guess: read identity from the harness or configuration, ask the
-operator, or use `Unidentified model (role) — operator, please amend` as the
-honest fallback. Model identity is a qualification-ledger key, not complete
-provenance; the report's context, mechanism, reproduction, measurements,
-workaround, and verification remain the causal record.
+model attribution under this contract. Consumer-repository artifacts are
+excluded, as are ordinary pull requests, commits, and other artifacts wherever
+they live.
+
+Before an attributed upstream GitHub write, verify identity from the active
+task or harness, or from an explicit Factory launch packet; either is
+authoritative for that run. `~/.codex/config.toml` alone describes a default
+and does not prove the active model. When identity is verified as
+`gpt-5.6-luna`, render `— GPT-5.6 Luna (<role>)`; for `gpt-5.6-sol`, render
+`— GPT-5.6 Sol (<role>)`. Substitute the exact assigned role without
+normalizing or inventing it. Reasoning effort and speed or service tier stay
+out of the public signature. If identity cannot be verified, stop before the
+upstream GitHub write and ask the operator. Never publish an unidentified-model
+fallback.
+
+Model identity is a qualification-ledger key, not complete provenance; the
+report's context, mechanism, reproduction, measurements, workaround, and
+verification remain the causal record.
 ```
 
 Adopt it as an application-owned migration:

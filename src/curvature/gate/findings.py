@@ -47,14 +47,34 @@ def is_vendored(path: Path) -> bool:
     )
 
 
-SANCTIONED_SCRIPTS = frozenset({"curvature.js"})
+CLIENT_ENTRIES = frozenset({"curvature.js", "live.js"})
+CLIENT_NETWORK_AUTHORITY = {
+    "curvature.js": frozenset({"fetch"}),
+    "live.js": frozenset({"EventSource"}),
+}
+FRAMEWORK_PACKAGE_DIRECTORY = Path(__file__).resolve().parents[1]
 
 
-def is_boost_layer(path: Path) -> bool:
-    """The boost layer: the only first-party script (C-300), vendored by
-    the framework and ceilinged like everything else."""
-    return (
-        path.name in SANCTIONED_SCRIPTS
-        and path.parent.name == "static"
-        and path.parent.parent.name == "curvature"
+def framework_client_directory(root: Path) -> Path | None:
+    """Locate entries owned by the exact Curvature package running this gate.
+
+    Filesystem identity is bounded ownership evidence, not cryptographic
+    provenance. Project metadata and lookalike paths grant no authority.
+    """
+    package = FRAMEWORK_PACKAGE_DIRECTORY.resolve()
+    if root.resolve() == package:
+        return package / "static"
+    source_package = (root / "src/curvature").resolve()
+    if source_package == package:
+        return source_package / "static"
+    return None
+
+
+def is_framework_client(path: Path, root: Path) -> bool:
+    """A chartered public entry at the exact package-owned path (C-300)."""
+    directory = framework_client_directory(root)
+    return bool(
+        directory
+        and path.parent.resolve() == directory.resolve()
+        and path.name in CLIENT_ENTRIES
     )

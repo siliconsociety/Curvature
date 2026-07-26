@@ -6,7 +6,7 @@ import tomllib
 import pytest
 
 from curvature.gate.cli import main, run_checks
-from curvature.gate.scaffold import APP_FILES, new_app
+from curvature.gate.scaffold import APP_FILES, _scaffold_git_env, new_app
 
 
 @pytest.fixture(scope="module")
@@ -72,6 +72,100 @@ def test_poured_app_is_a_git_repo_with_one_commit(poured):
     )
     assert done.returncode == 0
     assert "Poured by curvature new app" in done.stdout
+
+
+def test_pour_isolates_every_parent_git_variable(tmp_path, monkeypatch):
+    parent = tmp_path / "parent"
+    parent.mkdir()
+    subprocess.run(["git", "init", "--quiet"], cwd=parent, check=True)
+    tracked = parent / "tracked.txt"
+    tracked.write_text("committed parent content\n")
+    subprocess.run(["git", "add", "-A"], cwd=parent, check=True)
+    subprocess.run(
+        [
+            "git", "-c", "user.name=parent", "-c", "user.email=parent@example.test",
+            "commit", "--quiet", "-m", "Parent commit",
+        ],
+        cwd=parent,
+        check=True,
+    )
+    tracked.write_text("uncommitted parent content\n")
+    untracked = parent / "untracked.txt"
+    untracked.write_text("parent-only file\n")
+
+    def git(*args):
+        done = subprocess.run(
+            ["git", "-C", str(parent), *args],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+        return done.stdout.strip()
+
+    local_vars = set(git("rev-parse", "--local-env-vars").splitlines())
+    before = {
+        "head": git("rev-parse", "HEAD"),
+        "status": git("status", "--porcelain"),
+        "index": (parent / ".git/index").read_bytes(),
+        "config": (parent / ".git/config").read_bytes(),
+        "tracked": tracked.read_bytes(),
+        "untracked": untracked.read_bytes(),
+    }
+    inherited = {name: "inherited-parent-context" for name in local_vars}
+    inherited.update(
+        {
+            "GIT_DIR": str(parent / ".git"),
+            "GIT_WORK_TREE": str(parent),
+            "GIT_INDEX_FILE": str(parent / ".git/index"),
+            "GIT_COMMON_DIR": str(parent / ".git"),
+            "GIT_OBJECT_DIRECTORY": str(parent / ".git/objects"),
+            "GIT_CONFIG": str(parent / ".git/config"),
+        }
+    )
+    real_run = subprocess.run
+    git_calls = []
+
+    def isolated_run(command, **kwargs):
+        if command[0] == "git":
+            git_calls.append(command)
+            assert local_vars.isdisjoint(kwargs["env"])
+        return real_run(command, **kwargs)
+
+    with monkeypatch.context() as context:
+        for name, value in inherited.items():
+            context.setenv(name, value)
+        context.setattr(subprocess, "run", isolated_run)
+        poured = new_app(tmp_path / "apps", "isolated_app")
+
+    assert len(git_calls) == 4
+    assert git("log", "-1", "--format=%s") == "Parent commit"
+    assert git("rev-parse", "--is-bare-repository") == "false"
+    assert {
+        "head": git("rev-parse", "HEAD"),
+        "status": git("status", "--porcelain"),
+        "index": (parent / ".git/index").read_bytes(),
+        "config": (parent / ".git/config").read_bytes(),
+        "tracked": tracked.read_bytes(),
+        "untracked": untracked.read_bytes(),
+    } == before
+    poured_log = subprocess.run(
+        ["git", "-C", str(poured), "log", "-1", "--format=%s"],
+        capture_output=True,
+        check=True,
+        text=True,
+    )
+    assert poured_log.stdout.strip() == "Poured by curvature new app"
+
+
+def test_git_env_discovery_failure_falls_back_to_no_git_variables(monkeypatch):
+    def failed_discovery(command, **kwargs):
+        assert not any(name.startswith("GIT_") for name in kwargs["env"])
+        return subprocess.CompletedProcess(command, 1, "", "git unavailable")
+
+    monkeypatch.setenv("GIT_DIR", "/inherited/parent.git")
+    monkeypatch.setenv("GIT_AUTHOR_NAME", "inherited author")
+    monkeypatch.setattr(subprocess, "run", failed_discovery)
+    assert not any(name.startswith("GIT_") for name in _scaffold_git_env())
 
 
 def test_refuses_to_overwrite(poured):

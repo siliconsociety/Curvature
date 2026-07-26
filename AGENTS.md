@@ -106,12 +106,15 @@ The repository is the agent control plane. `AGENTS.md`, the gate, and the
 checked-in scripts are sufficient; ordinary Curvature work requires no
 framework-specific agent skill.
 
-## The board keeps the time
+## GitHub keeps the time
 
-This repo's living roadmap is the Pit Board (demo/data/roadmap.json,
-rendered at /). Work that ships moves or creates its card in the same
-commit; work that starts goes ON TRACK. A board that lags the repo is
-a stale instrument.
+Issues hold intake and durable technical discussion. An open pull request is
+active work; a merged pull request and its release are shipped work. When a
+field report starts the work, post the maintainer position on its issue before
+implementation so agreement, disagreement, and scope remain visible.
+
+Pit Board is an illustrative release-history demo, not a second project
+ledger. Ordinary work does not add or move its cards.
 
 ## When you finish
 

@@ -1,6 +1,6 @@
-"""The timing tower: the living roadmap, at home in the demo."""
+"""The timing tower: illustrative history, live in the demo."""
 
-import shutil
+import json
 from pathlib import Path
 
 import pytest
@@ -12,9 +12,14 @@ from demo.roadmap_store import RoadmapStore
 
 @pytest.fixture
 def client(tmp_path):
-    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
     working = tmp_path / "roadmap.json"
-    shutil.copy(seed, working)
+    working.write_text(json.dumps({"items": [
+        {"id": "active", "title": "Active fixture", "lane": "pouring"},
+        {"id": "next-new", "title": "Newer plan", "lane": "queued"},
+        {"id": "next-old", "title": "Older plan", "lane": "queued"},
+        {"id": "ship-new", "title": "Newer release", "lane": "shipped", "pit_id": "P2"},
+        {"id": "ship-old", "title": "Older release", "lane": "shipped", "pit_id": "P1"},
+    ]}))
     app.state.roadmap_store = RoadmapStore(working)
     return TestClient(app)
 
@@ -23,7 +28,7 @@ def test_the_tower_reads_like_a_pit_board(client):
     text = client.get("/").text
     for mark in ("ON TRACK", "NEXT UP", "SHIPPED"):
         assert mark in text
-    assert "P14" in text                     # shipped items keep their identity
+    assert "P2" in text
     assert 'alt="Pit Board emblem"' in text
     assert '/static/favicon.png' in text
 
@@ -33,25 +38,16 @@ def test_active_then_planned_then_shipped(client):
     assert text.index("ON TRACK") < text.index("NEXT UP") < text.index("SHIPPED")
 
 
-def test_every_lane_is_recent_first(client):
+def test_store_preserves_declared_recent_first_order(client):
     lanes = app.state.roadmap_store.by_lane()
-    assert [item.id for item in lanes["queued"]] == [
-        "public-live-playground", "live-production-hardening",
-    ]
-    assert lanes["shipped"][0].id == "readme-footer-032"
-    assert lanes["shipped"][-1].id == "founding"
-    assert lanes["shipped"][0].pit_id == "P22"
-    assert lanes["shipped"][-1].pit_id == "P1"
-    pit_numbers = [int((item.pit_id or "").removeprefix("P")) for item in lanes["shipped"]]
-    assert pit_numbers == list(range(len(pit_numbers), 0, -1))
+    assert [item.id for item in lanes["queued"]] == ["next-new", "next-old"]
+    assert [item.id for item in lanes["shipped"]] == ["ship-new", "ship-old"]
 
 
-def test_shipped_ids_survive_recent_first_sorting(client):
+def test_shipped_ids_render_with_their_release(client):
     text = client.get("/").text
-    assert text.index(">P16</span>") < text.index("Public site: a sharper identity")
-    assert text.index(">P15</span>") < text.index("Public site: new splash + living roadmap")
-    assert text.index(">P14</span>") < text.index("Pit Board becomes a roadmap again")
-    assert text.index(">P1</span>") < text.index("0.1.0 — the founding")
+    assert text.index(">P2</span>") < text.index("Newer release")
+    assert text.index(">P1</span>") < text.index("Older release")
 
 
 def test_new_items_are_recent_first(client):
@@ -85,12 +81,12 @@ def test_the_tower_declares_its_stream_and_legend(client):
     app.state.roadmap_store.add("On track fixture", "", "pouring")
     text = client.get("/").text
     assert 'data-live="/live"' in text
-    assert "LIVE ROADMAP · RECENT FIRST" in text
+    assert "LIVE DEMO · RECENT FIRST" in text
 
 
 def test_agents_read_the_tower_through_the_chart(client):
     chart = client.get("/", headers={"Curvature-Chart": "1"}).json()
-    assert "roadmap" in chart["purpose"]
+    assert "release-history" in chart["purpose"]
     assert chart["affordances"]["forms"] == []
     headings = chart["headings"]
     assert headings.index("ON TRACK") < headings.index("NEXT UP") < headings.index("SHIPPED")
@@ -100,3 +96,8 @@ def test_the_boost_layer_is_cache_busted_by_version(client):
     from importlib.metadata import version
 
     assert f'/static/lib/curvature.js?v={version("curvature")}' in client.get("/").text
+
+
+def test_the_historical_seed_remains_readable():
+    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
+    assert RoadmapStore(seed).by_lane()["shipped"]

@@ -1,9 +1,9 @@
-"""The timing tower — the living roadmap wearing its true clothes.
+"""The timing tower — release history wearing pit-lane clothes.
 
 A pit board is the sign the crew hangs over the wall: what's on track,
 what comes next, and what shipped. One vertical tower, monospace
-discipline, recent work first. Git is the editor and timekeeper; Live
-reflects its changes into every open page.
+discipline, recent work first. Live reflects file-backed demonstration
+changes into every open page.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ def _row(props: RowProps) -> Element:
 
 def tower(props: TowerProps) -> Element:
     return h.section(
-        h.p("LIVE ROADMAP · RECENT FIRST", class_="tower-legend"),
+        h.p("LIVE DEMO · RECENT FIRST", class_="tower-legend"),
         h.h3("ON TRACK", class_="lane-mark lane-mark-track"),
         h.ul(
             (

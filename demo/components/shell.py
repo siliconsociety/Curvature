@@ -1,6 +1,4 @@
-"""The document shell — a combinator: it pours the page around
-fragments. One header, one identity: it IS the roadmap, it's CALLED
-the Pit Board."""
+"""The Pit Board document shell pours the page around demo fragments."""
 
 from __future__ import annotations
 
@@ -17,7 +15,7 @@ def shell(*fragments: Element) -> Element:
         h.head(
             h.meta(charset="utf-8"),
             h.meta(name="viewport", content="width=device-width, initial-scale=1"),
-            h.title("Pit Board — Curvature's living roadmap"),
+            h.title("Pit Board — Curvature's release-history demo"),
             h.link(rel="icon", type="image/png", href="/static/favicon.png"),
             h.style_link("/static/manifold.css"),
             h.style_link("/static/tower.css"),
@@ -29,7 +27,7 @@ def shell(*fragments: Element) -> Element:
                       width="72", height="72", class_="emblem"),
                 h.div(
                     h.h1("PIT BOARD"),
-                    h.p("Curvature's living roadmap — git keeps the time.",
+                    h.p("An illustrative Curvature release-history demo.",
                         class_="board-sub"),
                 ),
                 class_="board-head",

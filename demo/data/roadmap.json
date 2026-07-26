@@ -57,18 +57,6 @@
       "note": "Launched the editorial splash and a read-only, Chart-readable /roadmap backed by the repository Pit Board. The deployed site keeps a last-known-good seed, exposes no public mutation controls, and checks GitHub's coherent Contents API every two minutes before Live swaps the fragment."
     },
     {
-      "id": "public-live-playground",
-      "title": "/demo: a small Live playground",
-      "lane": "queued",
-      "note": "Invite controlled vandalism in a bounded, resettable toy instead of the roadmap. It should be simple, playful, visibly multi-user, and safe to abandon or reset."
-    },
-    {
-      "id": "live-production-hardening",
-      "title": "Live: production contract",
-      "lane": "queued",
-      "note": "State the single-process guarantee; add heartbeats, bounded subscriber queues, disconnect cleanup, and deployed proxy-duration tests. Add a shared bus only when multi-worker delivery is required."
-    },
-    {
       "id": "pit-board-roadmap-cleanup",
       "pit_id": "P14",
       "title": "Pit Board becomes a roadmap again",

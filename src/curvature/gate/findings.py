@@ -5,7 +5,6 @@ invariant it serves, because the traceback should teach."""
 
 from __future__ import annotations
 
-import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -50,20 +49,24 @@ def is_vendored(path: Path) -> bool:
 
 CLIENT_ENTRIES = frozenset({"curvature.js", "live.js"})
 CLIENT_NETWORK_AUTHORITY = {
-    "curvature.js": frozenset({"fetch("}),
-    "live.js": frozenset({"EventSource("}),
+    "curvature.js": frozenset({"fetch"}),
+    "live.js": frozenset({"EventSource"}),
 }
+FRAMEWORK_PACKAGE_DIRECTORY = Path(__file__).resolve().parents[1]
 
 
 def framework_client_directory(root: Path) -> Path | None:
-    """Locate package-owned client entries in source or an installed package."""
-    pyproject = root / "pyproject.toml"
-    if pyproject.is_file():
-        project = tomllib.loads(pyproject.read_text()).get("project", {})
-        if project.get("name") == "curvature":
-            return root / "src/curvature/static"
-    if root.name == "curvature" and (root / "__init__.py").is_file():
-        return root / "static"
+    """Locate entries owned by the exact Curvature package running this gate.
+
+    Filesystem identity is bounded ownership evidence, not cryptographic
+    provenance. Project metadata and lookalike paths grant no authority.
+    """
+    package = FRAMEWORK_PACKAGE_DIRECTORY.resolve()
+    if root.resolve() == package:
+        return package / "static"
+    source_package = (root / "src/curvature").resolve()
+    if source_package == package:
+        return source_package / "static"
     return None
 
 

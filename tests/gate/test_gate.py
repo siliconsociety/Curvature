@@ -1,7 +1,7 @@
 import textwrap
 from pathlib import Path
 
-from curvature.gate import checks
+from curvature.gate import checks, findings
 from curvature.gate.cli import command_check
 from curvature.gate.findings import CLIENT_ENTRIES
 
@@ -25,26 +25,41 @@ def test_stray_first_party_js_is_off_curvature(tmp_path):
     assert [f.rule for f in findings] == ["ANOM-120"]
 
 
-def framework_project(root: Path):
+def framework_project(root: Path, monkeypatch):
     write(root, "pyproject.toml", '[project]\nname = "curvature"\nversion = "0.0.0"\n')
+    package = root / "src/curvature"
+    write(root, "src/curvature/__init__.py", "")
     write(root, "src/curvature/static/curvature.js", 'fetch("/fragments")\n')
     write(root, "src/curvature/static/live.js", 'new EventSource("/events")\n')
+    monkeypatch.setattr(findings, "FRAMEWORK_PACKAGE_DIRECTORY", package)
 
 
 def test_shipped_client_entry_set_is_exact():
     client_dir = Path(__file__).parents[2] / "src/curvature/static"
+    assert findings.framework_client_directory(Path(__file__).parents[2]) == client_dir
     assert {path.name for path in client_dir.glob("*.js")} == CLIENT_ENTRIES
 
 
-def test_chartered_framework_entries_and_vendor_are_allowed(tmp_path):
-    framework_project(tmp_path)
-    write(tmp_path, "static/vendor/lib.js", "// pinned\n")
+def test_chartered_framework_entries_are_allowed(tmp_path, monkeypatch):
+    framework_project(tmp_path, monkeypatch)
     assert checks.check_js_placement(tmp_path) == []
     assert checks.check_js_http(tmp_path) == []
 
 
-def test_missing_or_unchartered_framework_entries_are_rejected(tmp_path):
-    framework_project(tmp_path)
+def test_vendor_directory_grants_no_client_authority(tmp_path):
+    write(tmp_path, "static/vendor/inert.js", "// claimed vendor\n")
+    write(tmp_path, "static/vendor/network.js", 'globalThis.fetch ("/api")\n')
+    assert [finding.rule for finding in checks.check_js_placement(tmp_path)] == [
+        "ANOM-120",
+        "ANOM-120",
+    ]
+    http = checks.check_js_http(tmp_path)
+    assert [finding.rule for finding in http] == ["ANOM-121"]
+    assert http[0].path == "static/vendor/network.js"
+
+
+def test_missing_or_unchartered_framework_entries_are_rejected(tmp_path, monkeypatch):
+    framework_project(tmp_path, monkeypatch)
     (tmp_path / "src/curvature/static/live.js").unlink()
     write(tmp_path, "src/curvature/static/extra.js", "// no charter\n")
     findings = checks.check_js_placement(tmp_path)
@@ -59,27 +74,110 @@ def test_js_speaking_http_is_off_curvature(tmp_path):
     assert [f.rule for f in findings] == ["ANOM-121"]
 
 
-def test_framework_entries_cannot_borrow_each_others_protocol(tmp_path):
-    framework_project(tmp_path)
+def test_framework_entries_cannot_borrow_each_others_protocol(tmp_path, monkeypatch):
+    framework_project(tmp_path, monkeypatch)
     write(
         tmp_path,
         "src/curvature/static/curvature.js",
-        'fetch("/fragments")\nnew EventSource("/events")\n',
+        "\n".join((
+            'window.fetch ("/fragments")',
+            'new globalThis.EventSource ("/events")',
+            'new WebSocket ("/socket")',
+            "new XMLHttpRequest ()",
+        )),
     )
     write(
         tmp_path,
         "src/curvature/static/live.js",
-        'new EventSource("/events")\nfetch("/fragments")\n',
+        "\n".join((
+            'new window.EventSource ("/events")',
+            'globalThis.fetch ("/fragments")',
+            'new WebSocket ("/socket")',
+            "new XMLHttpRequest ()",
+        )),
     )
     findings = checks.check_js_http(tmp_path)
-    assert [finding.rule for finding in findings] == ["ANOM-121", "ANOM-121"]
-    assert "EventSource" in findings[0].message
-    assert "fetch" in findings[1].message
+    assert [finding.message.split()[0] for finding in findings] == [
+        "EventSource",
+        "WebSocket",
+        "XMLHttpRequest",
+        "fetch",
+        "WebSocket",
+        "XMLHttpRequest",
+    ]
+
+
+def test_framework_entries_keep_their_authority_through_simple_aliases(
+    tmp_path,
+    monkeypatch,
+):
+    framework_project(tmp_path, monkeypatch)
+    write(
+        tmp_path,
+        "src/curvature/static/curvature.js",
+        'const request = window.fetch;\nrequest ("/fragments")\n',
+    )
+    write(
+        tmp_path,
+        "src/curvature/static/live.js",
+        'const Stream = globalThis.EventSource;\nnew Stream ("/events")\n',
+    )
+    assert checks.check_js_http(tmp_path) == []
+
+
+def test_whitespace_and_global_member_network_calls_are_seen(tmp_path):
+    write(
+        tmp_path,
+        "static/hidden.js",
+        "\n".join((
+            'window.fetch ("/fetch")',
+            'globalThis.EventSource ("/events")',
+            'new window.WebSocket ("/socket")',
+            "new globalThis.XMLHttpRequest ()",
+        )),
+    )
+    found = checks.check_js_http(tmp_path)
+    assert [finding.message.split()[0] for finding in found] == [
+        "fetch",
+        "EventSource",
+        "WebSocket",
+        "XMLHttpRequest",
+    ]
+
+
+def test_simple_network_aliases_are_seen(tmp_path):
+    write(
+        tmp_path,
+        "static/aliases.js",
+        "\n".join((
+            "const request = globalThis.fetch;",
+            "const Stream = window.EventSource",
+            "const Socket = globalThis.WebSocket;",
+            "const Request = window.XMLHttpRequest",
+            'request ("/fetch")',
+            'new Stream ("/events")',
+            'new Socket ("/socket")',
+            "new Request ()",
+        )),
+    )
+    found = checks.check_js_http(tmp_path)
+    assert [(finding.line, finding.message.split()[0]) for finding in found] == [
+        (5, "fetch"),
+        (6, "EventSource"),
+        (7, "WebSocket"),
+        (8, "XMLHttpRequest"),
+    ]
 
 
 def test_pragma_line_is_allowed_and_counted(tmp_path):
     write(tmp_path, "static/extra.js", 'fetch("/api") // curvature-allow: probe\n')
     assert checks.check_js_http(tmp_path) == []
+    assert checks.pragma_census(tmp_path) == 1
+
+
+def test_pragma_without_a_reason_does_not_suppress_the_finding(tmp_path):
+    write(tmp_path, "static/extra.js", 'fetch ("/api") // curvature-allow\n')
+    assert [finding.rule for finding in checks.check_js_http(tmp_path)] == ["ANOM-121"]
     assert checks.pragma_census(tmp_path) == 1
 
 
@@ -263,8 +361,8 @@ def test_walk_source_skips_excluded_dirs(tmp_path):
 
 
 
-def test_only_the_framework_owned_client_entries_are_sanctioned(tmp_path):
-    framework_project(tmp_path)
+def test_only_the_framework_owned_client_entries_are_sanctioned(tmp_path, monkeypatch):
+    framework_project(tmp_path, monkeypatch)
     assert checks.check_js_placement(tmp_path) == []
     assert checks.check_js_http(tmp_path) == []
 
@@ -313,4 +411,20 @@ def test_an_app_cannot_counterfeit_the_package_path(tmp_path):
     assert [f.rule for f in checks.check_js_placement(tmp_path)] == [
         "ANOM-120",
         "ANOM-120",
+    ]
+
+
+def test_project_name_cannot_counterfeit_framework_ownership(tmp_path):
+    write(tmp_path, "pyproject.toml", '[project]\nname = "curvature"\nversion = "9.9.9"\n')
+    write(tmp_path, "src/curvature/__init__.py", "")
+    write(tmp_path, "src/curvature/static/curvature.js", 'window.fetch ("/api")\n')
+    write(tmp_path, "src/curvature/static/live.js", 'new EventSource ("/events")\n')
+
+    assert [finding.rule for finding in checks.check_js_placement(tmp_path)] == [
+        "ANOM-120",
+        "ANOM-120",
+    ]
+    assert [finding.rule for finding in checks.check_js_http(tmp_path)] == [
+        "ANOM-121",
+        "ANOM-121",
     ]

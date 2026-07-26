@@ -106,7 +106,12 @@ without changing its authority, but are not part of the current two-entry
 package. *Why:* ownership and bounded authority prevent client sediment
 without making one filename structurally indivisible. *Enforcement:* gate
 (ANOM-120 rejects consumer, counterfeit, and unchartered scripts) plus package
-and scaffold proofs of the exact public set and stable include.
+and scaffold proofs of the exact public set and stable include. Framework
+ownership means exact filesystem identity with the Curvature package executing
+the gate; a project name or lookalike path is not evidence. This is a bounded
+local identity check, not a claim of cryptographic provenance. `static/vendor`
+continues to mark third-party review policy for CSS and geometry, but grants no
+JavaScript client authority.
 
 **C-301 · Network authority follows the charter.**
 Permission is per capability, not per file format: `curvature.js` may use
@@ -114,7 +119,11 @@ Permission is per capability, not per file format: `curvature.js` may use
 streams. Neither charter grants `XMLHttpRequest` or `WebSocket`, and one entry
 does not inherit the other's protocol. *Why:* enumeration is not a blanket
 license to speak every protocol. *Enforcement:* gate (ANOM-121 token-scans
-non-vendor scripts against the authority of their exact package-owned entry).
+every script against the authority of its exact package-owned entry). The
+predictable textual scan recognizes direct and `window`/`globalThis` calls
+across ordinary whitespace plus simple `const`/`let`/`var` aliases. It is not
+a JavaScript parser; dynamic property access and arbitrary data flow remain
+outside its stated evidence.
 
 **C-304 · Obligations are medium-blind; evidence is medium-aware.**
 Every maintained artifact must have a declared role, evidence appropriate to

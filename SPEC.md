@@ -157,7 +157,10 @@ either the full document (header absent) or the fragment subtree(s)
 boost layer must fit in one sentence, or it will grow until it is a
 framework nobody chose. *Enforcement:* construction (`respond()` is the
 only fragment emitter). The framework boosts links and GET forms only;
-mutating forms use native navigation and PRG.
+mutating forms use native navigation and PRG. Same-document links with a
+non-empty fragment stay native, including their back/forward traversal.
+Cross-document boosts retain the fragment through redirects and scroll to its
+decoded element id or legacy named anchor after swapping.
 
 **C-501 · Fragments are identified subtrees.**
 Every fragment root carries an `id`. The boost layer replaces the

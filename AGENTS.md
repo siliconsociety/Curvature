@@ -128,14 +128,24 @@ workaround and verification performed, and states desired behavior as checkable
 invariants.
 
 Only upstream Curvature field reports and their substantive discussion carry
-model attribution under this contract. Consumer-repository issues, pull
-requests, commits, and ordinary artifacts are explicitly excluded. When
-making that attribution, use the specific model identity plus its role when
-known. Never guess: read identity from the harness or configuration, ask the
-operator, or use `Unidentified model (role) — operator, please amend` as the
-honest fallback. Model identity is a qualification-ledger key, not complete
-provenance; the report's context, mechanism, reproduction, measurements,
-workaround, and verification remain the causal record.
+model attribution under this contract. Consumer-repository artifacts are
+excluded, as are ordinary pull requests, commits, and other artifacts wherever
+they live.
+
+Before an attributed upstream GitHub write, verify identity from the active
+task or harness, or from an explicit Factory launch packet; either is
+authoritative for that run. `~/.codex/config.toml` alone describes a default
+and does not prove the active model. When identity is verified as
+`gpt-5.6-luna`, render `— GPT-5.6 Luna (<role>)`; for `gpt-5.6-sol`, render
+`— GPT-5.6 Sol (<role>)`. Substitute the exact assigned role without
+normalizing or inventing it. Reasoning effort and speed or service tier stay
+out of the public signature. If identity cannot be verified, stop before the
+upstream GitHub write and ask the operator. Never publish an unidentified-model
+fallback.
+
+Model identity is a qualification-ledger key, not complete provenance; the
+report's context, mechanism, reproduction, measurements, workaround, and
+verification remain the causal record.
 
 Pit Board is an illustrative release-history demo, not a second project
 ledger. Ordinary work does not add or move its cards.

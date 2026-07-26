@@ -79,13 +79,14 @@ switched off — not as nostalgia, but because a server-rendered app whose
 tests drive real forms through real URLs is an app whose degraded path is
 its *tested* path. We had this once. We are taking it back.
 
-**3. JavaScript annotates; it never decides.** The boost layer — the only
-JavaScript Curvature ships — intercepts working links and GET forms and
-swaps fragments instead of navigating. Writes remain native browser
-submissions: their failure semantics are too important to simulate.
-Enhancement, by definition, only touches paths that already work without it.
-App logic in the browser is an anomaly, and the gate knows what a `fetch`
-call looks like.
+**3. The client annotates; it never decides.** Curvature's client layer is
+closed and chartered by role. Its stable entrypoint enhances working links and
+GET forms with fragment swaps; its Live branch maintains only streams declared
+by server-rendered roots. Each gets only the network primitive its role needs.
+Writes remain native browser submissions: their failure semantics are too
+important to simulate. Enhancement, by definition, only touches paths that
+already work without it. Application logic in the browser is an anomaly, and
+the gate knows both ownership and protocol authority.
 
 **4. The UI is typed Python.** Components are functions of props; props are
 pydantic models. Your markup logic is type-checked by the same tools as
@@ -111,6 +112,13 @@ agent. AGENTS.md is the canonical documentation; the README is a courtesy
 translation for humans. Curvature is, as far as we know, the first framework
 to declare this out loud — every framework that survives the next decade
 will do the same, and will pretend it always had.
+
+**8. Obligations do not depend on medium; evidence does.** Every maintained
+artifact earns its role, supplies evidence its medium can honestly provide,
+and grows within a geometry whose units are defined. No language or format
+grants authority. Types, selectors, browser behavior, and line mass remain
+different measurements; naming a shared obligation is not permission to fake
+a shared unit.
 
 ## The refusals
 

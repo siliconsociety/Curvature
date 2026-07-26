@@ -3,6 +3,7 @@ from pathlib import Path
 
 from curvature.gate import checks
 from curvature.gate.cli import command_check
+from curvature.gate.findings import CLIENT_ENTRIES
 
 
 def write(root: Path, relpath: str, text: str) -> Path:
@@ -24,16 +25,56 @@ def test_stray_first_party_js_is_off_curvature(tmp_path):
     assert [f.rule for f in findings] == ["ANOM-120"]
 
 
-def test_boost_layer_and_vendor_are_allowed(tmp_path):
-    write(tmp_path, "curvature/static/curvature.js", "// the only script\n")
+def framework_project(root: Path):
+    write(root, "pyproject.toml", '[project]\nname = "curvature"\nversion = "0.0.0"\n')
+    write(root, "src/curvature/static/curvature.js", 'fetch("/fragments")\n')
+    write(root, "src/curvature/static/live.js", 'new EventSource("/events")\n')
+
+
+def test_shipped_client_entry_set_is_exact():
+    client_dir = Path(__file__).parents[2] / "src/curvature/static"
+    assert {path.name for path in client_dir.glob("*.js")} == CLIENT_ENTRIES
+
+
+def test_chartered_framework_entries_and_vendor_are_allowed(tmp_path):
+    framework_project(tmp_path)
     write(tmp_path, "static/vendor/lib.js", "// pinned\n")
     assert checks.check_js_placement(tmp_path) == []
+    assert checks.check_js_http(tmp_path) == []
+
+
+def test_missing_or_unchartered_framework_entries_are_rejected(tmp_path):
+    framework_project(tmp_path)
+    (tmp_path / "src/curvature/static/live.js").unlink()
+    write(tmp_path, "src/curvature/static/extra.js", "// no charter\n")
+    findings = checks.check_js_placement(tmp_path)
+    assert len(findings) == 2
+    assert "unchartered" in findings[0].message
+    assert "'live.js' is missing" in findings[1].message
 
 
 def test_js_speaking_http_is_off_curvature(tmp_path):
     write(tmp_path, "static/extra.js", 'fetch("/api")\n')  # curvature-allow: exercises the check
     findings = checks.check_js_http(tmp_path)
     assert [f.rule for f in findings] == ["ANOM-121"]
+
+
+def test_framework_entries_cannot_borrow_each_others_protocol(tmp_path):
+    framework_project(tmp_path)
+    write(
+        tmp_path,
+        "src/curvature/static/curvature.js",
+        'fetch("/fragments")\nnew EventSource("/events")\n',
+    )
+    write(
+        tmp_path,
+        "src/curvature/static/live.js",
+        'new EventSource("/events")\nfetch("/fragments")\n',
+    )
+    findings = checks.check_js_http(tmp_path)
+    assert [finding.rule for finding in findings] == ["ANOM-121", "ANOM-121"]
+    assert "EventSource" in findings[0].message
+    assert "fetch" in findings[1].message
 
 
 def test_pragma_line_is_allowed_and_counted(tmp_path):
@@ -222,8 +263,8 @@ def test_walk_source_skips_excluded_dirs(tmp_path):
 
 
 
-def test_only_the_framework_copy_of_the_boost_layer_is_sanctioned(tmp_path):
-    write(tmp_path, "curvature/static/curvature.js", 'fetch("fragments")\n')
+def test_only_the_framework_owned_client_entries_are_sanctioned(tmp_path):
+    framework_project(tmp_path)
     assert checks.check_js_placement(tmp_path) == []
     assert checks.check_js_http(tmp_path) == []
 
@@ -264,3 +305,12 @@ def test_anomaly_170_refuses_placeholder_purposes(tmp_path):
 def test_an_app_cannot_smuggle_javascript_under_the_framework_filename(tmp_path):
     write(tmp_path, "app/static/curvature.js", "// counterfeit\n")
     assert [f.rule for f in checks.check_js_placement(tmp_path)] == ["ANOM-120"]
+
+
+def test_an_app_cannot_counterfeit_the_package_path(tmp_path):
+    write(tmp_path, "curvature/static/curvature.js", "// counterfeit\n")
+    write(tmp_path, "curvature/static/live.js", "// counterfeit\n")
+    assert [f.rule for f in checks.check_js_placement(tmp_path)] == [
+        "ANOM-120",
+        "ANOM-120",
+    ]

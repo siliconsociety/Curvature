@@ -5,6 +5,7 @@ invariant it serves, because the traceback should teach."""
 
 from __future__ import annotations
 
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -47,14 +48,30 @@ def is_vendored(path: Path) -> bool:
     )
 
 
-SANCTIONED_SCRIPTS = frozenset({"curvature.js"})
+CLIENT_ENTRIES = frozenset({"curvature.js", "live.js"})
+CLIENT_NETWORK_AUTHORITY = {
+    "curvature.js": frozenset({"fetch("}),
+    "live.js": frozenset({"EventSource("}),
+}
 
 
-def is_boost_layer(path: Path) -> bool:
-    """The boost layer: the only first-party script (C-300), vendored by
-    the framework and ceilinged like everything else."""
-    return (
-        path.name in SANCTIONED_SCRIPTS
-        and path.parent.name == "static"
-        and path.parent.parent.name == "curvature"
+def framework_client_directory(root: Path) -> Path | None:
+    """Locate package-owned client entries in source or an installed package."""
+    pyproject = root / "pyproject.toml"
+    if pyproject.is_file():
+        project = tomllib.loads(pyproject.read_text()).get("project", {})
+        if project.get("name") == "curvature":
+            return root / "src/curvature/static"
+    if root.name == "curvature" and (root / "__init__.py").is_file():
+        return root / "static"
+    return None
+
+
+def is_framework_client(path: Path, root: Path) -> bool:
+    """A chartered public entry at the exact package-owned path (C-300)."""
+    directory = framework_client_directory(root)
+    return bool(
+        directory
+        and path.parent.resolve() == directory.resolve()
+        and path.name in CLIENT_ENTRIES
     )

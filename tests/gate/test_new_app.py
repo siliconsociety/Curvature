@@ -38,6 +38,12 @@ def test_poured_readme_explains_the_update_boundary(poured):
     assert "upgrades never overwrite" in readme
 
 
+def test_poured_shell_keeps_the_stable_consumer_entrypoint(poured):
+    shell = (poured / "app/components/shell.py").read_text()
+    assert 'h.script(src=f"/static/lib/curvature.js?v={ASSETS}")' in shell
+    assert "live.js" not in shell
+
+
 def test_poured_agents_carries_upstream_field_report_doctrine(poured):
     contract = " ".join((poured / "AGENTS.md").read_text().split())
     assert "offer to file an upstream Curvature issue" in contract

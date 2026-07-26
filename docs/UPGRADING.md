@@ -6,9 +6,9 @@ of code. An update must preserve that boundary.
 ## Package-owned runtime
 
 The installed `curvature` package owns imports from `curvature`, the framework
-gate, static runtime assets such as `curvature.js`, and the source templates
-used for future scaffolds and pours. Existing applications update this layer
-through their dependency lock:
+gate, the closed static runtime (`curvature.js` and `live.js`), and the source
+templates used for future scaffolds and pours. Existing applications update
+this layer through their dependency lock:
 
 ```bash
 uv lock --upgrade-package curvature
@@ -17,9 +17,10 @@ uv sync
 ```
 
 Commit the lockfile with any compatibility changes. Deploy from that lockfile.
-The default shell serves `curvature.js` from the installed package and keys its
-URL with the installed package version, so a runtime update also moves the
-browser asset without copying it into the application.
+The default shell continues to serve only `curvature.js` from the installed
+package and keys its URL with the installed package version. That stable
+entrypoint propagates the same query to `live.js`, so a runtime update moves
+both browser assets without copying either into the application.
 
 Applications that do not commit a lockfile should install an explicit
 Curvature version. An unconstrained install is not an update policy.
@@ -53,14 +54,26 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
-## 0.4.2
+## 0.4.3
 
-The boost layer now leaves same-page fragment navigation and its history
-traversal to the browser. Cross-page boosted navigation preserves fragments
-through redirects and scrolls to the resolved target after swapping. This is a
-package-only runtime correction: update Curvature in the application lockfile,
-sync the environment, exercise affected links in a real browser, and deploy.
-No application-owned source migration is required.
+The stable `/static/lib/curvature.js?v=<version>` include now loads the
+package-owned `live.js` branch with the same asset version. Navigation, swaps,
+focus, pending state, and history remain in the entrypoint; declared
+EventSource lifecycle lives in the branch. The boost layer also leaves
+same-page fragment navigation and its history traversal to the browser, while
+cross-page boosted navigation preserves fragments through redirects and
+scrolls to the resolved target after swapping.
+
+This is a package-only runtime update. Existing applications need no source or
+script-tag migration: update Curvature to 0.4.3 in the application lockfile,
+sync the environment, exercise boosted and Live paths in a real browser, run
+`./gate.sh`, and deploy.
+
+## 0.4.2 (internal only; never published)
+
+0.4.2 was a merged integration waypoint for the fragment-navigation
+correction. It is not a consumer upgrade target and must never be tagged or
+published; its package-owned correction ships publicly as part of 0.4.3.
 
 ## 0.4.1
 

@@ -91,14 +91,15 @@ def lap(props: LapProps) -> Element:
 - **Pages keep themselves current.** Live (SSE) pushes updates into
   every open browser — the demo board redraws whenever its file-backed
   data changes — with zero app JavaScript.
-- **curvature.js** (the only script, held under a 150-line ratcheted ceiling) boosts working links and
-  GET forms into fragment swaps. Mutating forms stay native, so a lost
-  connection can never turn a POST into the wrong GET. Native submitter
-  overrides remain native semantics, and enhanced submissions expose
-  `aria-busy` and `data-curvature-pending` while intent is in flight.
-  Same-page fragment links and their history stay browser-native; cross-page
-  boosts preserve and scroll to their fragment after swapping. Same route,
-  same render, one header of difference.
+- **The client layer is closed and chartered.** `curvature.js` remains the
+  stable, sole consumer-facing include. It boosts working links and GET forms
+  into fragment swaps; its package-owned `live.js` branch manages only
+  server-declared EventSource streams. Mutating forms stay native, native
+  submitter overrides remain native semantics, and enhanced submissions expose
+  `aria-busy` and `data-curvature-pending` while intent is in flight. Same-page
+  fragment links and their history stay browser-native; cross-page boosts
+  preserve and scroll to their fragment after swapping. Applications write no
+  JavaScript.
 - **The ratchet only tightens; healthy trees Spiral.** Base file ceilings
   fall, the coverage floor rises, and `curvature ratchet` is the only hand on
   the mechanism. Local occupied surface lets related leaves grow by radius,
@@ -156,7 +157,7 @@ disappears. That is the boundary.
 ## Updating an app
 
 Curvature has two ownership classes. The installed package owns the runtime,
-including `curvature.js`, Live, response helpers, and the gate. Update that
+including `curvature.js`, `live.js`, response helpers, and the gate. Update that
 runtime deliberately, review the lockfile, and run the app's gate:
 
 ```bash

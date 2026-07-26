@@ -10,7 +10,15 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from curvature.gate.findings import Finding, is_boost_layer, is_vendored, walk_source
+from curvature.gate.findings import (
+    CLIENT_ENTRIES,
+    CLIENT_NETWORK_AUTHORITY,
+    Finding,
+    framework_client_directory,
+    is_framework_client,
+    is_vendored,
+    walk_source,
+)
 from curvature.gate.routes import check_mutating_routes as check_mutating_routes
 
 HTTP_TOKENS = ("fetch(", "XMLHttpRequest", "WebSocket(", "EventSource(")
@@ -25,33 +33,49 @@ def _allowed(line: str) -> bool:
 
 
 def check_js_placement(root: Path) -> list[Finding]:
-    """ANOM-120: the only first-party script is the boost layer (C-300)."""
+    """ANOM-120: only the closed package-owned client set is chartered (C-300)."""
     findings = []
     for path in walk_source(root, frozenset({".js"})):
-        if is_vendored(path) or is_boost_layer(path):
+        if is_vendored(path) or is_framework_client(path, root):
             continue
         findings.append(Finding(
             "ANOM-120", str(path.relative_to(root)), None,
-            "first-party JavaScript outside the boost layer (C-300); "
-            "move the behavior server-side or into native HTML",
+            "consumer, counterfeit, or unchartered JavaScript (C-300); "
+            "application behavior belongs server-side or in native HTML",
         ))
+    if directory := framework_client_directory(root):
+        actual = {
+            path.name for path in directory.glob("*.js")
+            if path.is_file()
+        }
+        for missing in sorted(CLIENT_ENTRIES - actual):
+            findings.append(Finding(
+                "ANOM-120", str((directory / missing).relative_to(root)), None,
+                f"chartered framework client entry {missing!r} is missing (C-300)",
+            ))
     return findings
 
 
 def check_js_http(root: Path) -> list[Finding]:
-    """ANOM-121: JavaScript never speaks HTTP on its own (C-301)."""
+    """ANOM-121: each client entry gets only its chartered protocol (C-301)."""
     findings = []
     for path in walk_source(root, frozenset({".js"})):
-        if is_vendored(path) or is_boost_layer(path):
+        if is_vendored(path):
             continue
+        authority = (
+            CLIENT_NETWORK_AUTHORITY[path.name]
+            if is_framework_client(path, root)
+            else frozenset()
+        )
         for number, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
             if _allowed(line):
                 continue
             for token in HTTP_TOKENS:
-                if token in line:
+                if token in line and token not in authority:
                     findings.append(Finding(
                         "ANOM-121", str(path.relative_to(root)), number,
-                        f"{token.rstrip('(')} outside the boost layer (C-301)",
+                        f"{token.rstrip('(')} exceeds this script's network charter "
+                        "(C-301)",
                     ))
     return findings
 

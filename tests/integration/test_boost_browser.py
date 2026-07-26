@@ -15,12 +15,13 @@ from playwright.sync_api import expect
 from curvature.live import TERMINAL_SIGNAL
 
 BOOST = Path(__file__).parents[2] / "src/curvature/static/curvature.js"
+LIVE = Path(__file__).parents[2] / "src/curvature/static/live.js"
 
 
-def _page(fragment: str) -> str:
+def _page(fragment: str, version: str = "0.4.3") -> str:
     return (
         "<!doctype html><html><head>"
-        '<script src="/curvature.js" defer></script></head>'
+        f'<script src="/static/lib/curvature.js?v={version}" defer></script></head>'
         f'<body data-boost><main>{fragment}</main></body></html>'
     )
 
@@ -32,6 +33,7 @@ def _home() -> str:
         '<a id="broken" href="/broken">Broken</a>'
         '<a id="slow" href="/slow">Slow</a>'
         '<a id="fast" href="/fast">Fast</a>'
+        '<a id="add-live" href="/live-added">Add Live</a>'
         '<form id="search" action="/search" method="get">'
         '<input name="q" value="tires">'
         '<button name="scope" value="all">Find</button></form>'
@@ -54,6 +56,8 @@ class BoostProbe(BaseHTTPRequestHandler):
     last_write_was_boosted = False
     broken_requests: list[bool] = []
     terminal_requests = 0
+    live_module_requests: list[tuple[str, str | None, str | None]] = []
+    navigation_requests: list[tuple[str, bool]] = []
 
     def log_message(self, _format, *_args):
         pass
@@ -70,12 +74,39 @@ class BoostProbe(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         boosted = self.headers.get("Curvature-Boost") == "1"
-        if parsed.path == "/curvature.js":
+        if parsed.path == "/static/lib/curvature.js":
             self._send(BOOST.read_text(), content_type="text/javascript")
+        elif parsed.path == "/static/lib/live.js":
+            type(self).live_module_requests.append((
+                parsed.query,
+                self.headers.get("Sec-Fetch-Dest"),
+                self.headers.get("Referer"),
+            ))
+            if parsed.query == "v=missing":
+                self._send("missing", status=404, content_type="text/plain")
+            else:
+                if parsed.query == "v=slow":
+                    time.sleep(0.25)
+                self._send(LIVE.read_text(), content_type="text/javascript")
         elif parsed.path == "/":
             self._send(_home())
+        elif parsed.path == "/module-failure-home":
+            self._send(_page(
+                '<section id="panel">module unavailable '
+                '<a id="next" href="/next">Next</a></section>',
+                version="missing",
+            ))
+        elif parsed.path == "/live-race-home":
+            self._send(_page(
+                '<section id="panel">no live yet '
+                '<a id="add-live" href="/live-added">Add Live</a></section>',
+                version="slow",
+            ))
         elif parsed.path == "/live-home":
             self._send(_live_home())
+        elif parsed.path == "/live-added":
+            fragment = '<section id="panel" data-live="/added-stream">added</section>'
+            self._send(fragment if boosted else _page(fragment))
         elif parsed.path == "/live-away":
             fragment = (
                 '<section id="status">away '
@@ -102,6 +133,7 @@ class BoostProbe(BaseHTTPRequestHandler):
             else:
                 self._send(_page('<section id="panel">native fallback</section>'))
         elif parsed.path in {"/next", "/slow", "/fast"}:
+            type(self).navigation_requests.append((parsed.path, boosted))
             if parsed.path == "/slow" and boosted:
                 time.sleep(0.25)
             label = parsed.path.removeprefix("/")
@@ -194,9 +226,63 @@ def live_source_state(page):
     return page.evaluate("liveSources.map(source => ({url: source.url, closed: source.closed}))")
 
 
+def wait_for_live_sources(page, count=1):
+    page.wait_for_function(
+        "count => window.liveSources?.length === count",
+        arg=count,
+    )
+
+
+def test_versioned_entrypoint_loads_versioned_live_module(page, live_url):
+    BoostProbe.live_module_requests = []
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-home")
+    wait_for_live_sources(page)
+
+    assert BoostProbe.live_module_requests == [
+        (
+            "v=0.4.3",
+            "script",
+            f"{live_url}/static/lib/curvature.js?v=0.4.3",
+        )
+    ]
+
+
+def test_swapped_in_live_root_starts_without_duplicate_module_import(page, live_url):
+    BoostProbe.live_module_requests = []
+    page.add_init_script(LIVE_SOURCE_PROBE)
+    page.goto(f"{live_url}/live-race-home")
+    page.locator("#add-live").click()
+    page.wait_for_url(f"{live_url}/live-added")
+    wait_for_live_sources(page)
+
+    assert live_source_state(page) == [{"url": "/added-stream", "closed": False}]
+    assert len(BoostProbe.live_module_requests) == 1
+
+
+def test_live_module_failure_leaves_boosted_navigation_usable(page, live_url):
+    BoostProbe.live_module_requests = []
+    BoostProbe.navigation_requests = []
+    page.goto(f"{live_url}/module-failure-home")
+    page.wait_for_timeout(100)
+
+    page.locator("#next").click()
+    page.wait_for_url(f"{live_url}/next")
+    expect(page.locator("#panel")).to_have_text("next")
+    assert BoostProbe.live_module_requests == [
+        (
+            "v=missing",
+            "script",
+            f"{live_url}/static/lib/curvature.js?v=missing",
+        )
+    ]
+    assert BoostProbe.navigation_requests == [("/next", True)]
+
+
 def test_live_swaps_transfer_ownership_without_duplicates(page, live_url):
     page.add_init_script(LIVE_SOURCE_PROBE)
     page.goto(f"{live_url}/live-home")
+    wait_for_live_sources(page)
 
     page.evaluate("""() => {
       liveSources[0].message('<section id="status" data-live="/stream">one</section>');
@@ -210,6 +296,7 @@ def test_live_swaps_transfer_ownership_without_duplicates(page, live_url):
 def test_detached_live_owner_closes_and_returning_starts_fresh(page, live_url):
     page.add_init_script(LIVE_SOURCE_PROBE)
     page.goto(f"{live_url}/live-home")
+    wait_for_live_sources(page)
     page.locator("#away").click()
     page.wait_for_url(f"{live_url}/live-away")
     assert live_source_state(page) == [{"url": "/stream", "closed": True}]
@@ -225,6 +312,7 @@ def test_detached_live_owner_closes_and_returning_starts_fresh(page, live_url):
 def test_changed_live_url_closes_the_old_source(page, live_url):
     page.add_init_script(LIVE_SOURCE_PROBE)
     page.goto(f"{live_url}/live-home")
+    wait_for_live_sources(page)
     page.evaluate(
         "liveSources[0].message('<section id=\"status\" data-live=\"/other\">changed</section>')"
     )
@@ -245,6 +333,7 @@ def test_terminal_event_closes_without_native_reconnection(page, live_url):
 def test_return_after_terminal_event_starts_fresh(page, live_url):
     page.add_init_script(LIVE_SOURCE_PROBE)
     page.goto(f"{live_url}/live-home")
+    wait_for_live_sources(page)
     page.evaluate("liveSources[0].finish()")
     assert live_source_state(page) == [{"url": "/stream", "closed": True}]
 

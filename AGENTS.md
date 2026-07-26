@@ -9,7 +9,7 @@ session; everything else you need is enforced, not remembered.
 
 Curvature is a contract that ships a runtime. Server-rendered Python web
 apps: FastAPI routes, components as typed functions, real links and real
-forms, one small boost script for the AJAX feel. The application must
+forms, one small closed client layer for the AJAX feel. The application must
 work with JavaScript switched off — that is not a feature, it is the
 architecture (SPEC.md C-202).
 
@@ -87,10 +87,12 @@ async def create_lap(title: Annotated[str, Form()]):
 
 ## What you must never do
 
-- **Never write application JavaScript.** The framework-owned boost layer
-  (`curvature.js`) is the sole sanctioned script. If a behavior seems to need JS, it belongs on
-  the server or in native HTML (`<details>`, `<dialog>`, `popover`,
-  CSS `:has()`). A `.js` file from your hands is an anomaly on sight
+- **Never write application JavaScript.** The framework owns a closed client
+  layer: the stable `curvature.js` entrypoint provides navigation and swaps,
+  and its package-owned `live.js` branch provides declared Live lifecycle.
+  Neither grants client authority to applications. If a behavior seems to need
+  JS, it belongs on the server or in native HTML (`<details>`, `<dialog>`,
+  `popover`, CSS `:has()`). A consumer `.js` file is an anomaly on sight
   (ANOM-120).
 - **Never edit `ratchet.toml`.** `curvature ratchet` is the only hand on
   the mechanism. Ceilings fall, floors rise; a loosened bound is caught

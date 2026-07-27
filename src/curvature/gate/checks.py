@@ -11,6 +11,7 @@ import ast
 import re
 from pathlib import Path
 
+from curvature.gate import event_horizons
 from curvature.gate.findings import (
     CLIENT_ENTRIES,
     CLIENT_NETWORK_AUTHORITY,
@@ -36,6 +37,7 @@ NETWORK_ALIAS = re.compile(
     rf"{_GLOBAL}(?P<primitive>{_PRIMITIVES})\s*"
     rf"(?:;|(?=//|[\r\n]|$))",
 )
+SEND_BEACON = re.compile(r"\bnavigator\s*\.\s*sendBeacon\s*\(")
 ALLOW_PRAGMA = "curvature-allow"
 ALLOW_WITH_REASON = re.compile(r"curvature-allow:\s*\S")
 
@@ -69,21 +71,37 @@ def _network_uses(source: str) -> list[tuple[int, str]]:
         for match in pattern.finditer(source):
             line = source.count("\n", 0, match.start()) + 1
             uses.add((line, primitive))
+    for match in SEND_BEACON.finditer(source):
+        line = source.count("\n", 0, match.start()) + 1
+        uses.add((line, "sendBeacon"))
     return sorted(uses)
 
 
 def check_js_placement(root: Path) -> list[Finding]:
-    """ANOM-120: only the closed package-owned client set is chartered (C-300)."""
-    findings = []
+    """ANOM-120: every script needs a framework or Event Horizon charter."""
+    catalog = event_horizons.load(root)
+    findings = list(catalog.findings)
     for path in walk_source(root, frozenset({".js"})):
-        # static/vendor remains meaningful to CSS and bounds policy, but cannot
-        # grant client authority under C-300.
-        if is_framework_client(path, root):
+        if is_framework_client(path, root) or catalog.entrypoint_for(path):
             continue
+        if horizon := catalog.horizon_for_directory(path.parent):
+            message = (
+                "Event Horizon field 'entrypoint' declares "
+                f"{horizon.entrypoint.name!r}; {path.name!r} is unchartered (C-300)"
+            )
+        elif path.is_relative_to(root / "app/static/vendor"):
+            message = (
+                "consumer JavaScript has no valid sibling event-horizon.json "
+                "charter (C-300)"
+            )
+        else:
+            message = (
+                "consumer, counterfeit, or unchartered JavaScript (C-300); "
+                "application behavior belongs server-side, in native HTML, or "
+                "inside a declared Event Horizon"
+            )
         findings.append(Finding(
-            "ANOM-120", str(path.relative_to(root)), None,
-            "consumer, counterfeit, or unchartered JavaScript (C-300); "
-            "application behavior belongs server-side or in native HTML",
+            "ANOM-120", str(path.relative_to(root)), None, message,
         ))
     if directory := framework_client_directory(root):
         actual = {
@@ -100,13 +118,16 @@ def check_js_placement(root: Path) -> list[Finding]:
 
 def check_js_http(root: Path) -> list[Finding]:
     """ANOM-121: each client entry gets only its chartered protocol (C-301)."""
+    catalog = event_horizons.load(root)
     findings = []
     for path in walk_source(root, frozenset({".js"})):
-        authority = (
-            CLIENT_NETWORK_AUTHORITY[path.name]
-            if is_framework_client(path, root)
-            else frozenset()
-        )
+        horizon = catalog.entrypoint_for(path)
+        if is_framework_client(path, root):
+            authority = CLIENT_NETWORK_AUTHORITY[path.name]
+        elif horizon is not None:
+            authority = horizon.network_authority
+        else:
+            authority = frozenset()
         source = path.read_text(errors="replace")
         lines = source.splitlines()
         for number, primitive in _network_uses(source):
@@ -119,6 +140,11 @@ def check_js_http(root: Path) -> list[Finding]:
                     f"{primitive} exceeds this script's network charter (C-301)",
                 ))
     return findings
+
+
+def check_js_capabilities(root: Path) -> list[Finding]:
+    """ANOM-123: Event Horizon code stays inside non-network capabilities."""
+    return event_horizons.check_capabilities(root)
 
 
 def check_dom_sins(root: Path) -> list[Finding]:

@@ -89,6 +89,20 @@ browser primitive under a new name.
 - `history` and `local_time` are optional explicit opt-ins. Absent or false
   means no history or local-time authority.
 
+The non-network check is deliberately textual and predictable. It recognizes:
+
+- `localStorage`, `sessionStorage`, `indexedDB`, and `document.cookie` as
+  storage evidence;
+- `innerHTML`, `outerHTML`, `insertAdjacentHTML`, and `document.write` as HTML
+  injection evidence;
+- `history.pushState` and `history.replaceState` as history evidence;
+- `Intl.DateTimeFormat`, `toLocaleString`, `toLocaleDateString`, and
+  `toLocaleTimeString` as local-time evidence.
+
+Like Curvature's other token checks, a line may carry a reasoned
+`curvature-allow:` pragma when enforcement code or a test must name forbidden
+evidence. The gate reports that pragma census.
+
 The manifest does not replace the server contract. Consumer tests must prove
 the product-specific meaning of `server_contract` and must retain a working
 JavaScript-off baseline for the surrounding application and the horizon's
@@ -146,6 +160,6 @@ consumers remain on 0.3.2 and move directly to the repaired 0.4.4 release:
 4. Run `./gate.sh`, exercise the affected browser path, and deploy from the
    reviewed lockfile.
 
-Consumers without Event Horizons can follow the ordinary package-only 0.4.3
-upgrade note. See [UPGRADING.md](UPGRADING.md) for the historical erratum and
-the 0.4.4 path.
+Consumers without Event Horizons can update normally to 0.4.4 as a
+package-only change. See [UPGRADING.md](UPGRADING.md) for the historical
+erratum and the complete 0.4.4 path.

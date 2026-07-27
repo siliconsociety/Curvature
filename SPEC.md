@@ -418,7 +418,7 @@ from app routes; there is nothing to hand-maintain).
 | ID     | Invariant | Check |
 |--------|-----------|-------|
 | ANOM-110 | C-100 | component signature: first annotation name ends in `Props` |
-| ANOM-120 | C-300 | Event Horizon manifest/schema/path/file/entrypoint/extra-script/budget violation |
+| ANOM-120 | C-300 | unchartered/counterfeit/missing framework script or Event Horizon manifest/schema/path/file/entrypoint/extra-script/budget violation |
 | ANOM-121 | C-301 | network token outside an exact framework or Event Horizon charter |
 | ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
 | ANOM-123 | C-305 | false non-network Event Horizon capability evidence |
@@ -435,11 +435,11 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-161 | C-802 | satellite manifest disagrees with its directory |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 
-Token checks (ANOM-121, ANOM-123, ANOM-130) honor one escape hatch: a line carrying a
-`curvature-allow` pragma with a reason. Enforcement code and tests that
-exercise refusals must spell the forbidden words; the pragma keeps them
-buildable while staying greppable — and `curvature check` reports the
-pragma census on every run, so the escape hatch can never go quietly.
+Token checks (ANOM-121, ANOM-123, ANOM-130) honor one escape hatch: a line
+carrying a `curvature-allow` pragma with a reason. Enforcement code and tests
+that exercise refusals must spell the forbidden words; the pragma keeps them
+buildable while staying greppable — and `curvature check` reports the pragma
+census on every run, so the escape hatch can never go quietly.
 
 A curved repo is one where `curvature check` exits 0 and has *teeth it
 can show*: the finding index above is the framework minimum. A green gate

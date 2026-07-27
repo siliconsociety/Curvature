@@ -59,6 +59,16 @@ def test_poured_agents_carries_upstream_field_report_workflow(poured):
     assert "qualification-ledger" not in contract
 
 
+def test_poured_guidance_names_the_event_horizon_boundary(poured):
+    agents = " ".join((poured / "AGENTS.md").read_text().split())
+    readme = " ".join((poured / "README.md").read_text().split())
+    assert "outside a declared Event Horizon" in agents
+    assert "app/static/vendor/<name>/event-horizon.json" in agents
+    assert "consumer tests" in agents
+    assert "Event Horizon" in readme
+    assert "ordinary application writes no JavaScript" in readme
+
+
 def test_curvature_repository_owns_github_attribution_policy():
     contract = " ".join((Path(__file__).parents[2] / "AGENTS.md").read_text().split())
     assert "Every GitHub message authored by an agent" in contract

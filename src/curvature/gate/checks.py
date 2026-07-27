@@ -38,6 +38,12 @@ NETWORK_ALIAS = re.compile(
     rf"(?:;|(?=//|[\r\n]|$))",
 )
 SEND_BEACON = re.compile(r"\bnavigator\s*\.\s*sendBeacon\s*\(")
+SEND_BEACON_ALIAS = re.compile(
+    rf"\b(?:const|let|var)\s+"
+    rf"(?P<alias>[A-Za-z_$][\w$]*)\s*=\s*"
+    rf"{_GLOBAL}navigator\s*\.\s*sendBeacon\s*"
+    rf"(?:;|(?=//|[\r\n]|$))",
+)
 ALLOW_PRAGMA = "curvature-allow"
 ALLOW_WITH_REASON = re.compile(r"curvature-allow:\s*\S")
 
@@ -59,6 +65,10 @@ def _network_uses(source: str) -> list[tuple[int, str]]:
         match.group("alias"): match.group("primitive")
         for match in NETWORK_ALIAS.finditer(source)
     }
+    aliases.update({
+        match.group("alias"): "sendBeacon"
+        for match in SEND_BEACON_ALIAS.finditer(source)
+    })
     patterns = {
         **NETWORK_CALLS,
         **{

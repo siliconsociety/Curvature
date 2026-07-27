@@ -105,6 +105,18 @@ def test_network_false_rejects_fetch(tmp_path):
     assert "fetch exceeds" in findings[0].message
 
 
+def test_send_beacon_cannot_escape_through_a_simple_alias(tmp_path):
+    horizon(
+        tmp_path,
+        'const beacon = globalThis.navigator.sendBeacon;\nbeacon("/audit");\n',
+        manifest=declaration(network=True),
+    )
+    findings = checks.check_js_http(tmp_path)
+    assert [(finding.line, finding.message) for finding in findings] == [
+        (2, "sendBeacon exceeds this script's network charter (C-301)"),
+    ]
+
+
 def test_only_the_exact_declared_entrypoint_is_chartered(tmp_path):
     directory = horizon(tmp_path)
     write(tmp_path, "app/static/vendor/editor/extra.js", "// stowaway\n")

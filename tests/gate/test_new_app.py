@@ -9,15 +9,6 @@ import pytest
 from curvature.gate.cli import main, run_checks
 from curvature.gate.scaffold import APP_FILES, _scaffold_git_env, new_app
 
-ATTRIBUTION_START = "Only upstream Curvature field reports"
-ATTRIBUTION_END = "verification remain the causal record."
-
-
-def attribution_doctrine(source: str) -> str:
-    start = source.index(ATTRIBUTION_START)
-    end = source.index(ATTRIBUTION_END, start) + len(ATTRIBUTION_END)
-    return " ".join(source[start:end].split())
-
 
 @pytest.fixture(scope="module")
 def poured(tmp_path_factory):
@@ -54,38 +45,28 @@ def test_poured_shell_keeps_the_stable_consumer_entrypoint(poured):
     assert "live.js" not in shell
 
 
-def test_poured_agents_carries_upstream_field_report_doctrine(poured):
+def test_poured_agents_carries_upstream_field_report_workflow(poured):
     contract = " ".join((poured / "AGENTS.md").read_text().split())
     assert "offer to file an upstream Curvature issue" in contract
     assert "Filing requires the operator's nod" in contract
     assert "creates no issue, attribution policy, or process artifact" in contract
     assert "minimal reproduction" in contract
     assert "desired behavior as checkable invariants" in contract
-    assert "Only upstream Curvature field reports" in contract
-    assert "Consumer-repository artifacts are excluded" in contract
-    assert "ordinary pull requests, commits, and other artifacts" in contract
-    assert "active task or harness" in contract
-    assert "explicit Factory launch packet" in contract
-    assert "~/.codex/config.toml" in contract
-    assert "does not prove the active model" in contract
-    assert "— GPT-5.6 Luna (<role>)" in contract
-    assert "— GPT-5.6 Sol (<role>)" in contract
-    assert "exact assigned role" in contract
-    assert "Reasoning effort and speed or service tier stay out" in contract
-    assert "stop before the upstream GitHub write and ask the operator" in contract
-    assert "Never publish an unidentified-model fallback" in contract
-    assert "Unidentified model (role) — operator, please amend" not in contract
-    assert "qualification-ledger key, not complete provenance" in contract
+    assert "model attribution" not in contract
+    assert "GPT-5.6" not in contract
+    assert "~/.codex/config.toml" not in contract
+    assert "bot-managed footer" not in contract
+    assert "qualification-ledger" not in contract
 
 
-def test_attribution_doctrine_stays_canonical_across_guidance(poured):
-    root = Path(__file__).parents[2]
-    sources = (
-        (poured / "AGENTS.md").read_text(),
-        (root / "AGENTS.md").read_text(),
-        (root / "docs/UPGRADING.md").read_text(),
-    )
-    assert len({attribution_doctrine(source) for source in sources}) == 1
+def test_curvature_repository_owns_github_attribution_policy():
+    contract = " ".join((Path(__file__).parents[2] / "AGENTS.md").read_text().split())
+    assert "Every GitHub message authored by an agent" in contract
+    assert "issue bodies, pull request descriptions, reviews, and comments" in contract
+    assert "immediately before any bot-managed footer" in contract
+    assert "Commit messages remain ordinary Git history" in contract
+    assert "Curvature repository policy" in contract
+    assert "do not inherit it unless they independently opt in" in contract
 
 
 def test_poured_config_knows_its_first_party_import_roots(poured):

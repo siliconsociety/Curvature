@@ -2,15 +2,13 @@
 
 GitHub issues hold intake and technical discussion, open pull requests show
 active work, and merged pull requests plus releases record what shipped.
-Pit Board at `/` is an illustrative release-history demo backed by
-`demo/data/roadmap.json` and exposed through Curvature's own Chart. It is not a
-second project ledger. This file records longer-lived decisions that would
-otherwise be easy to misremember.
+This file records longer-lived decisions that would otherwise be easy to
+misremember.
 
 ## Current direction (2026-07-25)
 
 - Curvature is an alpha contract and runtime being hardened for production;
-  a live demo is evidence of deployability, not proof of readiness.
+  a deployed consumer is evidence of deployability, not proof of readiness.
 - Native HTML is the baseline. The boost enhances links and GET forms only;
   mutating forms stay native and complete through POST-redirect-GET.
 - Chart and Atlas remain the general machine-readable interface. They are

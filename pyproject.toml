@@ -71,7 +71,7 @@ pythonpath = ["."]
 filterwarnings = ["error"]
 
 [tool.pyright]
-include = ["src/curvature", "demo"]
+include = ["src/curvature"]
 exclude = ["src/curvature/pours"]
 extraPaths = ["src", "."]
 pythonVersion = "3.12"

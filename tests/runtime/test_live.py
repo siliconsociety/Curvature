@@ -60,44 +60,6 @@ def test_clean_completion_sends_the_terminal_signal():
     assert asyncio.run(collect()) == [TERMINAL_SIGNAL]
 
 
-def test_the_tower_streams_its_state(tmp_path):
-    import shutil
-    from pathlib import Path
-
-    from demo.app import _tower_events
-    from demo.roadmap_store import RoadmapStore
-
-    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
-    working = tmp_path / "roadmap.json"
-    shutil.copy(seed, working)
-    store = RoadmapStore(working)
-
-    async def first_event():
-        generator = _tower_events(store)
-        return await anext(generator)
-
-    fragment = asyncio.run(first_event())
-    assert fragment.id == "pit-tower"
-    assert fragment.attrs.get("data_live") == "/live"
-
-
-def test_store_version_tracks_the_file(tmp_path):
-    import shutil
-    import time
-    from pathlib import Path
-
-    from demo.roadmap_store import RoadmapStore
-
-    seed = Path(__file__).parents[2] / "demo" / "data" / "roadmap.json"
-    working = tmp_path / "roadmap.json"
-    shutil.copy(seed, working)
-    store = RoadmapStore(working)
-    before = store.version()
-    time.sleep(0.01)
-    store.add("bump", "", "queued")
-    assert store.version() != before
-
-
 def test_quiet_streams_heartbeat_and_resume():
     async def event_silence_event():
         yield h.div("x", id="only")

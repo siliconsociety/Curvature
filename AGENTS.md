@@ -147,9 +147,6 @@ Model identity is a qualification-ledger key, not complete provenance; the
 report's context, mechanism, reproduction, measurements, workaround, and
 verification remain the causal record.
 
-Pit Board is an illustrative release-history demo, not a second project
-ledger. Ordinary work does not add or move its cards.
-
 ## When you finish
 
 Run `./gate.sh`. If it is green and coverage rose, run `curvature ratchet`

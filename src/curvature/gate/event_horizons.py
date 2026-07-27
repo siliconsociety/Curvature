@@ -146,7 +146,8 @@ def _load_one(
 ) -> tuple[EventHorizon | None, list[Finding]]:
     problems: list[Finding] = []
     if (
-        manifest.is_symlink()
+        not manifest.is_file()
+        or manifest.is_symlink()
         or manifest.parent.absolute() != manifest.parent.resolve()
         or manifest.resolve().parent != manifest.parent.resolve()
     ):

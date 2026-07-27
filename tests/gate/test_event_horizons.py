@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -175,6 +176,15 @@ def test_manifest_cannot_be_a_symlink(tmp_path):
     outside = write(tmp_path, "outside.json", json.dumps(declaration()))
     (directory / "event-horizon.json").unlink()
     (directory / "event-horizon.json").symlink_to(outside)
+    findings = checks.check_js_placement(tmp_path)
+    assert "must be a regular file" in findings[0].message
+
+
+def test_manifest_must_be_a_regular_file(tmp_path):
+    directory = horizon(tmp_path)
+    manifest = directory / "event-horizon.json"
+    manifest.unlink()
+    os.mkfifo(manifest)
     findings = checks.check_js_placement(tmp_path)
     assert "must be a regular file" in findings[0].message
 

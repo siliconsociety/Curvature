@@ -99,33 +99,13 @@ mechanism, gives a minimal reproduction, includes measurements where relevant,
 records the temporary workaround and verification performed, and states desired
 behavior as checkable invariants.
 
-Only upstream Curvature field reports and their substantive discussion carry
-model attribution under this contract. Consumer-repository artifacts are
-excluded, as are ordinary pull requests, commits, and other artifacts wherever
-they live.
-
-Before an attributed upstream GitHub write, verify identity from the active
-task or harness, or from an explicit Factory launch packet; either is
-authoritative for that run. `~/.codex/config.toml` alone describes a default
-and does not prove the active model. When identity is verified as
-`gpt-5.6-luna`, render `— GPT-5.6 Luna (<role>)`; for `gpt-5.6-sol`, render
-`— GPT-5.6 Sol (<role>)`. Substitute the exact assigned role without
-normalizing or inventing it. Reasoning effort and speed or service tier stay
-out of the public signature. If identity cannot be verified, stop before the
-upstream GitHub write and ask the operator. Never publish an unidentified-model
-fallback.
-
-Model identity is a qualification-ledger key, not complete provenance; the
-report's context, mechanism, reproduction, measurements, workaround, and
-verification remain the causal record.
 ```
 
 Adopt it as an application-owned migration:
 
 1. Copy the block into the application's app-owned `AGENTS.md`.
-2. Preserve its upstream-only attribution boundary.
-3. Run the application's `./gate.sh`.
-4. Commit the contract change as an application-owned migration.
+2. Run the application's `./gate.sh`.
+3. Commit the contract change as an application-owned migration.
 
 Package upgrades never overwrite an existing application's app-owned
 `AGENTS.md`.

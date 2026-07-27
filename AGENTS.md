@@ -127,10 +127,15 @@ reproduction, includes measurements where relevant, records the temporary
 workaround and verification performed, and states desired behavior as checkable
 invariants.
 
-Only upstream Curvature field reports and their substantive discussion carry
-model attribution under this contract. Consumer-repository artifacts are
-excluded, as are ordinary pull requests, commits, and other artifacts wherever
-they live.
+Every GitHub message authored by an agent in the Curvature repository carries
+model attribution: issue bodies, pull request descriptions, reviews, and
+comments, including ordinary maintainer work. Put the signature at the end of
+the authored message and immediately before any bot-managed footer. Commit
+messages remain ordinary Git history.
+
+This is Curvature repository policy, not part of the framework contract.
+Consumer repositories and other manifolds poured with Curvature do not inherit
+it unless they independently opt in.
 
 Before an attributed upstream GitHub write, verify identity from the active
 task or harness, or from an explicit Factory launch packet; either is
@@ -146,9 +151,6 @@ fallback.
 Model identity is a qualification-ledger key, not complete provenance; the
 report's context, mechanism, reproduction, measurements, workaround, and
 verification remain the causal record.
-
-Pit Board is an illustrative release-history demo, not a second project
-ledger. Ordinary work does not add or move its cards.
 
 ## When you finish
 

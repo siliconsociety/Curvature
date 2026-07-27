@@ -15,7 +15,7 @@ def make_request(*, chart: bool = False, boost: bool = False, query: bytes = b""
         headers.append((b"curvature-boost", b"1"))
     return Request({
         "type": "http", "method": "GET", "headers": headers,
-        "path": "/board", "query_string": query, "scheme": "http",
+        "path": "/laps", "query_string": query, "scheme": "http",
         "server": ("test", 80), "root_path": "",
     })
 
@@ -24,51 +24,51 @@ def shell(*fragments):
     return h.html(h.body(h.main(*fragments)))
 
 
-def board():
+def lap_log():
     return h.section(
-        h.h2("Pit Board"),
+        h.h2("Lap Log"),
         h.form(
             h.input_(type="text", name="title", required=True, maxlength=120),
             h.input_(type="hidden", name="status", value="open"),
             h.button("Add"),
-            action="/tasks", method="post",
+            action="/laps", method="post",
         ),
-        h.a("open (3)", href="/?status=open", class_="filter"),
-        id="pit-board",
+        h.a("open (3)", href="/laps?status=open", class_="filter"),
+        id="lap-log",
     )
 
 
 def test_chart_negotiation_returns_json():
-    response = respond(make_request(chart=True), board(), shell=shell, purpose="Track laps")
+    response = respond(make_request(chart=True), lap_log(), shell=shell, purpose="Track laps")
     assert response.media_type == "application/json"
 
 
 def test_chart_url_preserves_screen_defining_query_state():
     response = respond(
         make_request(chart=True, query=b"status=open"),
-        board(), shell=shell, purpose="Track laps",
+        lap_log(), shell=shell, purpose="Track laps",
     )
-    assert b'"url":"/board?status=open"' in response.body
+    assert b'"url":"/laps?status=open"' in response.body
 
 
 def test_html_responses_advertise_the_chart():
-    response = respond(make_request(), board(), shell=shell)
+    response = respond(make_request(), lap_log(), shell=shell)
     assert response.headers["curvature-chart"] == "available"
     assert "Curvature-Chart" in response.headers["vary"]
 
 
 def test_chart_carries_purpose_and_orientation():
-    chart = build_chart((board(),), url="/board", purpose="Track laps")
+    chart = build_chart((lap_log(),), url="/laps", purpose="Track laps")
     assert chart["chart"] == "curvature/1"
     assert chart["purpose"] == "Track laps"
-    assert chart["headings"] == ["Pit Board"]
-    assert chart["fragments"] == ["pit-board"]
+    assert chart["headings"] == ["Lap Log"]
+    assert chart["fragments"] == ["lap-log"]
 
 
 def test_forms_project_as_json_schema():
-    chart = build_chart((board(),), url="/board", purpose=None)
+    chart = build_chart((lap_log(),), url="/laps", purpose=None)
     form = chart["affordances"]["forms"][0]
-    assert form["action"] == "/tasks" and form["method"] == "post"
+    assert form["action"] == "/laps" and form["method"] == "post"
     assert form["prompt"] == "Add"
     fields = form["fields"]
     assert fields["properties"]["title"] == {"type": "string", "maxLength": 120}
@@ -77,8 +77,8 @@ def test_forms_project_as_json_schema():
 
 
 def test_links_project_with_their_text():
-    chart = build_chart((board(),), url="/board", purpose=None)
-    assert {"text": "open (3)", "href": "/?status=open"} in chart["affordances"]["links"]
+    chart = build_chart((lap_log(),), url="/laps", purpose=None)
+    assert {"text": "open (3)", "href": "/laps?status=open"} in chart["affordances"]["links"]
 
 
 def test_field_types_map_to_schema():
@@ -112,7 +112,7 @@ def test_select_projects_as_enum():
 
 def test_the_chart_wins_over_boost():
     response = respond(
-        make_request(chart=True, boost=True), board(), shell=shell, purpose="Track laps"
+        make_request(chart=True, boost=True), lap_log(), shell=shell, purpose="Track laps"
     )
     assert response.media_type == "application/json"
 
@@ -123,14 +123,14 @@ def test_chart_negotiation_refuses_a_placeholder_purpose():
     from curvature import Anomaly
 
     with pytest.raises(Anomaly, match="C-902"):
-        respond(make_request(chart=True), board(), shell=shell, purpose=None)
+        respond(make_request(chart=True), lap_log(), shell=shell, purpose=None)
 
 
 def test_the_html_heads_are_unchanged():
-    page = respond(make_request(), board(), shell=shell)
-    fragment = respond(make_request(boost=True), board(), shell=shell)
+    page = respond(make_request(), lap_log(), shell=shell)
+    fragment = respond(make_request(boost=True), lap_log(), shell=shell)
     assert page.body.startswith(b"<!doctype html>")
-    assert fragment.body.startswith(b'<section id="pit-board">')
+    assert fragment.body.startswith(b'<section id="lap-log">')
 
 
 def test_text_extraction_handles_every_child_kind():

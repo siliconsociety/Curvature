@@ -92,6 +92,12 @@ def test_script_takes_src_only():
         h.script("alert(1)", src="/x.js")  # type: ignore[call-arg]
 
 
+def test_style_link_is_an_external_stylesheet():
+    assert render(h.style_link("/static/app.css")) == (
+        '<link rel="stylesheet" href="/static/app.css">'
+    )
+
+
 def test_element_id_property():
     assert h.div(id="task-list").id == "task-list"
     assert h.div().id is None

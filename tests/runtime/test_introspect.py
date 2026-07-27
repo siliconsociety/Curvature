@@ -1,27 +1,26 @@
 import asyncio
 
 from curvature.introspect import fetch_chart
-from demo.app import app
 
 
-def test_server_side_tooling_reads_the_public_chart():
-    chart = asyncio.run(fetch_chart(app, "/"))
+def test_server_side_tooling_reads_the_public_chart(chart_app):
+    chart = asyncio.run(fetch_chart(chart_app, "/"))
     assert chart is not None and chart["chart"] == "curvature/1"
     assert chart["affordances"]["forms"] == []
-    assert "ON TRACK" in chart["headings"]
+    assert "Lap Status" in chart["headings"]
 
 
-def test_query_strings_reach_the_region():
-    chart = asyncio.run(fetch_chart(app, "/atlas", query="unused=1"))
+def test_query_strings_reach_the_region(chart_app):
+    chart = asyncio.run(fetch_chart(chart_app, "/atlas", query="unused=1"))
     assert chart is not None and chart["fragments"] == ["atlas"]
 
 
-def test_missing_regions_return_none():
-    assert asyncio.run(fetch_chart(app, "/nowhere")) is None
+def test_missing_regions_return_none(chart_app):
+    assert asyncio.run(fetch_chart(chart_app, "/nowhere")) is None
 
 
-def test_non_chart_regions_return_none():
-    assert asyncio.run(fetch_chart(app, "/static/tower.css")) is None
+def test_non_chart_regions_return_none(chart_app):
+    assert asyncio.run(fetch_chart(chart_app, "/healthz")) is None
 
 
 def test_non_json_two_hundreds_return_none():

@@ -89,8 +89,8 @@ def lap(props: LapProps) -> Element:
   it with httpx — which executes no JS — so the degraded path is the
   tested path, permanently.
 - **Pages keep themselves current.** Live (SSE) pushes updates into
-  every open browser — the demo board redraws whenever its file-backed
-  data changes — with zero app JavaScript.
+  every open browser by swapping server-rendered fragments declared by the
+  application, with zero app JavaScript.
 - **The client layer is closed and chartered.** `curvature.js` remains the
   stable, sole consumer-facing include. It boosts working links and GET forms
   into fragment swaps; its package-owned `live.js` branch manages only
@@ -139,20 +139,15 @@ Onboarding an agent takes zero steps: the scaffold poured AGENTS.md,
 the gate, and one example component as the pattern. Point your agent at
 the directory and ask for a feature — the repo is the prompt.
 
-## The demo
+## Develop the framework
 
-PyPI ships the framework; the repo ships Pit Board, an illustrative
-release-history demo rather than a second project ledger:
+The repository is the framework itself. Clone it, sync the locked development
+environment, and run the same gate CI runs:
 
 ```bash
 git clone https://github.com/siliconsociety/Curvature && cd Curvature
 uv sync && ./gate.sh
-uv run uvicorn demo.app:app --reload --timeout-graceful-shutdown 1   # Pit Board
 ```
-
-Then turn JavaScript off and use it again. Links, forms, redirects, and
-refreshes still work; only enhancement (fragment swaps and live push)
-disappears. That is the boundary.
 
 ## Updating an app
 
@@ -175,9 +170,10 @@ release-specific notes.
 
 ## Status
 
-Alpha. The contract, runtime, gate, demo, browser-level boost tests, and a
-fresh-pour Auth integration suite are real and self-hosting. Production
-readiness is earned by the gate and deployment checks, not asserted by the
-version label. The spec is versioned and arguable; argue by issue.
+Alpha. The contract, runtime, gate, browser-level boost tests, and a fresh-pour
+Auth integration suite are real and exercised by the repository's test and
+package proofs. Production readiness is earned by the gate and deployment
+checks, not asserted by the version label. The spec is versioned and arguable;
+argue by issue.
 
 MIT.

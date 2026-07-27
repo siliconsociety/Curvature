@@ -69,9 +69,11 @@ observed path escaped.
 
 ## The tenets
 
-**1. The server owns the logic.** All of it. State, rules, decisions live
-in Python, in one place, testable with one toolchain. If a behavior matters,
-it is not implemented in the browser.
+**1. The server owns the logic.** In ordinary Curvature space, state, rules,
+and decisions live in Python, in one place, testable with one toolchain. An
+explicit Event Horizon may own only the product behavior that cannot tolerate
+a round trip; its server contract remains authoritative and its JavaScript-off
+path remains tested.
 
 **2. The web is the platform.** Real links. Real forms. POST, redirect,
 GET. Every page renders whole and every action completes with JavaScript
@@ -79,14 +81,15 @@ switched off — not as nostalgia, but because a server-rendered app whose
 tests drive real forms through real URLs is an app whose degraded path is
 its *tested* path. We had this once. We are taking it back.
 
-**3. The client annotates; it never decides.** Curvature's client layer is
-closed and chartered by role. Its stable entrypoint enhances working links and
-GET forms with fragment swaps; its Live branch maintains only streams declared
-by server-rendered roots. Each gets only the network primitive its role needs.
-Writes remain native browser submissions: their failure semantics are too
-important to simulate. Enhancement, by definition, only touches paths that
-already work without it. Application logic in the browser is an anomaly, and
-the gate knows both ownership and protocol authority.
+**3. The client annotates; it never decides.** Curvature's framework client
+layer is closed and chartered by role. Its stable entrypoint enhances working
+links and GET forms with fragment swaps; its Live branch maintains only
+streams declared by server-rendered roots. Each gets only the network
+primitive its role needs. Writes remain native browser submissions: their
+failure semantics are too important to simulate. An exceptional consumer Event
+Horizon may carry narrowly declared product behavior under the same
+Curvature-owned law, but unchartered browser logic remains an anomaly and the
+server contract stays authoritative.
 
 **4. The UI is typed Python.** Components are functions of props; props are
 pydantic models. Your markup logic is type-checked by the same tools as
@@ -122,8 +125,8 @@ a shared unit.
 
 ## The refusals
 
-No bundler. No build step. No client-side state store. No plugin registry.
-No mixin. No configuration sprawl. No abstraction admitted before the
+No bundler. No build step. No framework-owned client-side state store. No
+plugin registry. No mixin. No configuration sprawl. No abstraction admitted before the
 second concrete need. Each refusal is load-bearing: every artifact Curvature
 does not have is an artifact that cannot silt up.
 
@@ -147,21 +150,22 @@ The honest boundary is not scale. It is the latency class of a single
 interaction: rendering happens where the state lives, so work that
 cannot tolerate a round-trip — the 60fps enclave of canvas editors,
 maps, collaborative cursors — belongs past an **event horizon**: a
-declared, fenced, vendored boundary beyond which different physics
-apply and the gate's sight deliberately ends, with its budget and its
-contract enforced at the horizon itself (event horizon doctrine, spec
-0.2). Most
-applications are five percent past the horizon and ninety-five percent
-ordinary space, and ordinary space is faster, cheaper, and testable
-with JavaScript off.
+declared, fenced, vendored boundary governed by the Curvature-owned
+`curvature-event-horizon/0.2` schema. The gate validates the generic fence —
+manifest, paths, capabilities, and byte budget — while the consumer owns its
+server semantics and product tests (see [EVENT_HORIZONS.md](docs/EVENT_HORIZONS.md)).
+Most applications are five percent past the horizon and ninety-five percent
+ordinary space, and ordinary space is faster, cheaper, and testable with
+JavaScript off.
 
 Heavy traffic is not the argument against curvature; it is the argument
 for it — more mass wants more geometry. The client-heap taxes scale
 with your users: bundles, hydration, API chatter, and a UI state no one
 but the pixels can see. A curved app scales with requests, caches as
-HTML, and keeps its entire capability surface on the server, legible to
+HTML, and keeps its ordinary capability surface on the server, legible to
 any client you point at it — including the ones arriving next, which do
-not have eyes.
+not have eyes. An Event Horizon is the deliberately narrow exception, not
+the new center of gravity.
 
 The space is curved for whoever maintains it after you stop looking.
 Nobody is looking at week twelve. The geometry has to do it.

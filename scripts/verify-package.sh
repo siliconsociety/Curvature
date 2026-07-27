@@ -62,8 +62,9 @@ uv pip install --python "$work/wheel-env/bin/python" "${wheel}[fastapi,auth]"
   ./gate.sh
   uv run curvature pour auth
   uv run python - <<'PY'
-from pathlib import Path
+import json
 from importlib.metadata import version
+from pathlib import Path
 
 import curvature
 
@@ -78,8 +79,42 @@ shell = Path("app/components/shell.py").read_text()
 stable_include = 'h.script(src=f"/static/lib/curvature.js?v={ASSETS}")'
 if stable_include not in shell or "live.js" in shell:
     raise SystemExit("scaffold does not preserve the stable consumer entrypoint")
-if version("curvature") != "0.4.3":
+if version("curvature") != "0.4.4":
     raise SystemExit(f"unexpected package version: {version('curvature')}")
+
+horizons = Path("app/static/vendor")
+for name, network, script in (
+    (
+        "local-draft",
+        False,
+        'document.querySelector("form")?.addEventListener("input", () => {});\n',
+    ),
+    (
+        "server-bridge",
+        True,
+        'document.querySelector("form")?.addEventListener("submit", () => '
+        'fetch("/preview"));\n',
+    ),
+):
+    directory = horizons / name
+    directory.mkdir(parents=True)
+    (directory / f"{name}.js").write_text(script)
+    (directory / "event-horizon.json").write_text(json.dumps({
+        "spec": "curvature-event-horizon/0.2",
+        "name": name,
+        "purpose": f"Package proof for {name}",
+        "entrypoint": f"{name}.js",
+        "server_contract": {
+            "source_of_truth": "native form fields",
+            "submission": "native HTML form",
+        },
+        "capabilities": {
+            "network": network,
+            "storage": False,
+            "html_injection": False,
+        },
+        "budget_bytes": {"javascript": 500},
+    }))
 
 main = Path("app/main.py")
 source = main.read_text()

@@ -31,6 +31,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *shape.check_hollow_branches(root),
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
+        *checks.check_js_capabilities(root),
         *checks.check_dom_sins(root),
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),
@@ -154,6 +155,7 @@ def command_audit(module_name: str) -> int:
     findings = [
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
+        *checks.check_js_capabilities(root),
         *checks.check_dom_sins(root),
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),

@@ -9,9 +9,10 @@ session; everything else you need is enforced, not remembered.
 
 Curvature is a contract that ships a runtime. Server-rendered Python web
 apps: FastAPI routes, components as typed functions, real links and real
-forms, one small closed client layer for the AJAX feel. The application must
-work with JavaScript switched off — that is not a feature, it is the
-architecture (SPEC.md C-202).
+forms, one small closed client layer for the AJAX feel. Ordinary application
+space must work with JavaScript switched off — that is not a feature, it is the
+architecture (SPEC.md C-202). Event Horizons are explicit exceptional
+enclaves; their contract is in [docs/EVENT_HORIZONS.md](docs/EVENT_HORIZONS.md).
 
 ## The one command that matters
 
@@ -87,13 +88,16 @@ async def create_lap(title: Annotated[str, Form()]):
 
 ## What you must never do
 
-- **Never write application JavaScript.** The framework owns a closed client
-  layer: the stable `curvature.js` entrypoint provides navigation and swaps,
-  and its package-owned `live.js` branch provides declared Live lifecycle.
-  Neither grants client authority to applications. If a behavior seems to need
-  JS, it belongs on the server or in native HTML (`<details>`, `<dialog>`,
-  `popover`, CSS `:has()`). A consumer `.js` file is an anomaly on sight
-  (ANOM-120).
+- **Never write unchartered application JavaScript.** The framework owns a
+  closed client layer: the stable `curvature.js` entrypoint provides navigation
+  and swaps, and its package-owned `live.js` branch provides declared Live
+  lifecycle. Ordinary behavior belongs on the server or in native HTML
+  (`<details>`, `<dialog>`, `popover`, CSS `:has()`). A consumer `.js` file is
+  an anomaly unless it is the exact entrypoint of a valid
+  `curvature-event-horizon/0.2` manifest at
+  `app/static/vendor/<name>/event-horizon.json`; extra or undeclared scripts
+  remain anomalies (ANOM-120). Event Horizons are exceptional enclaves for
+  behavior that cannot tolerate a round trip, not a general JS permission.
 - **Never edit `ratchet.toml`.** `curvature ratchet` is the only hand on
   the mechanism. Ceilings fall, floors rise; a loosened bound is caught
   against git history (ANOM-142) and will not survive review.
@@ -106,7 +110,8 @@ async def create_lap(title: Annotated[str, Form()]):
 
 The repository is the agent control plane. `AGENTS.md`, the gate, and the
 checked-in scripts are sufficient; ordinary Curvature work requires no
-framework-specific agent skill.
+framework-specific agent skill. For a declared Event Horizon, read
+`docs/EVENT_HORIZONS.md` before changing its manifest or entrypoint.
 
 ## GitHub keeps the time
 

@@ -87,43 +87,78 @@ Full stop. The unboosted path is not a fallback; it is the application.
 *Why:* §2 of the manifesto — the degraded path must be the tested path.
 *Enforcement:* structural — the test suite drives the app through
 `httpx`, which executes no JavaScript. If it isn't reachable without JS,
-it isn't testable, and coverage (C-401) starves until it is.
+it isn't testable, and coverage (C-401) starves until it is. An Event Horizon
+is an exceptional latency enclave; it does not remove the consumer's
+server-contract or JavaScript-off proof obligation.
 
 ## 3. Framework client layer
 
 **C-300 · Client authority is closed and chartered.**
-Application client code is zero. Curvature supplies a closed set of
-package-owned public entries, each with one declared role. The 0.4.3 set is:
+Ordinary application client code is zero. Curvature supplies a closed
+framework registry of package-owned public entries, each with one declared
+role. The 0.4.4 framework set is:
 
 - `curvature.js` — the stable consumer-facing include; owns fetch navigation,
   fragment swapping, focus, pending state, and history.
 - `live.js` — loaded by the stable entrypoint; owns the lifecycle of
   EventSource streams declared by Live roots.
 
-A new client capability is a spec amendment argued by issue, not an ordinary
-refactor. Private implementation leaves may split an existing capability
-without changing its authority, but are not part of the current two-entry
-package. *Why:* ownership and bounded authority prevent client sediment
-without making one filename structurally indivisible. *Enforcement:* gate
-(ANOM-120 rejects consumer, counterfeit, and unchartered scripts) plus package
-and scaffold proofs of the exact public set and stable include. Framework
-ownership means exact filesystem identity with the Curvature package executing
-the gate; a project name or lookalike path is not evidence. This is a bounded
-local identity check, not a claim of cryptographic provenance. `static/vendor`
-continues to mark third-party review policy for CSS and geometry, but grants no
-JavaScript client authority.
+A new framework client capability is a spec amendment argued by issue, not an
+ordinary refactor. Private implementation leaves may split an existing
+capability without changing its authority, but are not part of the current
+two-entry package. Consumer entries form a second registry under this same
+law: only a valid Curvature-owned Event Horizon manifest at
+`app/static/vendor/<name>/event-horizon.json` can charter one, and only its
+exact declared entrypoint is admitted. A bare `static/vendor` path grants no
+JavaScript authority. *Why:* two explicit registries preserve bounded
+ownership without restoring the 0.3.2 blanket exemption. *Enforcement:* gate
+(ANOM-120 reports manifest, schema, path, file, entrypoint, extra-script, and
+budget violations and rejects consumer, counterfeit, missing, extra,
+unchartered, or entrypoint-mismatched scripts) plus package and scaffold
+proofs of the exact framework set and stable include. Framework ownership
+means exact filesystem identity with the
+Curvature package executing the gate; a project name or lookalike path is not
+evidence. This is a bounded local identity check, not a claim of cryptographic
+provenance. `static/vendor` continues to mark third-party review policy for
+CSS and geometry, but its JavaScript authority comes only from the Event
+Horizon schema.
 
 **C-301 · Network authority follows the charter.**
-Permission is per capability, not per file format: `curvature.js` may use
-`fetch` for navigation; `live.js` may use `EventSource` for declared Live
-streams. Neither charter grants `XMLHttpRequest` or `WebSocket`, and one entry
-does not inherit the other's protocol. *Why:* enumeration is not a blanket
-license to speak every protocol. *Enforcement:* gate (ANOM-121 token-scans
-every script against the authority of its exact package-owned entry). The
-predictable textual scan recognizes direct and `window`/`globalThis` calls
-across ordinary whitespace plus simple `const`/`let`/`var` aliases. It is not
-a JavaScript parser; dynamic property access and arbitrary data flow remain
-outside its stated evidence.
+Permission is per capability, not per file format or registry: `curvature.js`
+may use `fetch` for navigation; `live.js` may use `EventSource` for declared
+Live streams. A consumer Event Horizon with `network: false` gets no network
+primitive; `network: true` grants `fetch` only. `XMLHttpRequest`, `WebSocket`,
+`EventSource`, and `sendBeacon` are never granted to a v0.2 consumer horizon,
+and one entry does not inherit another entry's protocol. *Why:* enumeration
+is not a blanket license to speak every protocol. *Enforcement:* gate
+(ANOM-121 scans framework entries and valid consumer horizons against their
+declared network authority). The predictable textual scan
+recognizes direct and `window`/`globalThis` calls across ordinary whitespace
+plus simple `const`/`let`/`var` aliases. It is not a JavaScript parser; dynamic
+property access and arbitrary data flow remain outside its stated evidence.
+
+**C-305 · Event Horizon manifests are typed constitutions.**
+An exceptional consumer enclave is valid only when its manifest declares the
+exact `curvature-event-horizon/0.2` schema at
+`app/static/vendor/<name>/event-horizon.json`. The required fields are
+`spec`, `name`, `purpose`, `entrypoint`, `server_contract`, `capabilities`,
+and `budget_bytes`; `stylesheet` is optional. `server_contract` is a non-empty
+map of string keys to string values. `budget_bytes` is an object with a
+required positive integer `javascript` ceiling and no extra keys; when
+`stylesheet` is declared, it also requires a positive integer `css` ceiling.
+Each artifact is measured independently. The required capability keys are
+`network`, `storage`, and `html_injection`; `history` and `local_time` are
+optional, and unknown capability names or schema versions fail. Declared paths
+must remain inside the horizon directory and declared files must exist. These
+manifest, schema, path, file, entrypoint, extra-script, and budget violations
+are ANOM-120. Network evidence is ANOM-121. Evidence of `storage`,
+`html_injection`, `history`, or `local_time` when its manifest capability is
+false (or omitted, for an optional key) is ANOM-123. The byte ceilings are
+additional bounds; they never change ratchet or Spiral configuration.
+Curvature validates this generic fence.
+Consumer tests prove the product-specific server contract and JavaScript-off
+baseline. *Why:* a manifest must be a narrow constitution interpreted by
+Curvature, not consumer JSON that silently invents authority.
 
 **C-304 · Obligations are medium-blind; evidence is medium-aware.**
 Every maintained artifact must have a declared role, evidence appropriate to
@@ -140,8 +175,10 @@ Curvature ships no service worker and caches no authenticated pages or
 one-time secrets in the browser. *Why:* a generic replay cache cannot know
 the authorization and invalidation rules of an application; pretending it
 can breaks the one-source-of-truth claim. *Enforcement:* the sanctioned
-public set in ANOM-120 contains only `curvature.js` and `live.js`, neither
-chartered for a service worker or replay cache.
+framework set in ANOM-120 contains only `curvature.js` and `live.js`, neither
+chartered for a service worker or replay cache. A consumer Event Horizon may
+declare only the fixed v0.2 capabilities in its own product enclave; that is
+not a Curvature offline feature.
 
 **C-302 · No inline script bodies.**
 `script()` elements may carry `src` only. *Why:* inline script is
@@ -381,9 +418,10 @@ from app routes; there is nothing to hand-maintain).
 | ID     | Invariant | Check |
 |--------|-----------|-------|
 | ANOM-110 | C-100 | component signature: first annotation name ends in `Props` |
-| ANOM-120 | C-300 | consumer, counterfeit, missing, or unchartered client script |
-| ANOM-121 | C-301 | network token outside an exact entry's protocol charter |
+| ANOM-120 | C-300 | unchartered/counterfeit/missing framework script or Event Horizon manifest/schema/path/file/entrypoint/extra-script/budget violation |
+| ANOM-121 | C-301 | network token outside an exact framework or Event Horizon charter |
 | ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
+| ANOM-123 | C-305 | false non-network Event Horizon capability evidence |
 | ANOM-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
 | ANOM-131 | C-201 | mutating route returns non-redirect |
 | ANOM-140 | C-400 | file lines over ceiling |
@@ -397,11 +435,11 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-161 | C-802 | satellite manifest disagrees with its directory |
 | ANOM-170 | C-902 | respond() without an authored purpose |
 
-Token checks (ANOM-121, ANOM-130) honor one escape hatch: a line carrying a
-`curvature-allow` pragma with a reason. Enforcement code and tests that
-exercise refusals must spell the forbidden words; the pragma keeps them
-buildable while staying greppable — and `curvature check` reports the
-pragma census on every run, so the escape hatch can never go quietly.
+Token checks (ANOM-121, ANOM-123, ANOM-130) honor one escape hatch: a line
+carrying a `curvature-allow` pragma with a reason. Enforcement code and tests
+that exercise refusals must spell the forbidden words; the pragma keeps them
+buildable while staying greppable — and `curvature check` reports the pragma
+census on every run, so the escape hatch can never go quietly.
 
 A curved repo is one where `curvature check` exits 0 and has *teeth it
 can show*: the finding index above is the framework minimum. A green gate

@@ -50,8 +50,8 @@ tracked leaves. The derivation and adoption controls live in
 
 A web framework for code that agents maintain. Live, dynamic web apps
 in pure Python — single-page feel, pages that update themselves in
-real time, zero JavaScript app code — and a gate that makes the
-maintainable path the only path that builds. (Not a static-site
+real time, zero ordinary application JavaScript — and a gate that makes
+the maintainable path the only path that builds. (Not a static-site
 generator: state lives on the server, and open pages stay current over
 a live stream.)
 
@@ -84,13 +84,15 @@ def lap(props: LapProps) -> Element:
 - **Components** are functions of frozen, closed pydantic props. The UI
   is just Python: typed by pyright, measured by coverage, tested by
   pytest without a browser in sight.
-- **The app works with JavaScript off.** Reads render full pages; writes
+- **The ordinary app works with JavaScript off.** Reads render full pages; writes
   are POST → redirect → GET through real forms. Your test suite drives
   it with httpx — which executes no JS — so the degraded path is the
-  tested path, permanently.
+  tested path, permanently. An Event Horizon is an explicit exception for
+  behavior that cannot tolerate a round trip; it does not replace this
+  baseline.
 - **Pages keep themselves current.** Live (SSE) pushes updates into
   every open browser by swapping server-rendered fragments declared by the
-  application, with zero app JavaScript.
+  application, with zero ordinary application JavaScript.
 - **The client layer is closed and chartered.** `curvature.js` remains the
   stable, sole consumer-facing include. It boosts working links and GET forms
   into fragment swaps; its package-owned `live.js` branch manages only
@@ -98,8 +100,10 @@ def lap(props: LapProps) -> Element:
   submitter overrides remain native semantics, and enhanced submissions expose
   `aria-busy` and `data-curvature-pending` while intent is in flight. Same-page
   fragment links and their history stay browser-native; cross-page boosts
-  preserve and scroll to their fragment after swapping. Applications write no
-  JavaScript.
+  preserve and scroll to their fragment after swapping. Ordinary applications
+  write no JavaScript. A product-owned Event Horizon may write only the exact
+  entrypoint allowed by a valid Curvature manifest; see
+  [Event Horizons](docs/EVENT_HORIZONS.md).
 - **The ratchet only tightens; healthy trees Spiral.** Base file ceilings
   fall, the coverage floor rises, and `curvature ratchet` is the only hand on
   the mechanism. Local occupied surface lets related leaves grow by radius,
@@ -110,6 +114,12 @@ Drafting belongs to native controls: text, selection, and open details stay in
 the browser while the operator edits. Server-derived or persisted state earns
 a round trip and an identified fragment replacement. Pending attributes bridge
 those two moments without pretending the server has already accepted anything.
+
+Event Horizons are exceptional enclaves for latency-critical product behavior,
+not a second general-purpose application runtime. Their manifest is a second
+charter registry under the same Curvature law: the schema fixes the available
+capabilities, the gate checks the fence, and consumer tests keep the server
+contract and JavaScript-off path honest.
 
 ## Start from nothing
 
@@ -166,7 +176,8 @@ repository. Package upgrades never overwrite those files. When a release
 requires an app-source migration, its upgrade note names the files and the
 owner applies the diff like any other code change. See
 [docs/UPGRADING.md](docs/UPGRADING.md) for the complete contract and
-release-specific notes.
+release-specific notes; Event Horizon consumers should also read
+[docs/EVENT_HORIZONS.md](docs/EVENT_HORIZONS.md).
 
 ## Status
 

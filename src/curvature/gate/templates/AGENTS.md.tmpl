@@ -43,10 +43,14 @@ links — the constructors refuse anything else.
 
 ## The four nevers
 
-1. Never write application JavaScript. The framework owns a closed client
-   layer: `curvature.js` provides navigation and swaps, and package-owned
-   `live.js` provides declared Live lifecycle. Neither grants client authority
-   to this application; behavior belongs on the server or in native HTML.
+1. Never write application JavaScript outside a declared Event Horizon. The
+   framework client layer owns ordinary navigation and Live lifecycle; normal
+   behavior belongs on the server or in native HTML. Product behavior that
+   genuinely cannot tolerate a round trip needs the operator's declaration
+   first, then an exact `app/static/vendor/<name>/event-horizon.json` fence,
+   byte and capability budgets, and consumer tests for its server contract and
+   JavaScript-off baseline. The schema lives in Curvature's
+   [Event Horizon reference](https://github.com/siliconsociety/Curvature/blob/main/docs/EVENT_HORIZONS.md).
 2. Never edit ratchet.toml. `uv run curvature ratchet` is the only hand on
    the mechanism.
 3. Never bypass the gate — no skipped tests, no weakened assertions.

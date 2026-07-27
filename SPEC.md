@@ -166,9 +166,12 @@ its medium, and a bounded growth model whose units and topology are defined
 before enforcement. No language or format grants authority by itself.
 Architectural obligations may therefore be medium-blind; checks cannot pretend
 their evidence is. Python types, browser semantics, CSS selectors, and source
-line mass remain honestly different measurements. *Enforcement:* contract
-review plus each medium's named checks. General Markdown and figure geometry
-is not claimed here: its units and topology remain undefined.
+line mass remain honestly different measurements. Repository-rendered Markdown
+uses display math from the portable public macro register and backticked inline
+notation. *Enforcement:* contract review plus each medium's named checks;
+ANOM-124 rejects math tokens observed to fail on a supported public renderer.
+General Markdown and figure geometry are not otherwise claimed here: their
+units and topology remain undefined.
 
 **C-303 · Offline replay is not a framework feature.**
 Curvature ships no service worker and caches no authenticated pages or
@@ -422,6 +425,7 @@ from app routes; there is nothing to hand-maintain).
 | ANOM-121 | C-301 | network token outside an exact framework or Event Horizon charter |
 | ANOM-122 | C-102 | `raw()` call census (report, warn over budget) |
 | ANOM-123 | C-305 | false non-network Event Horizon capability evidence |
+| ANOM-124 | C-304 | Markdown math token rejected by a supported public renderer |
 | ANOM-130 | C-200 | `onclick=` / `javascript:` / `href="#"` in source |
 | ANOM-131 | C-201 | mutating route returns non-redirect |
 | ANOM-140 | C-400 | file lines over ceiling |

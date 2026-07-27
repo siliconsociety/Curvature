@@ -25,16 +25,16 @@ $$
 $$
 
 Volume capacity per unit surface grows linearly with radius. Curvature applies
-that relationship locally and absorbs the constant \(1/3\) into a unit
+that relationship locally and absorbs the constant `1/3` into a unit
 calibration: one occupied surface unit has radius one and keeps the base
-ceiling. For every non-vendored governed source file \(f\), its normalized mass
+ceiling. For every non-vendored governed source file `f`, its normalized mass
 is
 
 $$
-m_f=\frac{\operatorname{lines}(f)}{B_{\tau(f)}} ,
+m_f=\frac{\mathrm{lines}(f)}{B_{\tau(f)}} ,
 $$
 
-where \(B_{\tau(f)}\) is the stable default unit for its suffix:
+where `B_τ(f)` is the stable default unit for its suffix:
 
 | Source | One mass unit |
 |---|---:|
@@ -42,10 +42,10 @@ where \(B_{\tau(f)}\) is the stable default unit for its suffix:
 | CSS | 250 lines |
 | JavaScript | 150 lines |
 
-The occupied surface of directory \(D\) is
+The occupied surface of directory `D` is
 
 $$
-A_D=\sum_{f\in\operatorname{direct}(D)}\min(1,m_f).
+A_D=\sum_{f\in\mathrm{direct}(D)}\min(1,m_f).
 $$
 
 Each file contributes in proportion to its size until it occupies one full
@@ -62,10 +62,10 @@ $$
 and a healthy file's effective ceiling is
 
 $$
-C_f=\operatorname{round}(B_fR_D),
+C_f=\mathrm{round}(B_fR_D),
 $$
 
-where \(B_f\) is the project's ratcheted base ceiling for that language.
+where `B_f` is the project's ratcheted base ceiling for that language.
 Grandfather exceptions remain exact pins and are never multiplied.
 
 For the default Python base:

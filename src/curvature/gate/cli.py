@@ -13,7 +13,7 @@ import math
 import sys
 from pathlib import Path
 
-from curvature.gate import bounds, checks, scaffold, shape, spiral
+from curvature.gate import bounds, checks, markdown, scaffold, shape, spiral
 from curvature.gate.css import check_orphan_css
 from curvature.gate.findings import Finding, walk_source
 from curvature.gate.ratchet import load, save
@@ -32,6 +32,7 @@ def run_checks(root: Path) -> tuple[list[Finding], list[str]]:
         *checks.check_js_placement(root),
         *checks.check_js_http(root),
         *checks.check_js_capabilities(root),
+        *markdown.check_math(root),
         *checks.check_dom_sins(root),
         *checks.check_component_signatures(root),
         *checks.check_mutating_routes(root),

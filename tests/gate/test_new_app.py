@@ -69,6 +69,13 @@ def test_poured_guidance_names_the_event_horizon_boundary(poured):
     assert "ordinary application writes no JavaScript" in readme
 
 
+def test_poured_guidance_names_portable_math_contract(poured):
+    agents = " ".join((poured / "AGENTS.md").read_text().split())
+    assert "mathematical documentation" in agents
+    assert "backticked notation" in agents
+    assert "ANOM-124" in agents
+
+
 def test_curvature_repository_owns_github_attribution_policy():
     contract = " ".join((Path(__file__).parents[2] / "AGENTS.md").read_text().split())
     assert "Every GitHub message authored by an agent" in contract

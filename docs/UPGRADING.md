@@ -71,6 +71,13 @@ only; `XMLHttpRequest`, `WebSocket`, `EventSource`, and `sendBeacon` remain
 forbidden and are ANOM-121 findings. False non-network capability evidence is
 ANOM-123.
 
+The 0.4.4 gate also protects repository-rendered mathematical documentation.
+ANOM-124 reports syntax already observed to fail on a supported public
+renderer. Use `mathrm{...}` for named functions in display equations and
+backticked notation such as `B_τ(f)` or `r` inline. Existing consumers should
+correct any ANOM-124 findings as an application-owned documentation migration;
+new scaffolds carry the rule in their `AGENTS.md`.
+
 Horizon-bearing consumers should remain on 0.3.2 and move directly to 0.4.4:
 
 1. Audit each manifest against [EVENT_HORIZONS.md](EVENT_HORIZONS.md), keeping

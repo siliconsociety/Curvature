@@ -113,6 +113,13 @@ checked-in scripts are sufficient; ordinary Curvature work requires no
 framework-specific agent skill. For a declared Event Horizon, read
 `docs/EVENT_HORIZONS.md` before changing its manifest or entrypoint.
 
+## How to write mathematical documentation
+
+Use display equations for substantial math and the portable macro register
+accepted by the gate. Use backticked notation such as `B_τ(f)` and `r` inline.
+ANOM-124 protects the repository-rendered surface; add a newly observed
+renderer rejection to the centralized gate registry with its regression test.
+
 ## GitHub keeps the time
 
 Issues hold intake and durable technical discussion. An open pull request is

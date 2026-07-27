@@ -14,7 +14,7 @@ Spiral is on by default. Every directory is a local body: its substantial
 source files occupy surface, and the surface-to-volume law determines how
 much room a healthy leaf has to grow.
 
-For a sphere of radius \(r\),
+For a sphere of radius `r`,
 
 $$
 A(r)=4\pi r^2,\qquad
@@ -22,25 +22,24 @@ V(r)=\frac{4}{3}\pi r^3,\qquad
 \frac{V(r)}{A(r)}=\frac{r}{3}.
 $$
 
-Curvature normalizes each direct source file \(f\) by its language's base
-ceiling \(B_{\tau(f)}\), then measures the occupied surface of directory
-\(D\):
+Curvature normalizes each direct source file `f` by its language's base
+ceiling `B_τ(f)`, then measures the occupied surface of directory `D`:
 
 $$
-m_f=\frac{\operatorname{lines}(f)}{B_{\tau(f)}},\qquad
-A_D=\sum_{f\in\operatorname{direct}(D)}\min(1,m_f),\qquad
+m_f=\frac{\mathrm{lines}(f)}{B_{\tau(f)}},\qquad
+A_D=\sum_{f\in\mathrm{direct}(D)}\min(1,m_f),\qquad
 R_D=\max(1,\sqrt{A_D}).
 $$
 
 The effective ceiling is the ratcheted base multiplied by that local radius:
 
 $$
-C_f=\operatorname{round}(B_fR_D).
+C_f=\mathrm{round}(B_fR_D).
 $$
 
 A lone Python leaf therefore begins at 300 lines and cannot buy room by
 becoming oversized. Two substantial neighboring leaves have radius
-\(\sqrt2\) and a 424-line Python ceiling; three have 520, five have 671, and
+`√2` and a 424-line Python ceiling; three have 520, five have 671, and
 eight have 849. Child directories form their own bodies, so distant project
 mass cannot inflate a local file. At thirteen meaningful neighbors the
 twelve-neighbor coordination bound fires and the directory must branch. The

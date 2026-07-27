@@ -39,5 +39,8 @@ misremember.
 - Keep the public site on the latest released framework and verify its HTML,
   Chart, security headers, and health endpoint against the live deployment.
 - Publish performance and operational measurements only when reproducible.
-- Admit an event-horizon design only after a concrete product needs client
-  physics that native HTML and server rendering cannot provide.
+- Keep Event Horizons rare and explicit: admit one only after a concrete
+  product needs client physics that native HTML and server rendering cannot
+  provide. Each admitted enclave uses the Curvature-owned v0.2 manifest fence;
+  Curvature checks the generic boundary while consumer tests prove its server
+  contract and JavaScript-off path.

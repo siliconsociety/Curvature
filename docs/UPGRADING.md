@@ -54,7 +54,47 @@ For each tagged Curvature version:
 Framework CI proves a fresh stranger app. Consumer CI proves the existing app;
 both are required evidence because scaffolds diverge as soon as owners use them.
 
-## 0.4.3
+## 0.4.4
+
+0.4.4 is the compatibility repair for consumers with declared Event Horizons.
+Curvature now recognizes only `curvature-event-horizon/0.2` at
+`app/static/vendor/<name>/event-horizon.json`. It validates the
+Curvature-owned schema, directory/name agreement, contained paths and files,
+fixed capabilities, and declared byte budgets. `server_contract` is a
+non-empty map of string keys to string values. `budget_bytes` contains a
+required positive integer `javascript` ceiling and, when `stylesheet` is
+declared, a required positive integer `css` ceiling; each artifact is measured
+independently. Manifest, schema, path, file, entrypoint, extra-script, and
+budget violations are ANOM-120 findings. Only the exact declared entrypoint is
+chartered. `network: false` grants nothing and `network: true` grants `fetch`
+only; `XMLHttpRequest`, `WebSocket`, `EventSource`, and `sendBeacon` remain
+forbidden and are ANOM-121 findings. False non-network capability evidence is
+ANOM-123.
+
+Horizon-bearing consumers should remain on 0.3.2 and move directly to 0.4.4:
+
+1. Audit each manifest against [EVENT_HORIZONS.md](EVENT_HORIZONS.md), keeping
+   the exact v0.2 schema and removing extra or undeclared scripts.
+2. Update Curvature in the consumer lockfile to 0.4.4.
+3. Run consumer tests for the product's `server_contract` and JavaScript-off
+   baseline, then run `./gate.sh` and exercise the affected browser path.
+
+Manifest byte budgets are additional horizon bounds. They never alter the
+ratchet or Spiral configuration. Curvature checks the generic fence; the
+consumer owns product-specific server semantics and no-JavaScript proof.
+
+## 0.4.3 — historical erratum
+
+> **Warning:** The 0.4.3 statement below that existing applications need no
+> source or script-tag migration is false for applications that carry Event
+> Horizons.
+
+0.4.3 intentionally removed the blanket `static/vendor` JavaScript exemption,
+but did not yet interpret `event-horizon.json`. A horizon-bearing consumer
+cannot safely adopt 0.4.3: its declared scripts are rejected as unchartered
+and their former product capabilities are not a supported migration surface.
+Remain on 0.3.2 until moving directly to 0.4.4. This erratum does not change
+the package-only path for ordinary consumers without Event Horizons.
 
 The stable `/static/lib/curvature.js?v=<version>` include now loads the
 package-owned `live.js` branch with the same asset version. Navigation, swaps,
@@ -64,10 +104,10 @@ same-page fragment navigation and its history traversal to the browser, while
 cross-page boosted navigation preserves fragments through redirects and
 scrolls to the resolved target after swapping.
 
-This is a package-only runtime update. Existing applications need no source or
-script-tag migration: update Curvature to 0.4.3 in the application lockfile,
-sync the environment, exercise boosted and Live paths in a real browser, run
-`./gate.sh`, and deploy.
+For ordinary consumers without Event Horizons, this remains a package-only
+runtime update: update Curvature to 0.4.3 in the application lockfile, sync the
+environment, exercise boosted and Live paths in a real browser, run `./gate.sh`,
+and deploy. Horizon-bearing consumers follow the 0.4.4 path above.
 
 ## 0.4.2 (internal only; never published)
 
